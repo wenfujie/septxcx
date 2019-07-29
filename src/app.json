@@ -1,0 +1,87 @@
+{
+    "pages": [
+        "pages/coupons",
+        "pages/home/home"
+    ],
+    "subPackages": [
+        {
+            "root": "pages/goodsPackage",
+            "pages": [
+                "goods/good-otherlist",
+                "goods/good-comment",
+                "goods/good-list",
+                "goods/good-search",
+                "goods/default-four",
+                "goods/gift-bag",
+                "goods/good-collocation",
+                "wares/wares-detail",
+                "wares/wares-gift"
+            ]
+        },
+        {
+            "root": "pages/distributionPackage",
+            "pages": [
+                "center",
+                "wallet",
+                "withdraw-apply",
+                "withdraw-history",
+                "subordinate",
+                "task-list",
+                "task-detail",
+                "bill-info",
+                "rank-list",
+                "qrcode",
+                "spread"
+            ]
+        },
+        {
+            "root": "pages/UserPackage",
+            "pages": [
+                "member/member-info",
+                "member/my-collection",
+                "help/help-center",
+                "help/article-detail",
+                "address/address-list",
+                "address/address-detail",
+                "phone/bind-phone",
+                "phone/change-phone",
+                "vouchers/my-vouchers",
+                "vouchers/vouchers-list"
+            ]
+        },
+        {
+            "root": "pages/orderPackage",
+            "pages": [
+                "order/order/order-evaluate",
+                "order/order/order-settlement",
+                "order/orderDetail/order-detail",
+                "order/orderList/order-list"
+            ]
+        },
+        {
+            "root": "pages/afterSalePackage",
+            "pages": [
+                "afterSale/pages/apply/page",
+                "afterSale/pages/list/page",
+                "afterSale/pages/detail/page"
+            ]
+        }
+    ],
+    "preloadRule": {
+        "pages/coupons": {
+            "network": "all",
+            "packages": ["pages/UserPackage"]
+        },
+        "pages/home/home": {
+            "network": "all",
+            "packages": ["pages/goodsPackage","pages/distributionPackage"]
+        }
+    },
+    "window": {
+        "backgroundTextStyle": "light",
+        "navigationBarBackgroundColor": "#FF3636",
+        "navigationBarTitleText": "小七快赚",
+        "navigationBarTextStyle": "white",
+        "enablePullDownRefresh": false
+    }
+}

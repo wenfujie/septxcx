@@ -1,0 +1,235 @@
+{
+	"description": "项目配置文件。",
+	"setting": {
+		"urlCheck": false,
+		"es6": true,
+		"postcss": true,
+		"minified": true,
+		"newFeature": true,
+		"autoAudits": false
+	},
+	"miniprogramRoot": "dist/",
+	"compileType": "miniprogram",
+	"appid": "wxecab1b2e7d4fd145",
+	"projectname": "mpvue%E5%B0%8F%E7%A8%8B%E5%BA%8F",
+	"simulatorType": "wechat",
+	"simulatorPluginLibVersion": {},
+	"condition": {
+		"search": {
+			"current": -1,
+			"list": []
+		},
+		"conversation": {
+			"current": -1,
+			"list": []
+		},
+		"plugin": {
+			"current": -1,
+			"list": []
+		},
+		"game": {
+			"currentL": -1,
+			"list": []
+		},
+		"miniprogram": {
+			"current": 27,
+			"list": [
+				{
+					"id": 0,
+					"name": "测试",
+					"pathName": "pages/index/index",
+					"query": "name=jzp",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "商品列表",
+					"pathName": "pages/goods/good-list",
+					"query": ""
+				},
+				{
+					"id": 2,
+					"name": "商品列表",
+					"pathName": "pages/goodsPackage/goods/good-list",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "账户页",
+					"pathName": "pages/member/member-center",
+					"query": ""
+				},
+				{
+					"id": 4,
+					"name": "搜索页",
+					"pathName": "pages/goodsPackage/goods/good-search",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "地址详情",
+					"pathName": "pages/address/address-detail",
+					"query": ""
+				},
+				{
+					"id": 7,
+					"name": "订单结算",
+					"pathName": "pages/orderPackage/order/order/order-settlement",
+					"query": "orderHdId=704559",
+					"scene": null
+				},
+				{
+					"id": 8,
+					"name": "分销商中心",
+					"pathName": "pages/distributionPackage/center",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "分销商-我的钱包",
+					"pathName": "pages/distribution/wallet",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 10,
+					"name": "分销商-申请提现",
+					"pathName": "pages/distributionPackage/withdraw-apply",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "商品详情页",
+					"pathName": "pages/wares/wares-detail",
+					"query": "goodsCode=HJ00A",
+					"scene": null
+				},
+				{
+					"id": 12,
+					"name": "分销商-历史提现记录",
+					"pathName": "pages/distributionPackage/withdraw-history",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "分销商-我的团队",
+					"pathName": "pages/distribution/subordinate",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 14,
+					"name": "分销商-我的任务",
+					"pathName": "pages/distributionPackage/task-list",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 15,
+					"name": "分销商-授权",
+					"pathName": "pages/distributionPackage/spread",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 16,
+					"name": "分销商-推广二维码",
+					"pathName": "pages/distributionPackage/qrcode",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 16,
+					"name": "商品满减",
+					"pathName": "pages/goodsPackage/goods/good-otherlist",
+					"query": "type=2"
+				},
+				{
+					"id": 17,
+					"name": "收货地址",
+					"pathName": "pages/UserPackage/address/address-list",
+					"query": "showList=1"
+				},
+				{
+					"id": -1,
+					"name": "我的收藏",
+					"pathName": "pages/UserPackage/member/my-collection",
+					"query": ""
+				},
+				{
+					"id": 20,
+					"name": "订单列表",
+					"pathName": "pages/orderPackage/order/orderList/order-list",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 20,
+					"name": "收货地址",
+					"pathName": "pages/UserPackage/address/address-order",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "分销商-对账单",
+					"pathName": "pages/distributionPackage/bill-info",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "分销商-任务详情",
+					"pathName": "pages/distributionPackage/task-detail",
+					"query": "id=29",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "首页",
+					"pathName": "pages/home/home",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "订单结算",
+					"pathName": "pages/orderPackage/order/order/order-settlement",
+					"query": "orderHdId=705553",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "我的优惠券",
+					"pathName": "pages/UserPackage/vouchers/my-vouchers",
+					"query": ""
+				},
+				{
+					"id": 26,
+					"name": "更换手机号",
+					"pathName": "pages/UserPackage/phone/bind-phone",
+					"query": "type=1"
+				},
+				{
+					"id": 27,
+					"name": "每日搭配",
+					"pathName": "pages/goodsPackage/goods/good-collocation",
+					"query": "type=0"
+				},
+				{
+					"id": -1,
+					"name": "绑定手机号",
+					"pathName": "pages/UserPackage/phone/bind-phone",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "新人礼包",
+					"pathName": "pages/goodsPackage/goods/gift-bag",
+					"scene": null
+				}
+			]
+		}
+	}
+}

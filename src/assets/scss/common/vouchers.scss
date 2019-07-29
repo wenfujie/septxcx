@@ -1,0 +1,172 @@
+
+.top {
+    padding: computed(30) 0 computed(15) 0;
+}
+.fs30B {
+    color: $color-white;
+}
+.fs20 {
+    color: $color-white;
+}
+//未使用优惠券
+.unuse-coupon,.coupon-box {
+    width: 100%;
+    min-height: computed(200);
+    background: $bggradientcolor;
+    background-size: 100% 100%;
+    box-sizing: border-box;
+    .top-right {
+        background-color: $color-white;
+        color: $domaincolor;
+        border-radius: $btn-radius25;
+    }
+    .top-left {
+        color: $color-white;
+    }
+}
+.describe-detail {
+    margin-left: computed(5);
+    color: $color-white;
+    .desc {
+        width: 95%;
+        padding-bottom: computed(15);
+    }
+}
+// 未使用优惠券且没有说明
+.unuseCoupon-explain,.downcoupon {
+    width: 100%;
+    min-height: computed(201);
+    background: $bggradientcolor;
+    background-size: 100% 100%;
+    box-sizing: border-box;
+    .top {
+        padding: computed(30) 0 computed(15) 0;
+    }
+}
+.unuse-coupon,
+.unuseCoupon-explain,
+.my-coupon,
+.coupon-explain,
+.downcoupon,
+.coupon-box
+{
+    position: relative;
+    &::before {
+        content: "";
+        position: absolute;
+        left: computed(-2);
+        top: computed(130);
+        width: computed(25);
+        height: computed(50);
+        background-color: $color-white;
+        border-radius: 0 computed(50) computed(50) 0;
+    }
+    &::after {
+        content: "";
+        position: absolute;
+        right: computed(-2);
+        top: computed(130);
+        width: computed(25);
+        height: computed(50);
+        background-color: $color-white;
+        border-radius: computed(50) 0 0 computed(50);
+    }
+}
+.coupon-box{
+    background: $bggradientcolor;
+}
+// 已使用/已过期优惠券
+.my-coupon {
+    position: relative;
+    width: 100%;
+    min-height: computed(201);
+    background: $text-placeholder;
+    background-size: 100% 100%;
+    box-sizing: border-box;
+    color: $color-white;
+    .top {
+        padding: computed(37) 0;
+    }
+}
+// 已使用/已过期优惠券没说明
+.coupon-explain {
+    position: relative;
+    width: 100%;
+    min-height: computed(201);
+    background: $text-placeholder;
+    background-size: 100% 100%;
+    box-sizing: border-box;
+    color: $color-white;
+    .top {
+        padding: computed(37) 0;
+    }
+}
+.shuoming {
+    display: inline-block;
+    width: 98%;
+    word-wrap: break-word;
+}
+.down {
+    width: 100%;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.describe-detail {
+    width: 95%;
+    padding-left: computed(25);
+}
+.top,
+.bottom {
+    width: 100%;
+    display: flex;
+}
+.dashed {
+    width: 90%;
+    margin-left: 5%;
+    border-top: 1px dashed $color-white;
+}
+.bottom {
+    .describe {
+        width: 97%;
+        padding: computed(15) 0;
+        display: flex;
+        justify-content: space-between;
+        font-size: computed(24);
+        line-height: computed(28);
+    }
+}
+.top-left {
+    font-weight: 500;
+    width: computed(150);
+    margin: computed(10);
+    text-align: center;
+}
+.top-middle {
+    width: computed(310);
+    margin: computed(10) 0 0 computed(45);
+}
+.top-right {
+    width: computed(132);
+    height: computed(50);
+    line-height: computed(50);
+    background-color: $text-secondary;
+    border-radius: $btn-radius25;
+    text-align: center;
+    margin-top: computed(20);
+}
+.coupon-box,.downcoupon{
+    .top-right{
+        background: $color-white;
+        font-size: $font-common;
+        color: $domaincolor;
+    }
+    .top-left{
+        color: $color-white;
+    }
+}
+.date-time {
+    margin-top: computed(5);
+}

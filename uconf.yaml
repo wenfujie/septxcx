@@ -1,0 +1,62 @@
+dev:
+  septxcx:
+    env:
+      NODE_ENV: dev
+      SERVICE_API: http://qishon-zuul-gateway.dev.qs.com
+      TOKEN_API: http://qishon-zuul-gateway.dev.qs.com/uaa/oauth-client/token
+      OSS_API: http://qishon-zuul-gateway.dev.qs.com/file/oss
+      DP_API: http://qishon-zuul-gateway.dev.qs.com
+    svc:
+      nodePort: 
+      - from: 3000
+        to: 30180
+test:
+  septxcx:
+    env:
+      NODE_ENV: test
+      SERVICE_API: http://qishon-zuul-gateway.test.qs.com
+      NETTY_API: http://1.1.2.50:2080/api
+      TOKEN_API: http://qishon-zuul-gateway.test.qs.com/uaa/oauth-client/token
+      OSS_API: http://qishon-zuul-gateway.test.qs.com/file/oss
+      DP_API: http://qishon-zuul-gateway.test.qs.com
+    svc:
+      nodePort: 
+      - from: 3000
+        to: 30181
+prod:
+  septxcx:
+    replicas: 4
+    env:
+      NODE_ENV: prod
+      SERVICE_API: http://qishon-zuul-gateway
+      TOKEN_API: http://qishon-zuul-gateway/uaa/oauth-client/token
+      OSS_API: http://qishon-zuul-gateway/file/oss
+      DP_API: http://qishon-zuul-gateway
+    livenessProbe:
+      tcpSocket:
+        port: 3000
+      initialDelaySeconds: 30
+      periodSeconds: 30
+preprod:
+  septxcx:
+    replicas: 4
+    env:
+      NODE_ENV: preprod
+      SERVICE_API: http://qishon-zuul-gateway
+      TOKEN_API: http://qishon-zuul-gateway/uaa/oauth-client/token
+      OSS_API: http://qishon-zuul-gateway/file/oss
+      DP_API: http://qishon-zuul-gateway
+business:
+  septxcx:
+    replicas: 4
+    env:
+      NODE_ENV: prod
+      SERVICE_API: http://qishon-zuul-gateway
+      NETTY_API: http://qishon-openresty:2080/api/
+      TOKEN_API: http://qishon-zuul-gateway/uaa/oauth-client/token
+      OSS_API: http://qishon-zuul-gateway/file/oss
+      DP_API: http://qishon-zuul-gateway
+    svc:
+      nodePort: 
+      - from: 3000
+        to: 30183

@@ -1,0 +1,104 @@
+.overflow-scroll {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling : touch;
+}
+
+// 箭头旋转动效
+.rotatingUp {
+    transition: all 0.5s;
+    transform: rotate(-180deg);
+    display: inline-block;
+}
+
+.rotatingDown {
+    transition: all 0.5s;
+    display: inline-block;
+}
+
+.arrowRight{
+    transition: all 0.5s;
+    transform: rotate(-90deg);
+    display: inline-block;
+}
+
+// 文字样式
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.relative {
+    position: relative;
+}
+
+.absolute {
+    position: absolute;
+}
+
+.cusTag {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.cusTag:after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: computed(26);
+    width: computed(60);
+    padding: computed(0) computed(5);
+    color: #fff;
+    background: #D5AF6E;
+    content: "定制";
+}
+
+.giftTag {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.giftTag:after {
+    position: absolute;
+    top: computed(5);
+    left: computed(3);
+    font-size: computed(26);
+    width: computed(60);
+    padding: computed(0) computed(5);
+    color: #fff;
+    background: #D5AF6E;
+    content: "赠品";
+}
+//页面
+.page{
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+// 
+.flex-button{
+    width: 100%;
+    height: computed(100);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: $text-primary;
+    color: #fff;
+}
+
+.box-shadow {
+    box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.1);
+}

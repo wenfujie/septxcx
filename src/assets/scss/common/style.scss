@@ -1,0 +1,246 @@
+/*  局部通用样式  */
+
+.wrapper {
+    margin: 0 computed(30);
+}
+
+//  全局通用浮动
+.fl {
+    float: left;
+}
+
+.fr {
+    float: right;
+}
+
+.color-red {
+    color: #c41717;
+}
+
+.color-black {
+    color: #0D0E09;
+}
+
+.bg-red {
+    background: #c41717;
+}
+
+.bg-gray {
+    background: #f5f5f5;
+}
+
+.bg-white {
+    background: #ffffff;
+}
+
+.wd100 {
+    width: 100%;
+}
+
+.wd70 {
+    width: 70%;
+}
+
+.wd30 {
+    width: 30%;
+}
+
+/*  全局通用底部按钮  */
+.bottom-btn {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    height: computed(98);
+    background: $text-primary;
+    font-size: computed(30);
+    line-height: computed(98);
+    color: $color-white;
+    text-align: center;
+    z-index: 2;
+    border: none;
+}
+
+.bottom-btn2 {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    box-sizing: border-box;
+    height: computed(98);
+    padding: computed(13) computed(30);
+    border: none;
+    background: $color-white;
+    color: $color-white;
+    text-align: center;
+    .btn-txt {
+        font-size: computed(30);
+        line-height: computed(72);
+        background: $text-primary;
+    }
+    z-index: 2;
+}
+
+// 按钮渐变色
+.gradient-color{
+    background: linear-gradient(90deg, $domaincolor, $gradientcolor) !important;
+}
+.radius40{
+    border-radius: $btn-radius40
+}
+
+//底部按钮 渐变
+.com-foot-btn-cont{
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    padding: computed(30) 0;
+    background: $color-background;
+    .com-foot-btn{
+        @extend .gradient-color;
+        @extend .radius40;
+        text-align: center;
+        width: 92%;
+        margin: 0 auto;
+        line-height: computed(80);
+        color: $color-white;
+    }
+}
+
+
+/* 全局通用空内容 */
+.empty-content {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: computed(28);
+    line-height: computed(30);
+    color: #999999;
+    p {
+        font-size: computed(28);
+        line-height: computed(30);
+        color: #999999;
+    }
+}
+
+/* 全局通用svg图标样式 */
+.svg-icon {
+    /* 图标和文字相邻时，垂直对齐 */
+    vertical-align: -0.15em;
+    /* 通过设置 color 来改变 SVG 的颜色/fill */
+    fill: currentColor;
+    /* path 和 stroke 溢出 viewBox 部分在 IE 下会显示
+       normalize.css 中也包含这行 */
+    overflow: hidden;
+}
+
+/*  手机号绑定、更换页面  */
+.phone-box {
+    overflow: hidden;
+    margin: 0 computed(30) 0 computed(50);
+    .form-box {
+        box-sizing: border-box;
+        width: 100%;
+        height: computed(88);
+        margin-top: computed(50);
+    }
+    .form-box input {
+        display: block;
+        box-sizing: border-box;
+        height: computed(88);
+        padding-left:computed(50);
+        background: $color-border;
+        font-size: computed(30);
+        line-height: computed(88);
+        color: #0D0E09;
+        border: none;
+        /* 解决ios版微信浏览器的边框和阴影*/
+        border-radius: computed(44);
+        box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+        -webkit-appearance: none;
+    }
+    .input-phone{
+        width: 95%;
+    }
+    .captcha-text {
+        width: 53%;
+    }
+    button{
+        // width:computed(212);
+        height:computed(88);
+        text-align: center;
+        line-height: computed(88);
+        background: $domaincolor;
+        color: $color-white;
+        font-size: $font-title1;
+        border-radius:computed(44);
+        margin:computed(-88) computed(40) 0  0;
+         &::after {
+            border: none;
+        }
+    }
+    .disabled{
+        opacity:0.42;
+    }
+    .bottom-btns {
+        width:95%;
+        height: computed(88);
+        line-height: computed(88);
+        background: $domaincolor;
+        border-radius: computed(44);
+        margin-top: computed(160);
+        text-align: center;
+        color: $color-white;
+        font-size: $font-title1;
+    }
+}
+/*  添加底部导航需添加=>防止遮挡样式  */
+._footer-bar-padding {
+    padding-bottom: computed(98);
+}
+
+/*loading组件加载遮罩 -- 使用方式可参照商品详情*/
+.com-shade-style {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    .com-loading-style {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        margin-left: computed(-50);
+        margin-top: computed(-50);
+    }
+}
+
+.overflow {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.overflow-two{
+    word-break: break-all;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+input::-webkit-search-cancel-button{
+    display: none;
+}
+input[type="search"]::-ms-clear{
+    display: none !important;
+}
+input[type="search"]::-webkit-search-cancel-button {
+    display: none !important;
+}

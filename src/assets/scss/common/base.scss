@@ -1,0 +1,114 @@
+//CSS初始化
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+pre,
+form,
+fieldset,
+input,
+textarea,
+p,
+blockquote,
+th,
+td {
+  margin: 0;
+  padding: 0;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+fieldset,
+img {
+  border: 0;
+}
+
+address,
+caption,
+cite,
+code,
+dfn,
+em,
+strong,
+th,
+var {
+  font-style: normal;
+  font-weight: normal;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+caption,
+th {
+  text-align: left;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: 100%;
+  font-weight: normal;
+}
+
+q:before,
+q:after {
+  content: '';
+}
+
+abbr,
+acronym {
+  border: 0;
+}
+
+button {
+  outline: 0;
+  border: 0;
+}
+
+input {
+  background: #ffffff;
+}
+
+html,
+body {
+  background: #ffffff;
+  font-family: 'PingFang-SC-Medium';
+  color: #0D0E09;
+  box-sizing: border-box;
+}
+@media only screen and (min-width: 370px) and (min-height: 720px) and (-webkit-device-pixel-ratio: 3) {
+  /* 这代表IPX */
+  body, .van-tabbar, .sku-popup, .go-vouchers-btn, .bottom-btn, .qs-wares-btn {
+    background-color: #ffffff;
+    padding-bottom: computed(31)
+  }
+  .goods-actions{
+    margin-bottom: computed(31)
+  }
+}
+
+.clearfix::after{
+  content:"";
+  display:block;
+  height:0;
+  clear:both;
+  visibility:hidden
+}

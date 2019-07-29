@@ -1,0 +1,42 @@
+.DS_Store
+node_modules
+/dist
+.idea
+.vscode
+*.iml
+babel.config.js
+# local env files
+.env.local
+.env.*.local
+
+# 静态域名配置
+src/utils/common.js
+src/utils/filterCommon.js
+src/filter/filterCommon.wxs
+
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+*.idea
+*.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
+http.js
+
+# koa日志文件不提交
+server/logs
+server/server/assets
+
+# kube文件不提交
+kube
+
+src/filter/filterCommon.wxs
+src/utils/common.js
+# Docker文件不提交

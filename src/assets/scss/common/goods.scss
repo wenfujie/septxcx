@@ -1,0 +1,250 @@
+// 商品墙的外部盒子
+.good-box {
+    box-sizing: border-box;
+    padding: computed(90) 0 computed(60) 0;
+    -webkit-overflow-scrolling: touch;
+    min-height: 100%;
+    background: $color-light-gray;
+    ::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+        color: transparent;
+    }
+}
+// 除商品墙的外部盒子
+.goods-box {
+    min-height: 100%;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: computed(80);
+    background: $color-light-gray;
+}
+.search-box {
+    position: relative;
+    display: table-cell;
+    padding: 0 computed(30);
+    height: computed(110);
+    background-color: $domaincolor;
+    vertical-align: middle;
+    font-size: $font-common;
+    > i {
+        position: absolute;
+        left: computed(60);
+        top: computed(40);
+        color: $text-secondary;
+        font-size: $font-title1;
+    }
+    > input {
+        outline: none;
+        border: 0;
+        width: computed(635);
+        height: computed(58);
+        line-height: computed(58);
+        padding-left: computed(60);
+        border-radius: computed(29);
+        // text-align: center;
+        &::-webkit-input-placeholder {
+            /*WebKit browsers*/
+            color: $text-secondary;
+        }
+        &::-moz-input-placeholder {
+            /*Mozilla Firefox*/
+            color: $text-secondary;
+        }
+        &::-ms-input-placeholder {
+            /*Internet Explorer*/
+            color: $text-secondary;
+        }
+    }
+}
+.header-box {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    background-color: #fff;
+    .header {
+        display: flex;
+        justify-content: space-around;
+        line-height: computed(40);
+        text-align: center;
+        font-size: $font-regular;
+        border-bottom: computed(1) solid #dbdbdb;
+        padding: computed(15) computed(10) computed(15) computed(0);
+        color: $text-secondary;
+        .selected {
+            color: $domaincolor;
+            font-weight: bold;
+        }
+        &:last-child {
+            border-right: none;
+        }
+        .shaixuan {
+            width: computed(15);
+            height: computed(18);
+            padding: computed(10) 0 0 computed(10);
+        }
+    }
+}
+.header-item-sort {
+    width: computed(12);
+    height: computed(20);
+    padding: computed(10) 0 0 computed(10);
+}
+.good-list {
+    display: flex;
+    flex-wrap: wrap;
+    padding: computed(120) computed(16) computed(0) computed(16);
+    .checkbox {
+        position: absolute;
+        margin:computed(20) 0 0 computed(-130);
+        z-index: 9;
+    }
+    .img-shadow {
+        position: absolute;
+        width: computed(345);
+        height: computed(345);
+        background: rgba(0, 0, 0, 1);
+        opacity: 0.3;
+    }
+}
+.goods-list {
+    display: flex;
+    flex-wrap: wrap;
+    padding: computed(30) computed(16) computed(0) computed(16);
+}
+.good-list-item {
+    width: 48%;
+    border-radius: 20px;
+    height: computed(454);
+    background: rgba(255, 255, 255, 1);
+    margin: 0 computed(9) computed(20) computed(6);
+    .cuxiao{
+        width:computed(120);
+        height:computed(32);
+        position: absolute;
+        border-radius:computed(16);
+        margin:computed(16) 0 0 computed(-95);
+    }
+    .good-item-img {
+        width: computed(345);
+        height: computed(345);
+        img {
+            width: 100%;
+            height: 100%;
+            border-radius: computed(20) computed(20) 0 0;
+        }
+    }
+    .good-item-describe {
+        width: 93%;
+        padding: computed(5) 0 computed(5) computed(19);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: $text-primary;
+        font-size: $font-regular;
+    }
+    .good-price-box {
+        width: 93%;
+        height: computed(40);
+        line-height: computed(40);
+        padding-left: computed(12);
+        display: flex;
+        justify-content: flex-start;
+    }
+    .sale-single {
+        display: inline-block;
+        font-size: $font-small;
+    }
+    .good-item-price {
+        text-align: left;
+        font-size: $font-title1;
+        color: $domaincolor;
+        font-weight: bold;
+    }
+    del {
+        font-size: $font-common;
+        color: $text-secondary;
+        text-decoration: line-through;
+    }
+}
+// 面包屑弹出层
+.van-popup {
+    height: 100%;
+    margin-top: computed(-2);
+    .good-fifter {
+        height: 92%;
+        width: computed(660);
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        background-color: $color-white;
+
+        .fifter-content {
+            margin: computed(20) 0 computed(150) 0;
+        }
+        .fifter-header {
+            font-size: $font-title1;
+            color: $text-primary;
+            text-align: left;
+            padding-top: computed(30);
+        }
+        .content-box {
+            padding: computed(20);
+            .title {
+                position: relative;
+                display: flex;
+                justify-content: space-between;
+                .more {
+                    color: $text-secondary;
+                    font-size: $font-small;
+                    padding: 0 computed(55) 0 0;
+                    .iconiconup-copy:before,
+                    .iconicondown-copy:before {
+                        position: absolute;
+                        margin: computed(-30) 0 0 computed(42);
+                    }
+                }
+            }
+        }
+        .contents {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-start;
+            padding: computed(10) 0;
+            text-align: center;
+            font-size: $font-common;
+            p {
+                width: computed(180);
+                height: computed(50);
+                line-height: computed(50);
+                color: $text-black-gray;
+                background-color: $color-background;
+                margin: computed(18) computed(20) 0 0;
+                border-radius: $btn-radius25;
+            }
+            .checked {
+                background: $domaincolor;
+                color: $color-white;
+            }
+        }
+    }
+    .fifter-bottom {
+        width: 100%;
+        height: computed(97);
+        line-height: computed(97);
+        text-align: center;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        z-index: 9999;
+        box-shadow: 0 computed(1) 0 0 rgba(230, 230, 230, 1);
+        background-color: $color-white;
+        span {
+            display: inline-block;
+            width: 50%;
+            font-size: $font-regular;
+        }
+    }
+}

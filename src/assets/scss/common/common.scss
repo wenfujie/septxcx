@@ -1,0 +1,75 @@
+/* 通用样式 */
+.wrapper{
+  margin: 0 30rpx;
+}
+.bg-gray{
+  background: #f5f5f5;
+}
+.bg-white{
+  background: #ffffff;
+}
+.clearfix:after{
+  content:"";
+  display:block;
+  height:0;
+  clear:both;
+  visibility:hidden
+}
+.flex-vbox{
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;   
+}
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+}
+.flex-fix{
+  flex: 1
+}
+.wd65{
+  width: 65%;
+}
+.wd35{
+  width: 35%;
+}
+.fl{
+  float: left;
+}
+.fr{
+  float: right;
+}
+.hide-view{
+  display: none;
+}
+.show-view-block{ 
+  display: block;
+}
+.show-view-flex{ 
+  display: flex;
+}
+.mask{
+  width:100%;
+  height:100%;
+  position:fixed;
+  background-color:#0D0E09;
+  z-index:99;
+  top:0;
+  left:0;
+  opacity:0.5;
+  -moz-opacity: 0.5;    
+  filter: alpha(opacity=50); 
+}
+.body-fixed{
+  display: block;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.marginBottom31 {
+  padding-bottom: 31rpx;
+}

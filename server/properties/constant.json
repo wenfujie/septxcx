@@ -1,0 +1,17 @@
+{
+  "dev": {
+    "wxUnionid": "OdK0IFqD",
+    "publicAccount": "LB36Ji0S",
+    "grantType": "authorization_code"
+  },
+  "preprod": {
+    "wxUnionid": "EMHB4AcT",
+    "publicAccount": "oBhtsiUg",
+    "grantType": "authorization_code"
+  },
+  "prod": {
+    "wxUnionid": "EMHB4AcT",
+    "publicAccount": "ZLERKyJX",
+    "grantType": "authorization_code"
+  }
+}

@@ -1,0 +1,487 @@
+/*
+ * @Author: yongtian.hong
+ * @Date: 2018-11-07 15:18:20
+ * @LastEditors: lan.chen
+ * @LastEditTime: 2019-07-19 15:47:05
+ * @Description: 复写vant组件样式
+ */
+ .footer-bar {
+    .van-tabbar{
+        height: auto !important;
+    }
+    .van-tabbar-item{
+        padding-top:computed(7);
+    }
+    .van-tabbar-item__icon {
+       margin-bottom:computed(5);
+    }
+ }
+
+//dialog样式覆盖
+.van-dialog {
+    -webkit-border-radius: computed(8);
+    -moz-border-radius: computed(8);
+    border-radius: computed(8);
+
+    .dialog-filed {
+        display: block;
+        width: computed(450);
+        height: computed(50);
+        font-size: $font-common;
+        line-height: computed(30);
+        padding: computed(10) computed(50);
+        -webkit-border-radius: computed(50);
+        -moz-border-radius: computed(50);
+        border-radius: computed(50);
+        background: $color-background;
+        margin: computed(30) auto;
+    }
+}
+
+.van-dialog__header {
+    font-size: $font-h1;
+    line-height: 1;
+    padding-top: computed(60);
+}
+
+.van-dialog__content {
+    text-align: center;
+}
+
+.van-dialog__confirm .van-button__text {
+    color: $text-primary;
+    font-size: $font-h2 !important;
+}
+
+.van-dialog__message {
+    font-size: $font-h2 !important;
+}
+
+.van-dialog__cancel {
+    .van-button__text {
+        color: $text-regular;
+        font-size: $font-h2 !important;
+    }
+}
+
+.van-dialog__message--has-title {
+    padding-top: computed(20) !important;
+    color: $text-secondary !important;
+}
+
+.member-information .van-radio .van-icon-checked {
+    color: #0D0E09;
+}
+
+.member-information .van-checkbox {
+    float: left;
+    margin-top: 4vw;
+    margin-right: 4vw;
+    font-size: 3.73333vw;
+    line-height: 4vw;
+}
+
+.van-checkbox .van-checkbox__icon--checked {
+    background-color: $domaincolor !important;
+    border-color: $domaincolor !important;
+}
+.van-checkbox .van-icon-success{
+    line-height:computed(38) !important;
+
+}
+
+.van-checkbox .van-checkbox__icon--checked .van-icon {
+    background-color: $domaincolor !important;
+    border-color: $domaincolor !important;
+    border-radius: 50%;
+}
+
+.form-row .van-radio .van-icon-checked {
+    color: #0D0E09;
+}
+
+.container .van-tabs--line .van-tabs__wrap {
+    height: computed(90);
+}
+
+.container .van-tab {
+    font-size: computed(30);
+    font-weight: 500;
+}
+
+.pain-style .pain-dalog {
+    width: computed(650);
+    height: computed(460);
+    background: rgba(255, 255, 255, 1);
+    border-radius: computed(10);
+    overflow: initial;
+}
+
+.pain-dalog_point {
+    width: 100%;
+    height: computed(744);
+    background-color: transparent !important;
+    // background:rgba(255,255,255,1);
+    // background-image: url('../assets/images/volume/redBag.png');
+    border-radius: computed(10);
+    overflow-y: initial !important;
+}
+
+// .container .van-tabs__line{
+//     width: computed(375)!important;
+// }
+
+//单选框颜色覆盖
+.van-radio .van-icon-checked {
+    color: $domaincolor !important;
+}
+
+//picker样式覆盖
+.van-picker__toolbar {
+    background: #F8F8F8;
+}
+
+.van-hairline--top-bottom::after {
+    border-width: 2px 0 !important;
+    border-color: #DBDBDB !important;
+}
+
+.van-picker__confirm {
+    color: $maincolor !important;
+}
+
+.van-picker__cancel {
+    color: $blackcolor !important;
+}
+
+.van-picker-column__item--selected {
+    //color: $maincolor!important;
+}
+
+[class*=van-hairline]::after {
+    display: none
+}
+
+// .design .van-list{
+//     height: computed(1700);
+// }
+
+//覆盖loading样式
+.van-loading--white {
+    padding: 10px;
+    border-radius: 3px;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* 重置轮播图小圆点颜色 */
+.swiper-pagination-bullet-active {
+    background: $color-black !important;
+}
+
+/* 重置有赞商品导航 */
+.van-goods-action {
+    height: computed(98);
+
+    .van-hairline,
+    .van-button {
+        height: computed(98);
+        font-size: computed(16);
+
+        i {
+            color: $text-primary;
+        }
+    }
+}
+
+// .van-stepper {
+//     height: 100%;
+
+//     .van-stepper__minus {
+//         width: computed(88);
+//         height: 100%;
+//         border-top: 1px solid $text-secondary;
+//         border-right: none;
+//         border-bottom: 1px solid $text-secondary;
+//         border-left: 1px solid $text-secondary;
+//         border-top-left-radius: computed(5);
+//         border-bottom-left-radius: computed(5);
+
+//         &.van-stepper__minus--disabled {
+//             background-color: $color-white;
+//             border-top: 1px solid $text-placeholder;
+//             border-right: none;
+//             border-bottom: 1px solid $text-placeholder;
+//             border-left: 1px solid $text-placeholder;
+//         }
+//     }
+
+//     .van-stepper__input {
+//         width: computed(80);
+//         height: 100%;
+//         box-sizing: border-box;
+//         border: 1px solid $text-secondary;
+//     }
+
+//     .van-stepper__plus {
+//         width: computed(88);
+//         height: 100%;
+//         border-top: 1px solid $text-secondary;
+//         border-right: 1px solid $text-secondary;
+//         border-bottom: 1px solid $text-secondary;
+//         border-left: none;
+//         border-top-right-radius: computed(5);
+//         border-bottom-right-radius: computed(5);
+
+//         &.van-stepper__plus--disabled {
+//             background-color: $color-white;
+//             border-top: 1px solid $text-placeholder;
+//             border-right: 1px solid $text-placeholder;
+//             border-bottom: 1px solid $text-placeholder;
+//             border-left: none;
+//         }
+//     }
+// }
+
+ // 复写有赞样式
+.van-cell-reset {
+    border-bottom: dashed 1px #cccccc;
+    .van-cell__title {
+        flex: 4 !important;
+    }
+    .van-cell__value {
+        flex: none !important;
+    }
+}
+
+.van-radio-reset{
+    .van-radio__icon--checked {
+        background-color:$domaincolor !important;
+        border-color:$domaincolor !important;
+        }
+}
+
+//  分润覆盖radio样式
+.radio-box {
+    margin-left: computed(40);
+
+    .radio {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: computed(24);
+
+        .van-radio__input {
+            font-size: $font-common;
+            height: $font-common;
+        }
+
+        .van-radio__label {
+            font-size: $font-common;
+            line-height: $font-h1;
+            color: $text-regular;
+        }
+
+    }
+}
+
+//  下拉刷新适配
+.van-pull-refresh {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .van-pull-refresh__track {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+}
+
+.address-detail {
+    .van-cell {
+        width: 90%;
+        margin-left: 5%;
+        border: none;
+        border-bottom: computed(2) dashed rgba(179, 179, 179, 1) !important;
+        padding-right: computed(20);
+        word-wrap: break-word;
+        padding-left: 0;
+
+        &:not(:last-child)::after {
+            // border-bottom: none;
+        }
+
+        &:last-child {
+            // border-bottom: none;
+        }
+
+        .van-field__control {
+            &::-webkit-input-placeholder {
+                color: #cccccc;
+            }
+
+            &::-moz-input-placeholder {
+                color: #cccccc;
+            }
+
+            &::-ms-input-placeholder {
+                color: #cccccc;
+            }
+        }
+
+    }
+}
+
+
+// 单选框
+.van-radio__icon--checked .van-icon {
+    border-color: $domaincolor;
+    // 转mpvue后 无需设置background-color
+    // background-color: $domaincolor;
+}
+
+// 复选框
+.goods-item .van-checkbox__icon .van-icon {
+    // border: computed(2) solid $color-white;
+}
+
+// 复选框未选中样式
+.van-checkbox__icon .van-icon {
+    //   border: computed(2) solid $text-secondary;
+}
+
+.van-checkbox__label {
+    margin-top: computed(-3);
+    line-height: 0;
+}
+
+.van-icon .van-icon-arrow-down {
+    font-size: 30px;
+}
+
+//  账户页面重置cell样式
+.member-center {
+    .first-cell {
+        .van-cell {
+            &.title {
+                .van-cell__value {
+                    font-size: $font-small;
+                    font-weight: normal;
+                }
+            }
+        }
+    }
+}
+
+// 弹窗
+.sku-popup {
+    overflow-y: visible !important;
+}
+
+// 提现申请页面取消默认下划线
+.withdraw-apply {
+    .van-cell::after {
+        border: none !important;
+    }
+}
+
+.main .van-swipe__indicators {
+    display: none;
+}
+
+// 覆盖评分组件颜色rate
+.van-rate__item i {
+    color: $gradientcolor !important;
+}
+
+// 轮播图选中颜色
+.van-swipe__indicator--active {
+    background-color: $color-black !important;
+}
+
+// 注册协议确认按钮字体加粗
+.agreement-popup {
+    .van-button__text {
+        font-weight: bold;
+    }
+}
+
+.spread-page {
+    .van-button {
+        display: block;
+        width: computed(240);
+        height: computed(66);
+        margin: computed(12) auto computed(12);
+        color: $color-white!important;
+        background: $bggradientcolor;
+        border-radius: computed(66);
+        font-size: $font-regular;
+        line-height: computed(66);
+
+        .van-button__text {
+            color: $color-white;
+            font-size: $font-regular;
+            line-height: computed(66);
+            text-align: center;
+        }
+    }
+}
+.showPhone{
+    .van-popup {
+        border-radius: computed(20);
+        z-index: 99999;
+        width:computed(640);
+        height:computed(626);
+    }
+}
+// 绑定手机号弹窗
+.popup-phone {
+    .van-popup {
+        border-radius: computed(10);
+        z-index: 99999;
+    }
+}
+
+.sku-popup .van-popup {
+    width: 100%;
+    overflow-y: hidden !important;
+}
+
+// 分销商-对账单,分销商-分润排名 field组件样式覆盖
+.nickName{
+    .van-cell{
+        background-color: transparent;
+        padding: 0;
+    }
+}
+.search-name{
+    .van-cell{
+        background-color: transparent;
+        padding: 8rpx 0 8rpx 0;
+    }
+}
+
+
+.wheel-picker-active{
+    height: 50px;
+    color: #ff3636;
+    border: none;
+
+}
+
+.reward-popup{
+    .van-popup{
+        background-color: transparent;
+    }
+}
+
+/* 复选框样式重置 */
+.van-checkbox__icon{
+    background-color: $color-light-gray !important;
+    border-color: $text-placeholder !important;
+}
+.van-checkbox__icon--disabled{
+    background-color: $color-light-gray !important;
+    border-color: $text-gray !important;
+}

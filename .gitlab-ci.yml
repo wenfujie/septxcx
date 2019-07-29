@@ -1,0 +1,65 @@
+variables:
+  DOCKER_DRIVER: overlay
+  SPRING_PROFILES_ACTIVE: gitlab-ci
+
+stages:
+  - sonar
+  - build
+  - deploy
+
+sonar:
+  stage: sonar
+  only:
+    variables:
+      - $sonar == "y"
+  image: registry.qishon.com:33000/qishon/gitlab-sonar:v5
+  script:
+    - export LUA_PATH="/lua/?.lua;;"
+    - lua /lua/luaqishon/main.lua
+
+build:
+  stage: build
+  except:
+    variables:
+      - $deploy
+      - $sonar
+  only:
+    variables:
+      - $build == "y"
+      - $CI_COMMIT_REF_NAME == $build_1
+      - $CI_COMMIT_REF_NAME == $build_2
+      - $CI_COMMIT_REF_NAME == $build_3
+      - $CI_COMMIT_REF_NAME == $build_4
+      - $CI_COMMIT_REF_NAME == $build_5
+  image: registry.qishon.com:33000/qishon/gitlab-ci:v5
+  cache:
+    key: gitlab
+    paths:
+    - .gitlab_cache/
+  script:
+    - export LUA_PATH="/lua/?.lua;;"
+    - lua /lua/luaqishon/main.lua
+deploy:
+  stage: deploy
+  except:
+    variables:
+      - $build
+      - $sonar
+  only:
+    variables:
+      - $deploy
+      - $CI_COMMIT_REF_NAME == $deploy_1
+      - $CI_COMMIT_REF_NAME == $deploy_2
+      - $CI_COMMIT_REF_NAME == $deploy_3
+      - $CI_COMMIT_REF_NAME == $deploy_4
+      - $CI_COMMIT_REF_NAME == $deploy_5
+  image: registry.qishon.com:33000/qishon/gitlab-cd:v5
+  environment:
+    name: $deploy
+  cache:
+    key: gitlab
+    paths:
+    - .gitlab_cache/
+  script:
+    - export LUA_PATH="/lua/?.lua;;"
+    - lua /lua/luaqishon/main.lua

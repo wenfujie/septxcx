@@ -1,0 +1,75 @@
+//计算单位函数
+@function computed($number) {
+    @return $number*1rpx
+}
+
+;
+
+@function computed1($number1) {
+    @return $number1*1rpx
+}
+
+;
+//$serverUrl: "https://wxxcx.qishon.com/septwolves/"; //服务器地址
+$serverUrl: "https://wxxcx.qishon.com/wfj/"; //本地服务器地址
+
+$maincolor: #0d0e09;
+$blackcolor: #0d0e09;
+$blackcolor-1: rgba(116, 116, 116, 1);
+
+$domaincolor: #FF3636; // 主色
+$gradientcolor: #FF632A; // 辅助色
+$bggradientcolor: linear-gradient(90deg, $domaincolor, $gradientcolor); // 渐变色
+$bggradientcolorbt: linear-gradient($domaincolor, $gradientcolor); // 渐变色(上到下)
+$bg-green: #08C261;
+$yellow-start-color: #FFB54C;
+$yellow-end-color: #FF8533;
+$btn-radius40: computed(40); // 圆角40px，适用底部按钮
+$btn-radius25: computed(25); // 圆角25px，适用于小按钮
+
+//  常用文字色值-UI规范
+$text-primary: #333333; // 用于大多数文字
+$text-regular: #666666; // 用于辅助性文字（主要）
+$text-secondary: #999999; // 用于辅助性文字（次级）
+$text-gray-white: #C7C7CC; // 字体图标淡灰色
+$text-placeholder: #CCCCCC; // 用于弱提示文字（占位文字）
+$text-warn: #a82828; // 价格、错误提示、警示作用的文字颜色
+$text-price: #B3B3B3; // 吊牌价
+$text-gray: #E6E6E6; // 部分灰色文字
+$text-green: #2BA828; // 部分绿色文字
+$text-brown: #656560; // 棕色
+$text-orange: #E55140; // 橘色，用于文字颜色，active激活色
+$text-orange: #E55140; // 橘色，用于文字颜色，active激活色
+$text-apply: #FF3333; // 大红色
+$text-black-gray:#4A4B4B;
+//  常用标准色-UI规范
+$color-white: #ffffff; // 白色
+$color-background: #F5F5F5; // 底色
+$color-black: #000; // 纯黑
+$color-gray: #C4C4C4; // 灰色
+$color-border: #F2F2F2; // 灰色（接近白色）：用于边框
+$color-line: #909090; // 边框灰色
+$color-light-gray: #F5F5F5; // 边框灰色
+$color-gray-dashed: #E8E8E8; // 虚线
+$color-black-apply: #5B5B5B; // 黑色：透明度0.64
+$color-black-33:#333333;
+$color-red: #FF3636;
+$color-orange: #E55140; // 橘色，用于文字颜色，active激活色
+$color-btn-bg: #C5DCFC;
+$color-border-gray: #E5E5E5;
+$color-gray-C5: #C5C5C5;
+
+
+//  文字大小-UI规范
+$font-h: computed(45); // 字体图标
+$font-h1: computed(36); // 主要用于首页标题等
+$font-h2: computed(32); // 主要用于列表大标题等
+$font-title1: computed(30); // 主要用于列表商品价格等
+$font-regular: computed(28); // 大部分用于底部按钮字体（粗体主要用于Tab选中状态等）
+$font-num: computed(26); // 数量
+$font-common: computed(24); // 用于大多数字体
+$font-small: computed(20); // 辅助说明字体
+$font-mini: computed(16); // 图标说明
+
+$font-h0:computed(42); // 商品详情标题
+$font-little:computed(18); // 商品详情标题

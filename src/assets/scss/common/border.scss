@@ -1,0 +1,50 @@
+// 边框
+.border-t1-E6 {
+    border-top: solid computed(1) #E6E6E6;
+}
+
+.border-t1-c {
+    border-top: solid computed(1) #cccccc;
+}
+
+.border-b1-c {
+    border-bottom: solid computed(1) #cccccc;
+}
+
+.border-b1-E6 {
+    border-bottom: solid computed(1) #E6E6E6;
+}
+
+.border-dash-b3 {
+    border-bottom: computed(1.2) dashed #b3b3b3;
+}
+
+.border-solid-b3 {
+    border-bottom: computed(1) solid #b3b3b3;
+
+}
+
+.border-solid-33 {
+    border: 1px solid rgba(51, 51, 51, 1);
+}
+
+.border-1-c {
+    border: solid computed(1) #cccccc;
+}
+
+.border-1-w {
+    border: solid computed(1) #fff;
+}
+
+.border-dash-c {
+    border: dashed computed(1) #cccccc;
+}
+
+.no-right-border {
+    border-right: none;
+}
+
+.no-border {
+    border: none;
+    outline: none;
+}

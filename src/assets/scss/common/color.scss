@@ -1,0 +1,73 @@
+// 通用颜色
+.blue {
+    color: #2BA4F3 !important;
+}
+
+// 
+.orange {
+    color: $maincolor !important;
+}
+
+.black {
+    color: #0D0E09 !important;
+}
+
+.grey99 {
+    color: #999999 !important;
+}
+
+.grey66 {
+    color: #666666 !important;
+}
+
+.greycc {
+    color: #cccccc !important;
+}
+
+.white {
+    color: #fff !important;
+}
+
+.red {
+    color: #A82828 !important;
+}
+
+.bg-white {
+    background-color: #fff;
+}
+
+.bg-gray {
+    background-color: #F5F5F5;
+}
+
+.bg-grey {
+    background-color: #999999;
+}
+
+.bg-red {
+    background-color: $maincolor;
+}
+
+.bg-black {
+    background-color: #0D0E09;
+}
+
+.bg-black33 {
+    background-color: #333333;
+}
+
+.bg-red {
+    background: rgba(168, 40, 40, 1);
+}
+
+.bg-white {
+    background: #fff;
+}
+
+.bg-domaincolor {
+    background: #FF3636;
+}
+
+.color-mian {
+    color: #FF3636;
+}

@@ -1,0 +1,65 @@
+// 子元素水平排列
+.flex-box {
+    display: flex;
+    box-sizing: border-box;
+}
+
+// 子元素垂直排列
+.flex-vbox {
+    display: flex;
+    flex-direction: column; 
+    box-sizing: border-box;
+}
+
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+}
+
+.flex-around {
+    display: flex;
+    justify-content: space-around;
+}
+
+// 子元素水平垂直居中
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+// 子元素水平居中
+.flex-hcenter {
+    display: flex;
+    justify-content: center;
+}
+
+// 子元素垂直居中
+.flex-vcenter {
+    display: flex;
+    align-items: center;
+}
+
+// 右对齐
+.flex-end {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+// 右对齐
+.flex-start {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+// 占用剩余部分
+.flex-auto {
+    flex: 1;
+}
+
+// 换行
+.flex-wrap {
+    flex-wrap: wrap;
+}
