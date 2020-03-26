@@ -1,7 +1,6 @@
 .DS_Store
 node_modules
 build
-config
 /dist*
 .idea
 .vscode
@@ -12,9 +11,7 @@ babel.config.js
 .env.*.local
 
 # 静态域名配置
-src/utils/common.js
-src/utils/filterCommon.js
-src/filter/filterCommon.wxs
+
 
 
 # Log files
@@ -30,7 +27,7 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw*
-http.js
+
 
 # koa日志文件不提交
 server/logs
@@ -39,6 +36,5 @@ server/server/assets
 # kube文件不提交
 kube
 
-src/filter/filterCommon.wxs
-src/utils/common.js
+
 # Docker文件不提交

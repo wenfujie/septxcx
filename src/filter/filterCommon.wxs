@@ -1,0 +1,160 @@
+/**
+ * createTime: 2018/9/10 17:06
+ * author: zhibin.zhao
+ * description:
+ */
+ var baseConstant = {
+    busContsCode: 'D_BUSCONTS_WSC', // 业务触点 D_BUSCONTS_B2C
+    signUpTypeCode: 'D_SMP', //小程序登陆编码
+    serverUrl: "https://wxxcx.qishon.com/septxcx/", //test2环境
+    imgBaseUrl: "https://wxxcx.qishon.com/septapi/v2/oss/image/"
+
+    // serverUrl: "https://testxcx.7vipgo.com/septxcx/", //预生产环境
+    // imgBaseUrl: "https://testxcx.7vipgo.com/api/file/open/"
+
+    // serverUrl: "https://xcx.7vipgo.com/septxcx/", //正式环境
+    // imgBaseUrl: "https://xcx.7vipgo.com/api/file/open/"
+}
+var check = {
+    typeOf: function (target) {
+        return target.constructor
+    },
+    isObject: function (target) {
+        return this.typeOf(target) === "Object" ? true : false;
+    },
+    isNumber: function (target) {
+        return this.typeOf(target) === "Number" ? true : false;
+    },
+    isArray: function (target) {
+        return this.typeOf(target) === "Array" ? true : false;
+    },
+    isBoolean: function (target) {
+        return this.typeOf(target) === "Boolean" ? true : false;
+    },
+    isRegexp: function (target) {
+        return this.typeOf(target) === "RegExp" ? true : false;
+    },
+    isJson: function (target) {
+        return this.typeOf(target) === "json" ? true : false;
+    },
+    isString: function (target) {
+        return this.typeOf(target) === "String" ? true : false;
+    },
+    isMath: function (target) {
+        return this.typeOf(target) === "math" ? true : false;
+    },
+    isDate: function (target) {
+        return this.typeOf(target) === "Date" ? true : false;
+    },
+    isErrorv: function (target) {
+        return this.typeOf(target) === "error" ? true : false;
+    },
+    isEmpty: function (target) {
+        if (target === null) {
+            return true;
+        } else if (typeof target === 'undefined') {
+            return true;
+        } else if (target === NaN) {
+            return true;
+        } else if (this.isArray(target) || this.isString(target)) {
+            return target.length === 0 ? true : false
+        } else if (this.isObject(target)) {
+            if (JSON.stringify(target) == '{}') {
+                return true
+            }
+            return false
+        }
+    }
+}
+
+// HTML用到
+function imgFilter(fileUrl, companyId, imageSize = '') {
+    //如果是http开头，不需要处理
+    var exp = getRegExp("^http", "img");
+    var exp1 = getRegExp("(png|jpe?g)$", "img");
+    if(exp.test(fileUrl)){
+        return fileUrl
+    }else if(exp1.test(fileUrl)){//未经加密的地址
+        return baseConstant.serverUrl + "file-system/getImg?fileUrl=" + fileUrl + '&companyId=' + companyId
+    }else if (!!fileUrl) {
+        var imageUrl = baseConstant.imgBaseUrl + fileUrl
+        if (imageSize) {
+            imageUrl += '?imageSize=' + imageSize
+        }
+        return imageUrl
+    } else {
+        return baseConstant.serverUrl + 'images/septwolves.png'
+    }
+}
+
+function Fix2(value) {
+    if (check.isEmpty(value)) return 0;
+    value = Number(value)
+    var times = Math.pow(10, 2)
+    var des = value * times + 0.5;
+    des = parseInt(des, 10) / times;
+    return des.toFixed(2)
+}
+
+function minAmount(value) {
+    var fix2 = Fix2(value);
+    return fix2 > 0 ? fix2 : 0;
+}
+
+function goldDivide(value) {
+    if (value) {
+        return Number(value).toLocaleString();
+    }
+    return value;
+}
+//优惠券折扣金额保留
+function saveOneDecimals(val) {
+      var arr = val.toString().split(".");
+        if (arr.length > 1) {
+            return val.toFixed(1);
+        } else {
+             return arr[0];
+      }
+}
+function filterDate (val) {
+    if (val && val.length > 10) {
+        return val.substring(0, 10);
+    }
+    return val;
+}
+function indexOfM(val,str){
+    return val.indexOf(str)
+}
+
+// 手机号掩码
+function phoneMask(value) {
+    if(value){
+        return value.substring(0, 3) + '****' + value.substring(7, 11);
+    }
+    return value;
+}
+
+// 日期过滤器
+function dateFilter(str) {
+    if (str !== undefined) {
+        return str.substring(5, 7) + '.' + str.substring(8, 10) + ' ' + str.substring(11, 13) + ':' + str.substring(14, 16);
+    }
+}
+// 移除小数位
+function removeFix(str) {
+    if (str !== undefined && str !== null) {
+        if (str.substring(str.length - 2, str.length) === '.0') {}
+        return str.substring(0, str.length -2);
+    }
+}
+
+module.exports.imgFilter = imgFilter;
+module.exports.minAmount = minAmount;
+module.exports.Fix2 = Fix2;
+module.exports.goldDivide = goldDivide;
+module.exports.saveOneDecimals = saveOneDecimals;
+module.exports.filterDate = filterDate
+module.exports.indexOfM = indexOfM
+module.exports.phoneMask = phoneMask
+module.exports.dateFilter = dateFilter
+module.exports.removeFix = removeFix
