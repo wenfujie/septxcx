@@ -3,11 +3,11 @@
  * author: zhibin.zhao
  * description:
  */
-//  获取常数值
-const fileSystemObj = require('../controller/base/file-system')
+const fileSystemFun = require('../controller/file-system')
+
 module.exports = {
-    'POST/token': fileSystemObj.getFileSystemToken,
-    'GET/getImg/': fileSystemObj.getImgByPath,
-    'POST/imgUpload/': fileSystemObj.imgUpload,
-    'GET/getVideo/': fileSystemObj.getVideoByPath
+    'POST/token': fileSystemFun.getFileSystemToken, // 获取toke
+    'GET/getImg/': fileSystemFun.getImgByPath,  // 通过token获取图片
+    'POST/imgUpload/': fileSystemFun.imgUpload,  // 图片上传接口
+    'GET/getVideo/': fileSystemFun.getVideoByPath  // 获取视频资源
 }

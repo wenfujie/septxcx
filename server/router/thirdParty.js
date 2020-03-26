@@ -6,8 +6,8 @@
  * @Description: 第三方服务
  */
 
-const thirdPartyService = require("../controller/third-party/thirdPartyService");
+const thirdPartyFun = require("../controller/third-party");
 
 module.exports = {
-  "POST/getLogis": thirdPartyService.getLogis
+  "POST/getLogis": thirdPartyFun.getLogis
 };

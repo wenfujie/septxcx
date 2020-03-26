@@ -5,7 +5,7 @@
  */
 
 //  支付功能模块
-const fundFun = require("../controller/fund/fund");
+const fundFun = require("../controller/fund");
 
 module.exports = {
   "GET/getFundDetail": fundFun.getFund, // 获取账户资金

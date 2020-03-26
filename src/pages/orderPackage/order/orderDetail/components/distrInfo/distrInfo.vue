@@ -57,10 +57,14 @@
             <div class="left">订单备注：</div>
             <div class="right">{{order.ctmMessage||"暂无备注"}}</div>
         </div>
+        <div class="row-content" v-if="orgrinAccout!=''">
+            <div class="left">来源账号：</div>
+            <div class="right">{{orgrinAccout}}</div>
+        </div>
     </div>
 </template>
 <script>
-import logistic from "@/components/logistic";
+import logistic from "../logistic";
 export default {
     components: {
         logistic
@@ -84,7 +88,20 @@ export default {
                 this.order.cargoDestName +
                 this.order.cargoAddress;
             return addr;
-        }
+        },
+        orgrinAccout:function(){
+            let curAccountId=this.$store.state.orderList.curAccountId;
+            curAccountId=curAccountId.split(',')
+            //若返回的整合账号小于等于1，则不显示
+            if(curAccountId.length<2){
+                return ''
+            }
+            let orgrinAccout=this.order.sourceAccount
+            if(global.Storage.get("USER_INFO")&&(this.order.vipInfoHdId==global.Storage.get("USER_INFO").vipInfoId)){
+                orgrinAccout='当前账号'
+            }
+            return orgrinAccout
+        },
     }
 };
 </script>

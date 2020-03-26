@@ -1,7 +1,7 @@
 {
     "pages": [
-        "pages/coupons",
-        "pages/home/home"
+        "pages/home/home",
+        "pages/coupons"
     ],
     "subPackages": [
         {
@@ -14,8 +14,15 @@
                 "goods/default-four",
                 "goods/gift-bag",
                 "goods/good-collocation",
+                "goods/off-shelves",
                 "wares/wares-detail",
-                "wares/wares-gift"
+                "wares/wares-gift",
+                "wares/collocate-design",
+                "fission/assemble/assemble-list",
+                "fission/assemble/assemble-record",
+                "fission/bargain/bargain-list",
+                "fission/bargain/bargain-detail",
+                "fission/flashSale/flashsale-list"
             ]
         },
         {
@@ -44,9 +51,10 @@
                 "address/address-list",
                 "address/address-detail",
                 "phone/bind-phone",
-                "phone/change-phone",
                 "vouchers/my-vouchers",
-                "vouchers/vouchers-list"
+                "vouchers/vouchers-list",
+                "member/member-point",
+                "merge/member-merge-form"
             ]
         },
         {
@@ -55,7 +63,9 @@
                 "order/order/order-evaluate",
                 "order/order/order-settlement",
                 "order/orderDetail/order-detail",
-                "order/orderList/order-list"
+                "order/orderList/order-list",
+                "invoice/invoiceApply",
+                "invoice/invoiceDetail"
             ]
         },
         {
@@ -70,11 +80,16 @@
     "preloadRule": {
         "pages/coupons": {
             "network": "all",
-            "packages": ["pages/UserPackage"]
+            "packages": [
+                "pages/UserPackage",
+                "pages/distributionPackage"
+            ]
         },
         "pages/home/home": {
             "network": "all",
-            "packages": ["pages/goodsPackage","pages/distributionPackage"]
+            "packages": [
+                "pages/goodsPackage"
+            ]
         }
     },
     "window": {
@@ -83,5 +98,29 @@
         "navigationBarTitleText": "小七快赚",
         "navigationBarTextStyle": "white",
         "enablePullDownRefresh": false
+    },
+    "usingComponents": {
+        "van-tabbar": "/vant-weapp/dist/tabbar/index",
+        "van-tabbar-item": "/vant-weapp/dist/tabbar-item/index",
+        "van-toast": "/vant-weapp/dist/toast/index",
+        "van-field": "/vant-weapp/dist/field/index",
+        "van-action-sheet": "/vant-weapp/dist/action-sheet/index",
+        "van-popup": "/vant-weapp/dist/popup/index",
+        "van-dialog": "/vant-weapp/dist/dialog/index",
+        "van-cell": "/vant-weapp/dist/cell/index",
+        "van-cell-group": "/vant-weapp/dist/cell-group/index",
+        "van-stepper": "/vant-weapp/dist/stepper/index",
+        "van-icon": "/vant-weapp/dist/icon/index",
+        "van-picker": "/vant-weapp/dist/picker/index",
+        "van-datetime-picker": "/vant-weapp/dist/datetime-picker/index",
+        "van-radio-group": "/vant-weapp/dist/radio-group/index",
+        "van-radio": "/vant-weapp/dist/radio/index",
+        "van-checkbox-group": "/vant-weapp/dist/checkbox-group/index",
+        "van-checkbox": "/vant-weapp/dist/checkbox/index",
+        "van-switch": "/vant-weapp/dist/switch/index",
+        "van-area": "/vant-weapp/dist/area/index",
+        "van-rate": "/vant-weapp/dist/rate/index",
+        "van-loading": "vant-weapp/dist/loading/index",
+        "van-steps": "/vant-weapp/dist/steps/index"
     }
 }

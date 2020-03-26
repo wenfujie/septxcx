@@ -121,7 +121,11 @@ export default {
             return 100 / this.length - 1 + "%";
         }
     },
-      onHide() {
+    onHide() {
+        // 解决重复进页面数据未初始化
+        Object.assign(this.$data, this.$options.data());
+    },
+      onUnload() {
         // 解决重复进页面数据未初始化
         Object.assign(this.$data, this.$options.data());
     },

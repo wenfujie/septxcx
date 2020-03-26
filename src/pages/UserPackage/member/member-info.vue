@@ -190,11 +190,6 @@
             />
         </van-popup>
 
-        <!--底部按钮-->
-        <!--<div class="bottom-btn2" @click="putUserInfo">-->
-        <!--<p class="btn-txt">提交</p>-->
-        <!--</div>-->
-
         <div class="com-foot-btn-cont">
             <div class="com-foot-btn" @click="putUserInfo">提交</div>
         </div>
@@ -355,7 +350,9 @@ export default {
         },
         //  获取个人信息
         getUserInfo() {
-            let data = {};
+            let data = {
+                vipInfoHdId: global.Storage.get("USER_INFO").vipInfoId
+            };
             UserService.getUserInfo(data).then(res => {
                 this.userInfo = res;
                 //  会员信息整合，用户昵称取值字段变更
@@ -369,7 +366,6 @@ export default {
                     ? res.solarcalendar.split(" ")[0]
                     : null;
                 this.userphone = res.mobilePhone ? res.mobilePhone : "";
-                console.log(this.userphone, "this.userphone");
             });
         },
 
@@ -468,7 +464,7 @@ export default {
                 //  会员属性
                 customs: arr
             };
-            UserService.updateUserInfo(data)
+             UserService.updateUserInfo(data)
                 .then(
                     res => {},
                     err => {
@@ -490,9 +486,8 @@ export default {
                 })
                 .then(() => {
                     this.btnLock = false;
-                });
+                });           
         },
-
         //  获取会员自定义属性
         getMemberInfo() {
             let data = {

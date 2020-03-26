@@ -1,4 +1,10 @@
-
+<!--
+ * @Author: lan.chen
+ * @Date: 2019-06-29 14:02:07
+ * @LastEditors: lan.chen
+ * @LastEditTime: 2019-08-14 16:06:01
+ * @Description: 
+ -->
 <template>
     <div class="address-list">
         <!-- 个人中心跳转收货地址 -->
@@ -6,16 +12,8 @@
             <li class="address-list-item" v-for="(item, index) in addressList" :key="index">
                 <div @click="selectAddress(item)" class="border-dash-b3">
                     <div class="address-header">
-                        <span class="user-name">
-                            {{
-                            item.cargousrName
-                            }}
-                        </span>
-                        <span class="user-phone">
-                            {{
-                            item.cargoPhone
-                            }}
-                        </span>
+                        <span class="user-name">{{item.cargousrName}}</span>
+                        <span class="user-phone">{{item.cargoPhone}}</span>
                     </div>
                     <div class="address-msg">{{ item.destDesc + item.address }}</div>
                 </div>
@@ -75,7 +73,7 @@
 </template>
 <script>
 import { UserService } from "../../../api/service";
-import EmptyContent from "../../../components/EmptyContent";
+import EmptyContent from "@/components/EmptyContent";
 import Toast from "vant-weapp/dist/toast/toast";
 import Dialog from "vant-weapp/dist/dialog/dialog";
 export default {
@@ -92,9 +90,9 @@ export default {
             checked: false,
             fromPage: "", // 来源页面，用于地址选择的点击跳转
             addressList: [], // 地址列表
-            showEmpty: false,
-            type: 0,//判断是否第一次进入
-            isNew: 0, //判断是否是新增地址
+            showEmpty: false, //空判断
+            type: 0, //判断是否无地址列表进入编辑地址，1是 0否
+            isNew: false, //判断是否是新增地址,来判断地址详情的头部标题
             btnLock: false, //按钮锁
             showList: 0 //0为订单跳转入口  1为账户页跳转入口
         };
@@ -113,9 +111,6 @@ export default {
         // 获取地址列表
         getAddress(items) {
             this.showEmpty = false;
-            this.$nextTick(() => {
-                // window.scrollTo(0, 1)
-            });
             let data = {
                 vipUsrId: global.Storage.get("USER_INFO").usrId
             };
@@ -128,7 +123,7 @@ export default {
                 }
                 res.forEach(item => {
                     if (item.defaultFlag === 1) {
-                        this.type = 1;
+                        this.type = 1; //判断是否无地址列表进入新增地址，1是 0 否（测试要求第一次新增地址，复选框默认勾选）
                     } else {
                         this.type = 0;
                     }
@@ -155,8 +150,8 @@ export default {
         },
         // 删除地址
         deleteAddress(item) {
-            if (this.btnLock) return;
-            this.btnLock = true;
+            // if (this.btnLock) return;
+            // this.btnLock = true;
             Dialog.confirm({
                 message: "确定删除该地址吗？",
                 confirmButtonText: "确定"
@@ -203,11 +198,15 @@ export default {
         //  跳转新增地址
         newAddr() {
             if (this.addressList.length === 0) {
-                this.type = 1;
+                this.type = 1; //判断是否无地址列表进入新增地址 1是
+                this.isNew = true;
             } else {
                 this.type = 0;
             }
-            this.isNew = 0;
+            if (this.addressList.length > 19) {
+                Toast("最多可添加20条收货地址");
+                return;
+            }
             this.$router.push(
                 "/pages/UserPackage/address/address-detail?type=" +
                     this.type +
@@ -252,6 +251,12 @@ export default {
         this.fromPage = this.$route.query.fromPage || "";
         this.showList = this.$route.query.showList;
         this.getAddress();
+         setTimeout(() => {
+            wx.pageScrollTo({
+                scrollTop: 0,
+                duration: 300
+            });
+        }, 0);
     }
 };
 </script>
@@ -359,7 +364,7 @@ page {
         background: $color-white;
         box-shadow: 0 computed(4) computed(12) 0px rgba(0, 0, 0, 0.1);
         border-radius: computed(5);
-        margin-bottom: computed(140);
+        margin-bottom: computed(40);
         .address-list-item {
             width: 90%;
             margin: computed(5) computed(5) computed(0) computed(35);

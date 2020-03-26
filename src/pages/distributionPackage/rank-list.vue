@@ -148,6 +148,13 @@
                     ordFlag: parseInt(this.sort),
                     nickName:  this.nickName,
                 }
+
+                //  会员整合新增选中分销商查询
+                if(!!this.$store.state.distribution.accountInfo.id) {
+                    data.id = this.$store.state.distribution.accountInfo.id
+                    data.vipInfoHdId = this.$store.state.distribution.accountInfo.vipInfoHdId
+                }
+
                 Distribution.getRankList(data).then((res) => {
                     this.rankList.push.apply(this.rankList,res.list)
                     if(this.rankList.length >= res.total ||  res.total <= 0) {
@@ -320,6 +327,10 @@
             display: flex;
             flex-direction: column;
             flex: 1;
+        }
+        .van-radio__icon--checked{
+            background-color: $maincolor !important;
+            border-color: $maincolor !important;
         }
     }
 </style>

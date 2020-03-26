@@ -6,11 +6,6 @@
 <template>
     <div class="bill-info">
         <wxs module="filter" src="../../filter/filterCommon.wxs"></wxs>
-        <!-- 页面标签 begin -->
-        <!--<div class="bill-tab">-->
-        <!--<div v-for="item in tabMenu" @click="tabHandle(item.value)" class="tab-item" :class="{'active' : item.value === activeIndex}" :key="item.value">{{item.title}}</div>-->
-        <!--</div>-->
-        <!-- 页面标签 end -->
 
         <!-- 下级会员对账单 begin -->
         <div class="bill-list-box" v-show="activeIndex === 0">
@@ -19,13 +14,13 @@
                 <form @submit.prevent action="javascript:return true">
                     <!-- 微信昵称 -->
                     <van-field
-                            class="search-name mgL30 mgR30"
-                            :value="name"
-                            placeholder="请输入微信昵称"
-                            @keypress="searchHandel"
-                            @change="fieldChange('name',$event)"
-                            type="search"
-                            clearable
+                        class="search-name mgL30 mgR30"
+                        :value="name"
+                        placeholder="请输入微信昵称"
+                        @keypress="searchHandel"
+                        @change="fieldChange('name',$event)"
+                        type="search"
+                        clearable
                     />
                 </form>
                 <!-- 筛选层级 -->
@@ -53,7 +48,7 @@
                     <div class="fund-item clearfix">
                         <p class="fl">总返利金额（元）：<span>{{filter.Fix2(interestAmount)}}</span></p>
                         <a href="/pages/distributionPackage/rank-list" tag="div" class="fr fund-btn">查看分润排行<text
-                                class="iconfont iconxuanze"></text></a>
+                            class="iconfont iconxuanze"></text></a>
                     </div>
                 </div>
                 <!-- 下级会员对账单表头 -->
@@ -70,82 +65,40 @@
 
             <!-- 下级会员对账单列表 begin -->
             <div class="bill-list">
-                <!-- <van-pull-refresh v-model="isLoading" @refresh="onRefresh" :head-height="100">
-                    <van-list
-                            v-model="loading"
-                            :finished="finished"
-                            @load="loadMore"
-                            :offset="80"
-                    >
-                        <ul class="bill-content-list" v-if="billList.length>0">
-                            <li class="bill-content" v-for="item in billList" :key="item.id">
-                                <div class="bill-item">{{item.nickName || '匿名用户'}}</div>
-                                <div class="bill-item">{{item.billCode}}</div>
-                                <div class="bill-item">{{item.amountOrd | $goldDivide}}</div>
-                                <div class="bill-item">{{item.inAmt | $goldDivide}}</div>
-                                <div :class="['bill-item',
-                                { 'already' : item.ordStatusCode === 'D_DONE' || item.ordStatusCode === 'D_ORDRECEIVED'}]">
-                                    {{item.ordStatusName}}
-                                </div>
-                                <div class="bill-item time">{{item.crtLog}}</div>
-                            </li>
-                        </ul>
-                    </van-list>
-                    <div class="fund-empty" v-if="billList.length<=0 && !loading">
-                        <empty :emptyText="emptyText"></empty>
-                    </div>
-                </van-pull-refresh> -->
-
                 <div>
-                    <div>
-                        <ul class="bill-content-list" v-if="billList.length>0">
-                            <li class="bill-content" v-for="item in billList" :key="item.id">
-                                <div class="bill-item">{{item.nickName || '匿名用户'}}</div>
-                                <div class="bill-item">{{item.billCode}}</div>
-                                <div class="bill-item">{{filter.goldDivide(item.amountOrd)}}</div>
-                                <div class="bill-item">{{filter.goldDivide(item.inAmt)}}</div>
-                                <div :class="['bill-item',
-                                { 'already' : item.ordStatusCode === 'D_DONE' || item.ordStatusCode === 'D_ORDRECEIVED'}]">
-                                    {{item.ordStatusName}}
-                                </div>
-                                <div class="bill-item time">{{item.crtLog}}</div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="fund-empty" v-if="billList.length<=0 && !loading">
-                        <empty :emptyText="emptyText"></empty>
-                    </div>
+                    <ul class="bill-content-list" v-if="billList.length>0">
+                        <li class="bill-content" v-for="item in billList" :key="item.id">
+                            <div class="bill-item">{{item.nickName || '匿名用户'}}</div>
+                            <div class="bill-item">{{item.billCode}}</div>
+                            <div class="bill-item">{{filter.goldDivide(item.amountOrd)}}</div>
+                            <div class="bill-item">{{filter.goldDivide(item.inAmt)}}</div>
+                            <div :class="['bill-item',
+                            { 'already' : item.ordStatusCode === 'D_DONE' || item.ordStatusCode === 'D_ORDRECEIVED'}]">
+                                {{item.ordStatusName}}
+                            </div>
+                            <div class="bill-item time">{{item.crtLog}}</div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="fund-empty" v-if="billList.length<=0 && !loadingStatus">
+                    <empty :emptyText="emptyText"></empty>
                 </div>
             </div>
             <!-- 下级会员对账单列表 end -->
         </div>
         <!-- 下级会员对账单 end -->
 
-        <!-- 次级会员对账单 begin -->
-        <div class="secondary-bill" v-show="activeIndex === 1">
-            <div class="secondary-bill-list bg-gray">
-                <div class="bill-item">会员总数</div>
-                <div class="bill-item">订单总金额</div>
-                <div class="bill-item">返利总金额</div>
-            </div>
-            <div class="secondary-bill-list">
-                <div class="bill-item">{{billInfo.totalVip || 0}}</div>
-                <div class="bill-item">{{filter.Fix2(billInfo.totalAmountOrd || 0)}}</div>
-                <div class="bill-item">{{filter.Fix2(billInfo.totalInAmt || 0)}}</div>
-            </div>
-        </div>
-        <!-- 次级会员对账单 end -->
-
         <!--查询时间弹窗 begin-->
         <van-popup :show="isShowPopup"  position="bottom">
             <van-datetime-picker
-                    :value="currentDate"
-                    type="date"
-                    :min-date="minDate"
-                    :max-date="maxDate"
-                    @cancel="isShowPopup = false"
-                    @confirm="selectTime"
-                    @input="onDateInput"
+                :value="currentDate"
+                type="date"
+                :min-date="minDate"
+                :max-date="maxDate"
+                @cancel="isShowPopup = false"
+                @confirm="selectTime"
+                @input="onDateInput"
+                @change="onDateChange"
             />
         </van-popup>
 
@@ -153,32 +106,13 @@
 
         <!-- 筛选等级选择菜单 begin -->
         <van-action-sheet
-                :overlay="true"
-                :show="showLevel"
-                :close-on-click-overlay="true"
-                :actions="levelCodesList"
-                @select="choseLevel"
+            :overlay="true"
+            :show="showLevel"
+            :close-on-click-overlay="true"
+            :actions="levelCodesList"
+            @select="choseLevel"
         />
         <!-- 筛选等级选择菜单 end -->
-
-        <!-- 导出邮箱弹窗 begin -->
-        <!-- <van-dialog
-                :show="isShowEmail"
-                title="请填写您要接受账单的邮箱"
-                show-cancel-button
-                cancelButtonText="先不填写"
-                confirmButtonText="确认提交"
-                @confirm="sendEmail"
-        >
-            <van-field
-                    class="dialog-filed"
-                    :value="email"
-                    @change="fieldChange('name',$event)"
-                    type="email"
-                    placeholder="邮箱地址"
-            />
-        </van-dialog> -->
-        <!-- 导出邮箱弹窗 end -->
 
         <van-toast id="van-toast" />
     </div>
@@ -196,20 +130,16 @@
         },
         // 小程序 滚动到底部事件
         onReachBottom(){
+            if(!!this.isShowPopup) return
             this.loadMore();
         },
         // 小程序 下拉刷新事件
         onPullDownRefresh(){
+            if(!!this.isShowPopup) return
             this.onRefresh();
         },
         components: {
-            // 'van-field': Field,
-            // 'van-datetime-picker': DatetimePicker,
-            // 'van-popup': Popup,
             'empty': Empty,
-            // 'van-pull-refresh': PullRefresh,
-            // 'van-list': List,
-            // 'van-actionsheet': Actionsheet
         },
         data() {
             return {
@@ -229,13 +159,11 @@
                 isShowEmail: false,  // 控制导出邮箱弹窗遮罩显示的变量
                 email: null,  // 导出对账单对应的邮箱地址
                 timeType: null,  // 时间类型
-                currentDate: new Date().getTime(),  // 选中时间
-                dateStart: new Date(),  // 起始时间
-                dateEnd: new Date(),  // 结束时间
+                currentDate: null,  // 选中时间
+                dateStart: null,  // 起始时间
+                dateEnd: null,  // 结束时间
                 minDate: new Date(2019, 2, 1, 0, 0, 0).getTime(),  // 最小截止时间与产品沟通定在2019-03-01
-                maxDate: new Date().getTime(),  // 最大截止时间
-                loading: false,    // 是否处于加载更多
-                isLoading: false,  // 是否处于上拉刷新状态
+                maxDate: null,  // 最大截止时间
                 finished: true,  // 控制是否允许加载更多商品
                 billList: [],  // 下级会员对账单列表
                 billInfo: {},  // 次级会员对账单列表
@@ -249,26 +177,24 @@
                 levelCodesList: [],
                 totalVip: 0,  // 总会员数
                 consumer: 0,  // 购买会员总数
+                maxTime: null,
+                timeLimit: null,
+                loadingStatus: false
             }
         },
         methods: {
-            // 键盘失焦
-            // handleBlur(){
-            //     setTimeout(()=>{
-            //         this.$nextTick(() => {
-            //             window.scrollTo(0, 1)
-            //         })
-            //     }, 0)
-            // },
+
             // 控制 筛选会员 dialog显示
             handleLevelDialog(flag = false){
-                console.log(flag,"----")
+//                console.log(flag,"----")
                 this.showLevel = flag;
             },
+
             // input change事件
             fieldChange(key,event){
                 this[key] = event.mp.detail;
             },
+
             //  时间组件初始化
             timeInit() {
                 let date = new Date()
@@ -276,7 +202,10 @@
                 let month = date.getMonth()
                 let day = date.getDate()
                 this.dateStart = new Date(year, month, day, 0, 0, 0)
-                this.dateEnd = new Date(year, month, day, 23, 59, 59)
+                this.dateEnd = new Date(year, month, day, 23, 58, 59)
+                this.maxDate = new Date(year, month, day, 23, 59, 59).getTime()
+                this.maxTime = new Date(year, month, day, 23, 59, 59).getTime()
+                this.currentDate = new Date(year, month, day).getTime()
             },
 
             //  获取分销等级列表
@@ -288,13 +217,14 @@
                     } else {
                         this.levelCodesList = levelCodesList['D_MATRULELEVEL01']
                     }
-                    console.log(this.levelCodesList,"--------")
+//                    console.log(this.levelCodesList,"--------")
                 })
             },
 
             //  获取分销商下级对账单
             async getList() {
-//                this.loading = true
+                global.toastLoading()
+                this.loadingStatus = true
                 let data = {
                     pageNum: this.pageNum,
                     pageSize: this.pageSize,
@@ -304,6 +234,13 @@
                     dateEnd: this.timeEnd || this.dateEnd,
                     level: this.levelCodes
                 }
+
+                //  会员整合新增选中分销商查询
+                if(!!this.$store.state.distribution.accountInfo.id) {
+                    data.id = this.$store.state.distribution.accountInfo.id
+                    data.vipInfoHdId = this.$store.state.distribution.accountInfo.vipInfoHdId
+                }
+
                 Distribution.getBillList(data).then((res) => {
                     global.toastLoading(false);// 关闭
                     wx.stopPullDownRefresh();
@@ -315,29 +252,30 @@
                     } else {
                         this.finished = false
                     }
+                    this.loadingStatus = false
                 }, (err) => {
-                    this.loading = false
-                    this.isLoading = false
+                    this.loadingStatus = false
                 }).then(() => {
-                    this.loading = false
-                    this.isLoading = false
+                    this.loadingStatus = false
                 })
             },
 
             //  获取分销商次级对账单信息
             async getBillInfo() {
+
                 let data = {
                     id: await this.$store.dispatch('distribution/getDistributionId'),
                 }
+
+                //  会员整合新增选中分销商查询
+                if(!!this.$store.state.distribution.accountInfo.id) {
+                    data.id = this.$store.state.distribution.accountInfo.id
+                    data.vipInfoHdId = this.$store.state.distribution.accountInfo.vipInfoHdId
+                }
+
                 Distribution.getSecondaryBillInfo(data).then((res) => {
                     if (!!res) this.billInfo = res
                 })
-            },
-
-            //  切换tab标签
-            tabHandle(index) {
-                if (this.activeIndex === index) return
-                this.activeIndex = index
             },
 
             //  显示时间选择
@@ -349,23 +287,34 @@
                 if (activeTime === 'dateStart') {
                     this.minDate = new Date(2019, 2, 1, 0, 0, 0).getTime()
                     this.maxDate = dateEndStamp
-                    this.currentDate = dateStartStamp;
+                    setTimeout(()=> {
+                        this.currentDate = dateStartStamp;
+                    },100)
                 } else if (activeTime === 'dateEnd') {
                     this.minDate = dateStartStamp
-                    this.maxDate = new Date().getTime()
-                    this.currentDate = dateEndStamp;
+                    this.maxDate = this.maxTime
+                    setTimeout(() => {
+                        this.currentDate = dateEndStamp;
+                    },100)
                 }
                 setTimeout(()=>{
                     this.isShowPopup = true
                 },200)
             },
+
             // 日期值改变事件
             onDateInput(e){
                 this.currentDate = e.mp.detail;
             },
+
+            // 日期改变事件
+            onDateChange(e){
+//                console.log('日期改变事件',e)
+            },
+
             //  选择时间
             selectTime(value) {
-                console.log("修改选中start和end的时间")
+//                console.log("修改选中start和end的时间")
                 this[this.timeType] = new Date(value.mp.detail);
                 this.isShowPopup = false
             },
@@ -410,8 +359,15 @@
                         id: await this.$store.dispatch('distribution/getDistributionId'),
                         addressee: this.email
                     }
+
+                    //  会员整合新增选中分销商查询
+                    if(!!this.$store.state.distribution.accountInfo.id) {
+                        data.id = this.$store.state.distribution.accountInfo.id
+                        data.vipInfoHdId = this.$store.state.distribution.accountInfo.vipInfoHdId
+                    }
+
                     Distribution.sendEmail(data).then((res) => {
-                        console.log(res)
+//                        console.log(res)
                         if (res === true || res === 'true') {
                             Toast('邮件已发送，请您在相应邮箱中查收~')
                         } else {
@@ -436,7 +392,7 @@
 
             //  监听软键盘搜索的事件
             searchHandel(event){
-                console.log(this.name,event)
+//                console.log(this.name,event)
                 if (event.keyCode == 13) {
                     event.preventDefault(); //禁止默认事件（默认是换行）
                     this.name = event.target.value;
@@ -455,6 +411,7 @@
                 let time = global.formatTime(this.dateEnd)
                 return time.substring(0, 10)
             },
+
             //  订单总金额
             orderAmount: function () {
                 let amount = 0
@@ -466,18 +423,27 @@
                 let amount = 0
                 if (this.billList.length > 0) amount = this.billList[0].totalInAmt
                 return amount
-            }/* ,
-            totalVip: function () {
-                let totalVip = 0
-                if(this.billList.length >0) totalVip = this.billList[0].totalVip
-                return totalVip
-            } */
+            }
+        },
+        watch: {
+            'currentDate': function () {
+                if(this.currentDate >= this.maxTime) this.currentDate = new Date().getTime()
+            },
+            'maxDate': function () {
+                if(this.timeType === 'dateStart') {
+                    let date = new Date()
+                    let year = date.getFullYear()
+                    let month = date.getMonth()
+                    let day = date.getDate()
+                    if(this.maxDate >= new Date(year, month, day, 0, 0, 0).getTime()) {
+                        this.maxDate = new Date(year, month, day, 0, 0, 0).getTime()
+                    }
+                }
+            }
         },
         onLoad() {
-            global.toastLoading();// 开启
-
             this.timeInit()
-            this.getBillInfo()
+//            this.getBillInfo()
             this.getList()
             this.getLevelRule()
         },
@@ -490,7 +456,7 @@
 <style scoped type="text/scss" lang="scss">
     .van-cell{
         background-color: transparent;
-        padding: 8rpx 0 0 0;
+        padding: computed(8) 0 0 0;
     }
     .bill-info {
         box-sizing: border-box;
@@ -694,7 +660,9 @@
             position: relative;
             overflow: hidden;
             .secondary-bill-list {
+                box-sizing: border-box;
                 display: flex;
+                width: 100%;
                 .bill-item {
                     flex: 1;
                     box-sizing: border-box;

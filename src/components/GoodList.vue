@@ -14,9 +14,7 @@
                 <div
                     @click="goDetail(item)"
                     class="goods-main-item">
-                    <img :src="filter.imgFilter(item.goodsFilePath,company_id)"
-                         @onerror="global.errImg(event)"
-                         lazy-load="true">
+                    <img :src="filter.imgFilter(item.goodsFilePath,company_id, '345*345')" lazy-load="true">
                     <div class="goods-main-item__info">
                         <div class="goods-main-item__describe">{{item.goodsName}}</div>
                         <p class="overflow">
@@ -27,9 +25,9 @@
                             </text>
                         </p>
                     </div>
-                    <img :src="filter.imgFilter(item.spmFileUrl,company_id)"
+                    <img :src="filter.imgFilter(item.spmFileUrl,company_id, '60*60')"
                          v-if="item.spmFileUrl"
-                         @onerror="global.errImg(event)"
+
                          class="goods-main-item__logo"
                          lazy-load="true">
                 </div>
@@ -138,9 +136,9 @@
                     .goods-main-item__logo{
                         position: absolute;
                         top: computed(20);
-                        left:computed(20);
-                        width:computed(120);
-                        height: computed(32);
+                        right:computed(20);
+                        width:computed(60) !important;
+                        height: computed(60) !important;;
                         border-radius: computed(16);
                         overflow: hidden;
                     }

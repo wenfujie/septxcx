@@ -1,7 +1,14 @@
+/*
+ * @Author: yongtian.hong
+ * @Date: 2019-08-05 13:18:56
+ * @LastEditors: yongtian.hong
+ * @LastEditTime: 2019-08-12 11:49:41
+ * @Description:
+ */
 // import { Dialog, Toast } from "vant";
 
 import { getShopList } from "@/api/service/base";
-import { cityData } from "@/assets/js/cityData.js";
+// import { cityData } from "@/assets/js/cityData.js";
 import Toast from 'vant-weapp/dist/toast/toast';
 import Dialog from '@/components/dialog/dialog';
 import check from "@/utils/check";
@@ -11,6 +18,7 @@ import ordStateMap from "./stateCodeMap";
 import btnMap from './btnMap'
 import postSaleApi from "@/api/service/postSale";
 import store from "@/store";
+import debounce from "@/utils/debounce";
 
 // 路由跳转
 export const goTo = (vm, path) => {
@@ -36,6 +44,9 @@ export const cancelApplyHandler = vm => {
     });
 };
 
+
+
+
 // 取消申请弹窗
 export const cancelApply = vm => {
     return new Promise(async function (resolve, reject) {
@@ -53,7 +64,7 @@ export const cancelApply = vm => {
             });
         });
     });
-};
+}
 
 // 重新申请
 export const reApply = vm => {
@@ -73,35 +84,38 @@ export const reApply = vm => {
     });
 };
 // 修改申请
-export const modifyApply = async (vm, code) => {
+export const modifyApply = (vm, code) => {
+    let startTime = new Date();
     let stateName = ordStateMap[code];
     if (stateName != "待审核") {
         Toast("当前申请单订单" + stateName + "无法修改申请,请重新刷新");
         return false;
     }
     let good = vm.data.goodsList[0];
-    let result = await postSaleApi.getApplyNum({ rtlOrdDtId: good.saleOrdDtId })
+    postSaleApi.getApplyNum({ rtlOrdDtId: good.saleOrdDtId })
         .then(
-            res => {
-                return res;
+            result => {
+                good = Object.assign(good, {
+                    applyNum: vm.data.applyAmountQty + result.applyNum,
+                    reApplyCode: vm.data.reApplycode || vm.data.reapplycode,
+                    returnTypeCode: vm.data.returnTypeCode || null,
+                    returnsReasonCode: vm.data.returnsReasonCode || null,
+                    reasonMemo: vm.data.reasonMemo || "",
+                    applyMoney: vm.data.money || vm.data.applyMoney,
+                    applyAmountQty: vm.data.applyAmountQty
+                });
+                // 缓存当前要修改的申请单
+                store.commit('afterSale/apply/updateApplyGood', good)
+                // vm.$router.push("/pages/afterSale/pages/apply/page");
+                vm.$router.push("/pages/afterSalePackage/afterSale/pages/apply/page");
+
+                console.log('modifyEnd', new Date() - startTime)
             },
             err => {
                 Toast("获取可申请数量失败");
             }
         );
-    let params = Object.assign(good, {
-        applyNum: vm.data.applyAmountQty + result.applyNum,
-        reApplyCode: vm.data.reApplycode || vm.data.reapplycode,
-        returnTypeCode: vm.data.returnTypeCode || null,
-        returnsReasonCode: vm.data.returnsReasonCode || null,
-        reasonMemo: vm.data.reasonMemo || "",
-        applyMoney: vm.data.money || vm.data.applyMoney,
-        applyAmountQty: vm.data.applyAmountQty
-    });
-    // 缓存当前要修改的申请单
-    store.commit('afterSale/apply/updateApplyGood', params)
-    // vm.$router.push("/pages/afterSale/pages/apply/page");
-    vm.$router.push("/pages/afterSalePackage/afterSale/pages/apply/page");
+
 };
 
 // 获取售后详情
@@ -135,11 +149,6 @@ export const getExpressCompanies = async () => {
     return result.data;
 };
 
-//获取省市县区的数据
-export const getCityList = () => {
-    return cityData;
-};
-
 // 初始化详情状态
 export const initState = async vm => {
     // 按钮置空，防止初始化渲染出按钮
@@ -152,7 +161,7 @@ export const initState = async vm => {
     //获取售后详情
     vm.data = await getDetailAsync(vm);
     //获取省市区
-    vm.cityList = getCityList();
+    vm.cityList = await global.getCityData();
     //获取快递列表
     vm.logisList = await getExpressCompanies(vm);
     // 当前状态名
@@ -225,7 +234,7 @@ export const validBeforeSubmit = (vm, params) => {
                 Toast("请选择地址");
                 return false;
             } else {
-                params.shopId = global.Storage.get("USER_INFO").shopId;
+                params.shopId = global.Storage.get("properties").shopId;
                 return true;
             }
 
@@ -241,26 +250,10 @@ export const validBeforeSubmit = (vm, params) => {
     }
 };
 
-// 保存物流
-export const saveLogis = async vm => {
-
-    let params = {
-        reApplyCode: vm.data.reApplycode,
-        returnWayCode: vm.returnWayCode,
-        shippingId: vm.$store.state.afterSale.detail.logisInfo.shippingId,
-        addressId: vm.$store.state.afterSale.detail.address.id,
-        expressCode: vm.$store.state.afterSale.detail.kdInfo.expressNo,
-        shopId: vm.store.id
-    };
-    if (!validBeforeSubmit(vm, params)) {
-
-        return;
-    }
-    let result = await postSaleApi.saveLogis(params).then(success => {
-
-    }, error => {
-
-    });
+// 提交物流
+const submitLogis = debounce(async (vm, params) => {
+    let result = await postSaleApi.saveLogis(params)
+        .catch(err => { });
     if (result == 500) {
         Toast("提交失败");
     } else {
@@ -271,6 +264,24 @@ export const saveLogis = async vm => {
         vm.store = {};
         vm.logis = {};
     }
+
+}, 5000)
+
+// 保存物流
+export const saveLogis = async vm => {
+    let params = {
+        reApplyCode: vm.data.reApplycode,
+        returnWayCode: vm.returnWayCode,
+        shippingId: vm.$store.state.afterSale.detail.logisInfo.shippingId,
+        addressId: vm.$store.state.afterSale.detail.address.id,
+        expressCode: vm.$store.state.afterSale.detail.kdInfo.expressNo,
+        shopId: vm.store.id
+    };
+    if (!validBeforeSubmit(vm, params)) return;
+
+    // 防抖
+    submitLogis(vm, params)
+
 };
 
 //   按钮点击触发事件
@@ -278,13 +289,13 @@ export const btnClickEvent = async (vm, btnName, from) => {
 
     switch (btnName) {
         case "取消申请":
-            cancelApply(vm).then(() => {
-                initState(vm);
-                Toast("取消成功");
-
-            }, err => {
-                Toast("取消失败");
-            });
+            cancelApply(vm)
+                .then(() => {
+                    initState(vm);
+                    Toast("取消成功");
+                }, err => {
+                    Toast("取消失败");
+                });
             break;
         case "重新申请":
             reApply(vm);

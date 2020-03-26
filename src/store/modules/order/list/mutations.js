@@ -63,5 +63,9 @@ export default {
         state.orderList=[];
     },
     // 查看订单详情
-    viewOrderDetail(state, data) {}
+    viewOrderDetail(state, data) {},
+    //设置账号id
+    setAccountId(state,{account_id}){
+        state.curAccountId=account_id;
+    },
 };

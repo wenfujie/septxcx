@@ -14,7 +14,12 @@
                         <p class="fs30B">{{card.couponName}}</p>
                         <div class="fs20 date-time">活动有效期至{{valiPeriod}}</div>
                     </div>
-                    <div class="top-right coupon-state" @click="operate()">{{operation.name}}</div>
+                    <div
+                        class="top-right coupon-state"
+                        @click="operate()"
+                        v-if="unRceive==false"
+                    >立即领取</div>
+                    <div class="top-right coupon-state" v-else>已领取</div>
                 </div>
                 <div class="dashed"></div>
                 <div class="bottom">
@@ -51,7 +56,12 @@
                         <p class="fs30B">{{card.couponName}}</p>
                         <div class="fs20 date-time">活动有效期至{{valiPeriod}}</div>
                     </div>
-                    <div class="top-right coupon-state" @click="operate()">{{operation.name}}</div>
+                    <div
+                        class="top-right coupon-state"
+                        @click="operate()"
+                        v-if="unRceive==false"
+                    >立即领取</div>
+                    <div class="top-right coupon-state" v-else>已领取</div>
                 </div>
                 <div class="dashed"></div>
                 <div class="bottom">
@@ -79,7 +89,7 @@
 </template>
 
 <script>
-import { Vouchers, Order } from "@/api/service";
+import { Vouchers } from "@/api/service";
 import wxPay from "@/utils/wxPay";
 import payment from "@/utils/payment";
 import Toast from "vant-weapp/dist/toast/toast";
@@ -101,7 +111,8 @@ export default {
                 D_CASHVOLUME: "现金券",
                 D_DISCOUNTCOUPONS: "折扣券",
                 D_RECHARGEABLECARD: "充值卡"
-            }
+            },
+            unRceive: false
         };
     },
     computed: {
@@ -109,13 +120,11 @@ export default {
         valiPeriod: function() {
             if (this.card.couponEndTime == null) return;
             let end = this.card.couponEndTime.split(" ")[0].replace(/\-/g, ".");
-            // console.log(end)
             return end;
         },
         // 是否现金券
         isCashCoupon: function() {
             return this.card.cardTypeCode === "D_CASHVOLUME" ? true : false;
-            // return this.card.cardTypeCode === "002" ? true : false;
         },
         // 是否折扣券
         isDisCoupon: function() {
@@ -128,27 +137,10 @@ export default {
             return this.card.cardTypeCode === "D_RECHARGEABLECARD"
                 ? true
                 : false;
-            // return this.card.cardTypeCode === "czk" ? true : false;
         },
         // 是否一次性储值卡
         isOnceCard: function() {
             return this.card.cardTypeCode === "D_AONETIMECARD" ? true : false;
-        },
-        //操作按钮控制
-        operation: function() {
-            if (this.card.isBuy === 0 || this.card.buyPrice <= 0) {
-                return {
-                    name: "立即领取",
-                    type: "draw",
-                    showPrice: false
-                };
-            } else {
-                return {
-                    name: "立即使用",
-                    type: "buy",
-                    showPrice: false
-                };
-            }
         }
     },
     methods: {
@@ -166,24 +158,22 @@ export default {
                     delete params[key];
                 }
             });
-            // console.log("filter", params);
             return params;
         },
         //领取卡券
         async draw() {
             let params = {
-                usrId: global.Storage.get("USER_INFO").usrId,
-                companyId: global.Storage.get("COMPANYID").company_id,
                 busContsCode: global.baseConstant.busContsCode,
                 cardId: this.card.valueCardHdId,
                 couponsId: this.card.couponId,
-                ownCompanyId: global.Storage.get("COMPANYID").company_id
+                ownCompanyId: global.Storage.get("COMPANYID").company_id,
+                shopId: global.Storage.get("properties").shopId
             };
             params = this.paramsFilter(params);
             let result = await Vouchers.saveCoupons(params);
-            // console.log('result', result)
             if (result.length == 0) {
                 Toast("来迟一步~已经被领完拉~");
+                this.unRceive = true;
                 return;
             }
             switch (result[0].state) {
@@ -194,7 +184,7 @@ export default {
                             this.$router.replace(
                                 "/pages/UserPackage/vouchers/my-vouchers"
                             );
-                        }, 3000);
+                        }, 1500);
                     } else {
                         this.$emit("onSelectSuccess");
                     }
@@ -213,13 +203,7 @@ export default {
         },
         // 操作
         async operate() {
-            switch (this.operation.type) {
-                case "draw":
-                    this.draw();
-                    break;
-                default:
-                    break;
-            }
+            this.draw();
         }
     }
 };

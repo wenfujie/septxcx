@@ -84,7 +84,6 @@
             }
         }
         .closeIcon {
-            // border: computed(1) dashed rgb(136,136,136);
             z-index: 10000000;
             width: computed(64);
             height: computed(64);
@@ -123,8 +122,10 @@
                     max-width: computed(140);
                     color: $text-regular;
                     font-size: $font-regular;
+                    &.title-left__max{
+                        max-width: computed(240);
+                    }
                     &.remark-title {
-                        // font-size: $font-common;
                         color: $text-regular;
                     }
                 }
@@ -133,6 +134,10 @@
                     text-align: right;
                     font-size: $font-common;
                     color: $text-primary;
+                    .title-right-point{
+                        line-height: computed(40);
+                        margin-right: computed(10);
+                    }
                     &.red {
                         color: $domaincolor !important;
                         text {
@@ -206,10 +211,6 @@
             width: computed(630);
             padding: computed(20) 0 computed(25) 0;
             border-bottom: 1px dashed $color-gray-dashed;
-            &:last-child {
-                /*border-bottom: none;*/
-                /*padding-bottom: 0;*/
-            }
             .image {
                 width: computed(140);
                 height: computed(140);
@@ -345,10 +346,8 @@
             <div class="container-t bg-white mgB30 pd30">
                 <p class="fs28B title">
                     <span>商品清单</span>
-                    <!-- complimentaryQuantity -->
                     <span>({{allAmount}})</span>
                 </p>
-                <!-- @click="viewGoodList()" -->
                 <div class="flex-between">
                     <div class="flex-box w100 flex-vbox">
                         <ul>
@@ -357,14 +356,14 @@
                                 :class="{'cusTag': good.orderFlag == 1}"
                                 v-for="(good,index) in shopList"
                                 :key="index">
-                                <img :src="filter.imgFilter(good.url,company_id)" lazy-load="true" :key="good.url" class="image">
+                                <img :src="filter.imgFilter(good.url,company_id, '140*140')" lazy-load="true" :key="good.url" class="image">
                                 <div class="goodsList-middle">
                                     <p class="name overflow-two">{{good.goodsName}}</p>
                                     <p class="size-color overflow">尺码：{{good.sizeName}} 颜色：{{good.colorName}}</p>
                                 </div>
                                 <div class="goodsList-right">
-                                    <p v-if="!good.dealPrice" class="price">￥{{filter.Fix2(good.tagPrice)}}</p>
-                                    <p v-else-if="good.dealPrice" class="price">￥{{filter.Fix2(good.dealPrice)}}</p>
+                                    <p class="price" v-if="fissionType">￥{{filter.Fix2(good.salePrice)}}</p>
+                                    <p class="price" v-else>￥{{filter.Fix2(good.dealPrice?good.dealPrice:good.tagPrice)}}</p>
                                     <p class="num">x {{good.amount}}</p>
                                 </div>
                             </li>
@@ -382,7 +381,7 @@
                                     v-for="(goods,cIndex) in giftGroupItem.gifts"
                                     v-if="giftGroupItem.groupType !== '指定'">
                                     <div class="send">
-                                        <img :src="filter.imgFilter(goods.url,company_id)" lazy-load="true" :key="goods.url" class="image">
+                                        <img :src="filter.imgFilter(goods.url,company_id, '100*100')" lazy-load="true" :key="goods.url" class="image">
                                         <div class="goodsList-middle">
                                             <p class="name overflow">
                                                 <span>{{item.salePmType}}</span>
@@ -401,7 +400,7 @@
                                     v-if="giftGroupItem.gifts.length > 0 && giftGroupItem.groupType === '指定'">
                                     <div class="send" v-if="giftGroupItem.choseGoods.goodsName">
                                         <!-- 已选择赠品 -->
-                                        <img :src="filter.imgFilter(giftGroupItem.choseGoods.url,company_id)"
+                                        <img :src="filter.imgFilter(giftGroupItem.choseGoods.url,company_id, '100*100')"
                                              lazy-load="true"
                                              :key="giftGroupItem.choseGoods.url"
                                              class="image">
@@ -452,8 +451,12 @@
                             {{isDiscountCouponPrice}}
                             <text :class="[isDiscountCouponShow ? 'iconiconup-copy' : 'iconicondown-copy']" class="iconfont"></text>
                         </span>
-                        <span v-else-if="disCouponList.length === 1" class="title-right red">
+                        <span v-if="disCouponList.length === 1 && !fissionType" class="title-right red">
                             暂无可用
+                            <text class="iconfont iconicondown-copy"></text>
+                        </span>
+                        <span v-else-if="fissionType" class="title-right red">
+                            不可使用
                             <text class="iconfont iconicondown-copy"></text>
                         </span>
                     </div>
@@ -483,8 +486,12 @@
                             -￥{{ filter.Fix2(price.cashCouponPrice) }}
                             <text :class="[isCouponShow ? 'iconiconup-copy' : 'iconicondown-copy']" class="iconfont"></text>
                         </span>
-                        <span v-else-if="cashCouponList.length === 1" class="title-right red">
+                        <span v-if="cashCouponList.length === 1 && !fissionType" class="title-right red">
                             暂无可用
+                            <text class="iconfont iconicondown-copy"></text>
+                        </span>
+                        <span v-if="fissionType" class="title-right red">
+                            不可使用
                             <text class="iconfont iconicondown-copy"></text>
                         </span>
                     </div>
@@ -521,6 +528,34 @@
                         <span v-else class="title-right">包邮</span>
                     </div>
                 </div>
+
+                <!--使用积分 v-if="visiblePoint"-->
+                <div class="discount-coupon" v-if="visiblePoint">
+                    <div class="title">
+                        <span class="title-left title-left__max overflow flex-vcenter">使用{{pointInfo.point || 0}}积分</span>
+                        <span class="title-right flex-end">
+                            <span class="title-right-point">
+                                ￥{{ filter.goldDivide(filter.Fix2(pointInfo.pointPirce)) }}
+                            </span>
+                            <van-switch
+                                :checked="switchFlag"
+                                active-color="#FF3736" @change="pointChange"
+                                size="15px"
+                            />
+                        </span>
+                    </div>
+                </div>
+
+                <!--发票选择 begin（先影藏入口）-->
+                <div class="discount-coupon" v-if="invoiceStatus === true && actualPay > 0">
+                    <div class="title">
+                        <span class="title-left">{{invoiceData.type?invoiceData.type:'发票'}}</span>
+                        <span class="title-right" @click="setInvoice" style="color:#999;">
+                            {{invoiceData.title||'不开发票'}}<text class="iconfont iconxuanze" style="font-size:14px;"></text>
+                        </span>
+                    </div>
+                </div>
+                <!--发票选择 end-->
 
                 <!-- 订单备注 begin -->
                 <div class="discount-coupon">
@@ -572,6 +607,7 @@
 
         <van-dialog
             use-slot
+            v-if="showDialog"
             :title="showDialog == 'unSell'?'以下商品已下架：':'以下商品库存不足：'"
             @close="showDialog = ''"
             :show="showDialog == 'unSell' || showDialog == 'unStock'">
@@ -593,8 +629,11 @@
         Vouchers,
         Payment,
         Fund,
-        Goods
+        Goods,
+        Invoice,
+        Fission
     } from "@/api/service";
+
     import wxPay from "@/utils/wxPay";
     import check from "@/utils/check";
     import payment from "@/utils/payment";
@@ -603,24 +642,25 @@
 
     import Dialog from 'vant-weapp/dist/dialog/dialog';
     import Toast from 'vant-weapp/dist/toast/toast';
+
     export default {
         config:{
             navigationBarTitleText: '订单结算'
         },
         components: {
             deliverSelect,
-            orderSkuDialogComp
+            orderSkuDialogComp,
         },
         data() {
             return {
                 isShowSku: false,
                 colorActiveIndex: null,
                 sizeActiveIndex: null,
-                skuPopupList: '',// 赠品sku选择
+                skuPopupList: '',           // 赠品sku选择
                 sendListIndex: null,        // 赠品当前选中索引
-                price: {}, //折扣价格
-                vipDiscount: "", //vip折扣
-                memo: "", //订单备注
+                price: {},                  //折扣价格
+                vipDiscount: "",            //vip折扣
+                memo: "",                   //订单备注
                 showOnLoading: false,
                 Actionlist: {
                     disCoupon: {
@@ -659,73 +699,73 @@
                     }
                 },
                 transFee: 0,
-                balance: 0,//账户余额
-                areaList: {}, // 地址列表
+                balance: 0,             // 账户余额
+                areaList: {},           // 地址列表
                 address: [],
-                showAreaList: false, //显示省市区选择器
-                storeList: [], //  门店列表
-                store: {}, //门店对象
+                showAreaList: false,    // 显示省市区选择器
+                storeList: [],          // 门店列表
+                store: {},              // 门店对象
                 shipParams: {
                     kdps: {},
                     mdzq: {}
                 },
-                showStoreList: false, //显示门店选择器
-                canUsePoint: false, //用户是否可以使用积分
-                isPointUsed: true, //是否使用积分抵扣
-                isBalanceUsed: false, //是否使用余额
+                showStoreList: false,       // 显示门店选择器
+                canUsePoint: false,         // 用户是否可以使用积分
+                isPointUsed: true,          // 是否使用积分抵扣
+                isBalanceUsed: false,       // 是否使用余额
                 shopCart: {},
-                shopList: [], //商品清单
+                shopList: [],               // 商品清单
                 customList: {},
-                suitsList: [], //套装
-                singleList: [], //单品
-                disCouponList: [], //  折扣券列表
-                cashCouponList: [], //  现金券列表
+                suitsList: [],              // 套装
+                singleList: [],             // 单品
+                disCouponList: [],          // 折扣券列表
+                cashCouponList: [],         // 现金券列表
                 cardIds: {
                     cashCouponId: null,
                     disCouponId: null
                 },
-                showGoodsList: false, //展示商品清单上拉列表
-                showCusList: false, //显示定制清单
-                showDiscTickets: false, //展示折扣券上拉列表
-                showCashTickets: false, //展示抵用券上拉列表
-                showDalog: true, //默认显示弹窗提示
+                showGoodsList: false,       // 展示商品清单上拉列表
+                showCusList: false,         // 显示定制清单
+                showDiscTickets: false,     // 展示折扣券上拉列表
+                showCashTickets: false,     // 展示抵用券上拉列表
+                showDalog: true,            // 默认显示弹窗提示
                 isDiscountCouponShow: false,// 默认折扣券不展开
                 isDiscountCouponIndex: null,
                 isDiscountCouponPrice: '不使用折扣券',
-                isCouponShow: false,// 默认抵用券不展开
+                isCouponShow: false,        // 默认抵用券不展开
                 isCouponIndex: null,
                 isCouponPrice: '不使用抵用券',
-                sendList: [],// 赠品列表
-                sendActiveItem: {},// 赠品当前选中
-                company_id:'',//公司id
-                showDialog: false,// 库存上下架提示
-                unSellList:[],// 未上架列表
-                unStockList:[],// 库存不足列表
-                btnDiscountLock: false, // 折扣券、抵用券按钮锁
+                sendList: [],               // 赠品列表
+                sendActiveItem: {},         // 赠品当前选中
+                company_id:'',              // 公司id
+                showDialog: false,          // 库存上下架提示
+                unSellList:[],              // 未上架列表
+                unStockList:[],             // 库存不足列表
+                btnDiscountLock: false,     // 折扣券、抵用券按钮锁
 
+                disabledPoint: false,// 是否禁用积分checkbox
+                showPointFlag: 0,// 判断是否可使用积分
+                switchFlag: false,// 积分使用开关
+                pointInfo: {},// 将有使用积分时的积分信息保存下来
+                invoiceStatus: false, //  是否允许开发票
+                invoiceData: {}, //发票信息
+                fissionType:1, // 1秒杀 2拼团
+                onlineHdId: '',// 促销id
             };
         },
         watch: {
+            visiblePoint(boolean){
+                // 如果积分行由不显示变成显示 把开关打开
+                if(boolean){
+                    this.switchFlag = true;
+                }
+            },
             transFee() {
                 if (this.isBalanceUsed) {
                     // 获取用户余额信息
                     this.getUserGoldInfo();
                 }
             },
-//            "Actionlist.cashCoupon.value"(val) {
-//                if (this.$refs.cashCoupon.$data.selectedModel == -2) {
-//                    this.$refs.cashCoupon.$data.errMsg = val;
-//                } else {
-//                    this.$refs.cashCoupon.$data.errMsg = "";
-//                }
-//            },
-//            "Actionlist.disCoupon.value"(val) {
-//                if (this.$refs.disCoupon.$data.selectedModel == -2) {
-//                    this.$refs.disCoupon.$data.errMsg = val;
-//                } else {
-//                    this.$refs.disCoupon.$data.errMsg = "";
-//                }
-//            },
             'isDiscountCouponIndex'() {
                 if (this.isDiscountCouponIndex >= 0) {
                     if (this.isDiscountCouponIndex === 0) {
@@ -748,6 +788,33 @@
         },
 
         methods: {
+            //  获取发票设置
+            getInvoice() {
+                let data = {};
+                Invoice.canSetInvoice(data).then((res) => {
+                    if (res.invoiceStateCode === "D_INV_ORDSAVE") {
+                        this.invoiceStatus = true;
+                    } else {
+                        this.invoiceStatus = false;
+                    }
+                });
+            },
+            //  发票页面跳转
+            setInvoice() {
+                if (this.invoiceStatus === false) {
+                    return;
+                } else {
+                    // this.setStore();
+                    this.$router.push("/pages/orderPackage/invoice/invoiceApply?fromPage=settlement");
+                }
+            },
+
+            /** 点击勾选使用积分 **/
+            pointChange(e){
+                if(this.disabledPoint) return;
+                this.switchFlag = e.mp.detail;
+                this.getDiscount();
+            },
             // 组件回调：尺码、颜色选择
             onSelectColor(colorItem, sizeItem, currentSend) {
                 let obj = {}
@@ -774,34 +841,37 @@
                 // 商品id
                 obj.partHdId = currentSend.partHdId
 
+                let searchFlag = true
                 this.sendList.forEach((sendItem, sendIndex) => {
                     sendItem.giftGroup.forEach((giftGroupItem, giftGroupIndex) => {
-                        for (let i = 0; i < giftGroupItem.gifts.length; i++) {
-                            let current = giftGroupItem.gifts[i]
-                            if (current.colorCode === colorItem.colorCode &&
-                                current.sizeCode === sizeItem.sizeCode &&
-                                sendIndex === this.sendListIndex) {
+                        if (searchFlag) {
+                            for (let i = 0; i < giftGroupItem.gifts.length; i++) {
+                                let current = giftGroupItem.gifts[i]
+                                if (current.colorCode === colorItem.colorCode &&
+                                    current.sizeCode === sizeItem.sizeCode &&
+                                    sendIndex === this.sendListIndex) {
 
-                                giftGroupItem.choseCode = colorItem.classCode
-                                giftGroupItem.choseGoods.goodsCode = colorItem.goodsCode
-                                giftGroupItem.choseGoods.goodsName = colorItem.goodsName
+                                    giftGroupItem.choseCode = colorItem.classCode
+                                    giftGroupItem.choseGoods.goodsCode = colorItem.goodsCode
+                                    giftGroupItem.choseGoods.goodsName = colorItem.goodsName
 
-                                giftGroupItem.choseGoods.colorCode = colorItem.colorCode
-                                giftGroupItem.choseGoods.colorId = colorItem.colorId
-                                giftGroupItem.choseGoods.colorName = colorItem.colorName
+                                    giftGroupItem.choseGoods.colorCode = colorItem.colorCode
+                                    giftGroupItem.choseGoods.colorId = colorItem.colorId
+                                    giftGroupItem.choseGoods.colorName = colorItem.colorName
 
-                                giftGroupItem.choseGoods.sizeCode = sizeItem.sizeCode
-                                giftGroupItem.choseGoods.sizeId = sizeItem.sizeId
-                                giftGroupItem.choseGoods.sizeName = sizeItem.sizeName
+                                    giftGroupItem.choseGoods.sizeCode = sizeItem.sizeCode
+                                    giftGroupItem.choseGoods.sizeId = sizeItem.sizeId
+                                    giftGroupItem.choseGoods.sizeName = sizeItem.sizeName
 
-                                giftGroupItem.choseGoods.amount = obj.amount
-                                giftGroupItem.choseGoods.skuId = obj.skuId
-                                giftGroupItem.choseGoods.salePmHdId = obj.salePmHdId
-                                giftGroupItem.choseGoods.url = obj.url
-                                giftGroupItem.choseGoods.partHdId = obj.partHdId
-                                giftGroupItem.choseGoods.giftId = obj.giftId
+                                    giftGroupItem.choseGoods.amount = obj.amount
+                                    giftGroupItem.choseGoods.skuId = obj.skuId
+                                    giftGroupItem.choseGoods.salePmHdId = obj.salePmHdId
+                                    giftGroupItem.choseGoods.url = obj.url
+                                    giftGroupItem.choseGoods.partHdId = obj.partHdId
+                                    giftGroupItem.choseGoods.giftId = obj.giftId
 
-                                break
+                                    searchFlag = false
+                                }
                             }
                         }
                     })
@@ -854,6 +924,7 @@
                             colorObj.colorCode = itm.colorCode
                             colorObj.colorId = itm.colorId
                             colorObj.colorName = itm.colorName
+                            colorObj.colorSortSeq = itm.colorSortSeq
 
                             colorObj.classCode = itm.classCode
                             colorObj.goodsCode = itm.goodsCode
@@ -870,12 +941,10 @@
                             sizeObj.sizeId = itm.sizeId
                             sizeObj.sizeName = itm.sizeName
                             sizeObj.none = true     // 默认按钮可以点击
+                            sizeObj.sizeSortSeq = itm.sizeSortSeq
                             combineSize.push(sizeObj)
                         }
                     })
-
-//                    newGoodItem.colorList = global.objCombine(combineColor, 'colorCode')
-//                    newGoodItem.sizeList = global.objCombine(combineSize, 'sizeCode')
 
                     // 对象去重
                     let repeatColorList = global.objCombine(combineColor, 'colorCode')
@@ -960,12 +1029,6 @@
                 this.$refs.deliverSelect.$data.storeForm.storeName = "";
             },
 
-            // 门店选择
-            onStoreSelected(store) {
-                this.showStoreList = false;
-                this.store = store;
-            },
-
             //优惠券/抵用券互斥,选中优惠券同时要去获取与之不可用的抵用券，反之亦然
             getUsableTickets(cardIds) {
                 let params = {
@@ -1025,29 +1088,12 @@
                 });
             },
 
-            //折扣券选用回调（废弃）
-            async onSelectDiscTicket(item) {
-                if (this.disCouponList.length == 0) {
-                    this.Actionlist.disCoupon.value = "无可用";
-                }
-                //保存选中的卡id
-                this.cardIds.disCouponId = item.cardId;
-                // 选择不使用折扣券，将抵用券状态置为可选
-                if (!item.cardId || item.cardId == -1) {
-                    let discount = await this.getDiscount(); //不使用优惠券时价格需重新计算
-                    this.allCouponUnDisabled(this.cashCouponList);
-                    this.Actionlist.disCoupon.value = item.couponName;
-                    return;
-                } else {
-                    await this.filterCashCoupon(item.cardId);
-
-                    this.getDiscount();
-                }
-
-            },
-
             // 折扣券展开/收起
             discountCouponToggle() {
+                if (this.fissionType) {
+                    return
+                }
+
                 this.isDiscountCouponShow = !this.isDiscountCouponShow
             },
 
@@ -1101,20 +1147,11 @@
              * @param isCoupon true为使用折扣券 false
              */
             _giftCommonData(data) {
-                // let arr = [];
+                let newSendList = []
+
                 data.forEach((giftItem) => {
                     giftItem.giftGroup.forEach((itm) => {
-                        if (itm.groupType === "随机") {
-                            //  随机赠送取第一个商品(需求变更为取随机一个商品)
-                            // if (itm.gifts.length > 1) {
-                            //     let randomNum = (
-                            //         Math.random() * (itm.gifts.length - 1)
-                            //     ).toFixed() * 1;
-                            //     arr.push(itm.gifts[randomNum]);
-                            //     itm.gifts = arr;
-                            //     arr = [];
-                            // }
-                        }
+                        if (itm.groupType === "随机") {}
                         if (itm.groupType === "固定") {
                             //  固定全部赠送
                         }
@@ -1128,6 +1165,46 @@
                         itm.gifts.forEach((giftsItm) => {
                             // 促销id
                             giftsItm.salePmHdId = data[0].salePmHdId
+
+                            // 赠品数量累加
+                            let obj = {}
+                            if (newSendList.length === 0) {
+                                obj.goodsCode = giftsItm.goodsCode
+                                obj.skuId = giftsItm.skuId
+                                obj.num = giftsItm.amount
+                                newSendList.push(obj)
+                            } else {
+                                let isNumAddFlag = false
+                                for (let i = 0; i < newSendList.length; i++) {
+                                    if (newSendList[i].goodsCode === giftsItm.goodsCode &&
+                                        newSendList[i].skuId === giftsItm.skuId) {
+                                        newSendList[i].num += giftsItm.amount
+                                        isNumAddFlag = true
+                                        break
+                                    }
+                                }
+
+                                if (!isNumAddFlag) {
+                                    obj.goodsCode = giftsItm.goodsCode
+                                    obj.skuId = giftsItm.skuId
+                                    obj.num = giftsItm.amount
+                                    newSendList.push(obj)
+                                }
+                            }
+                        })
+                    })
+                });
+
+                data.forEach((giftItem) => {
+                    giftItem.giftGroup.forEach((itm) => {
+                        itm.gifts.forEach((giftsItm) => {
+                            newSendList.forEach((newItem, newIndex) => {
+                                if (newItem.goodsCode === giftsItm.goodsCode &&
+                                    newItem.skuId === giftsItm.skuId) {
+
+                                    giftsItm.num = newItem.num
+                                }
+                            })
                         })
                     })
                 });
@@ -1137,6 +1214,10 @@
 
             // 抵用券展开/收起
             couponToggle() {
+                if (this.fissionType) {
+                    return
+                }
+
                 this.isCouponShow = !this.isCouponShow
             },
 
@@ -1293,25 +1374,6 @@
                 }
             },
 
-            //抵用券选用回调（废弃）
-            async onSelectCashTicket(item) {
-                if (this.cashCouponList.length == 0) {
-                    //                this.Actionlist.cashCoupon.value = "无可用";
-                }
-
-                this.cardIds.cashCouponId = item.cardId;
-                // 选择不使用抵用券，折扣券将状态置为可选
-                if (!item.cardId || item.cardId == -1) {
-                    this.allCouponUnDisabled(this.disCouponList);
-                    this.Actionlist.cashCoupon.value = item.couponName;
-                    this.getDiscount();
-                    return;
-                }
-
-                this.getDiscount();
-
-            },
-
             // 过滤折扣券（折扣券优先）
             async filterDisCoupon(cardId) {
                 let result = await this.getUsableTickets(cardId);
@@ -1356,40 +1418,54 @@
                         skuList = skuList.concat(item.skuList);
                     });
                 }
+
+                if (this.fissionType) {
+                    shopCart.skuList.forEach((item, index) => {
+                        item.amount = item.ordQty
+                    })
+                }
+
                 return shopCart.skuList.concat(skuList);
             },
 
             // 获取购物清单
             async getShopList() {
-                let params = {
-                    ctmUsrId: global.Storage.get("USER_INFO").usrId,
-                    cookieId: global.Storage.get("USER_INFO").cookieId,
-                    rtlCartTempHdId: this.orderHdId || this.$route.query.orderHdId,
-                    busContsCode: global.baseConstant.busContsCode,
-                    shopCode: global.Storage.get("USER_INFO").shopCode
-                };
-                let shopCart = await Order.getSettlementInfo(params);
-
+                let shopCart
+                if(this.fissionType){
+                    let fissionData = {
+                        rtlCartTempHdId: this.orderHdId,
+                        busContsCode: global.baseConstant.busContsCode,
+                        shopId: global.Storage.get("properties").shopId
+                    }
+                    switch (this.fissionType) {
+                        case 1:
+                            fissionData.fpsCode = 'SECKILL';
+                            break;
+                        case 2:
+                            fissionData.fpsCode = 'GROUP';
+                            break;
+                        case 3:
+                            fissionData.fpsCode = 'BARGAIN';
+                            fissionData.vipInfoDtFssId = this.vipInfoDtFssId;
+                            break;
+                    }
+                    // 获取裂变促销结算页商品信息
+                    shopCart = await Fission.getFissionOrderSettleInfo(fissionData);
+                    this.onlineHdId = shopCart.onlineHdId
+//                    this.getDiscount();
+                }else{
+                    let params = {
+                        ctmUsrId: global.Storage.get("USER_INFO").usrId,
+                        cookieId: global.Storage.get("USER_INFO").usrId,
+                        rtlCartTempHdId: this.orderHdId || this.$route.query.orderHdId,
+                        busContsCode: global.baseConstant.busContsCode,
+                        shopCode: global.Storage.get("properties").shopCode
+                    };
+                    shopCart = await Order.getSettlementInfo(params);
+                }
                 this.shopList = this.combindShopList(shopCart);
                 global.toastLoading(false);// 关闭
             },
-
-            // 获取订单结算页促销赠品信息
-            async getOrderPromotion() {
-                let data = {
-                    shopCode: global.Storage.get("USER_INFO").shopCode,
-                    rtlCartTempHdId: this.orderHdId,
-                    busContsCode: global.baseConstant.busContsCode
-                };
-                await Vouchers.getNewOrderPromotion(data).then(async (res) => {
-                    if (res === '' || res.length <= 0) {
-                        return
-                    }
-
-                    this.sendList = await this._giftCommonData(res)
-                });
-            },
-
             // 获取会员折扣
             async getVipDiscount() {
                 let params = {
@@ -1397,8 +1473,8 @@
                     usrId: global.Storage.get("USER_INFO").usrId,
                     companyId: global.Storage.get("COMPANYID").company_id
                 };
-                //                let cardInfo = await UserService.getMyCardInfo(params);
-                //                this.vipDiscount = cardInfo.discount;
+                let cardInfo = await UserService.getMyCardInfo(params);
+                this.vipDiscount = cardInfo.discount;
             },
 
             // 获取用户是否可使用积分
@@ -1409,12 +1485,16 @@
 
             // 获取优惠券列表
             async getCouponsList() {
-                let params = {
-                    shopId: global.Storage.get("USER_INFO").shopId,
-                    rtlOrdInterHdId: this.orderHdId,
-                    scopeId: 0
-                };
-                let couponsList = await Vouchers.getOrderCouponsList(params);
+                let couponsList
+                if(!this.fissionType) {
+                    let params = {
+                        shopId: global.Storage.get("properties").shopId,
+                        rtlOrdInterHdId: this.orderHdId,
+                        scopeId: 0
+                    };
+                    couponsList = await Vouchers.getOrderCouponsList(params);
+                }
+
                 this.disCouponList = [{
                     disabled: false,
                     active: true,
@@ -1428,15 +1508,18 @@
                     couponName: '不使用抵用券'
                 }]; //现金券
 
-                couponsList.forEach((item, index) => {
-                    item.disabled = false;
-                    item.active = false;
-                    if (item.discount) {
-                        this.disCouponList.push(item);
-                    } else {
-                        this.cashCouponList.push(item);
-                    }
-                });
+                if(couponsList.length) {
+                    couponsList.forEach((item, index) => {
+                        item.disabled = false;
+                        item.active = false;
+                        if (item.discount) {
+                            this.disCouponList.push(item);
+                        } else {
+                            this.cashCouponList.push(item);
+                        }
+                    })
+                }
+
 
                 if (this.disCouponList.length == 0) {
                     this.Actionlist.disCoupon.value = "无可用";
@@ -1501,18 +1584,73 @@
                 }
             },
 
-            //获取价格
-            async getDiscount(cardIds) {
+            /**
+             * 获取价格接口中 积分使用逻辑
+             * @params
+             * internalPointFlag: 在getDiscount函数中递归调用才传，其他地方不可传(以该字段结束递归)
+             **/
+            aboutPoint(internalPointFlag){
+                // 将有使用积分时的积分信息保存下来
+                if(this.price.point){
+                    this.pointInfo = {
+                        point: this.price.point,
+                        pointPirce: this.price.pointPirce,
+                    }
+                }
+
+                // 如果有显示积分 && 不是内部调用
+                if(this.showPointFlag && typeof internalPointFlag !== 'number') {
+
+                    // 积分逻辑
+                    let checkPrice = this.price.salePrice + (this.price.pointPirce?this.price.pointPirce:0);
+
+                    // 商品价格（扣除积分前所有应扣价格）  <  最低积分使用额度   ==》  不让使用积分
+                    if( checkPrice < this.userPointInfo.prPointValue * this.userPointInfo.minPoint){
+                        // 之前是勾选使用积分的情况
+                        if(this.switchFlag) {
+                            this.switchFlag = false;
+                            this.disabledPoint = true;
+                            this.getDiscount('', 0);
+                        }else{
+                            this.disabledPoint = true;
+                            this.getDiscount('', 0);
+                        }
+                    }else{// 满足使用积分
+                        // 之前是勾选使用积分的情况
+                        if(this.switchFlag) {
+
+                        }else{
+                            this.disabledPoint = false;
+                            this.$nextTick(()=>{
+                                this.getDiscount('', this.switchFlag?1:0);
+                            })
+                        }
+                    }
+                }
+            },
+
+            /**
+             * 获取价格
+             * @params
+             * internalPointFlag: 在getDiscount函数中递归调用才传，其他地方不可传(以该字段结束递归)
+             **/
+            async getDiscount(cardIds, internalPointFlag) {
                 if (!cardIds) {
                     cardIds = this.cardIdsFormat().toString();
+                }
+                let usePointFlag = internalPointFlag;
+                if(typeof usePointFlag !== 'number') {
+                    usePointFlag = this.showPointFlag;
                 }
                 let params = {
                     companyId: global.Storage.get("COMPANYID").company_id,
                     usrId: global.Storage.get("USER_INFO").usrId,
                     rtlOrdInterHdId: this.orderHdId,
                     cardIds: cardIds || "",
-                    pointFlag: 0, //是否使用积分
-                    busContsCode: global.baseConstant.busContsCode
+                    pointFlag: this.usePointFlag, //是否使用积分
+                    busContsCode: global.baseConstant.busContsCode,
+                    shopId: global.Storage.get("properties").shopId,
+                    vipInfoHdId: global.Storage.get("USER_INFO").vipInfoId
                 };
                 this.price = await Vouchers.getOrderDiscountPoint(params);
                 // 如果存在积分可抵扣价格则取值,否则不显示
@@ -1521,6 +1659,10 @@
                 // } else {
                 //     this.Actionlist.integral.value = '';
                 // }
+
+                // 积分使用逻辑
+                this.aboutPoint(internalPointFlag);
+
                 if (this.isBalanceUsed) {
                     // 获取用户余额信息
                     this.getUserGoldInfo();
@@ -1571,16 +1713,37 @@
                 });
             },
 
+            /** 判断是否可使用积分 **/
+            async judgeUsePoint(){
+                this.userPointInfo = await UserService.getMinIntegral({
+                    shopId: global.Storage.get("properties").shopId,
+                    busContsCode: global.baseConstant.busContsCode,
+                });
+                this.userPointInfo.minPoint = this.userPointInfo.minPoint?this.userPointInfo.minPoint:0;
+                // 由于页面缓存问题导致不能用计算属性
+                // "integralFlag":  启用积分抵现 1：启用， 0停用;  "effFlag": 状态 1：启用，0停用;  "moreThanMin": 是否超过最小可用积分； "prPointValue": 积分面值； "minPoint": 最小使用积分；
+                if(this.userPointInfo.effFlag == 1 &&
+                    this.userPointInfo.integralFlag == 1 &&
+                    this.userPointInfo.moreThanMin &&
+                    typeof this.userPointInfo.prPointValue === 'number'){
+
+                    this.showPointFlag = 1;
+                }else{
+                    this.showPointFlag = 0;
+                }
+                this.switchFlag = this.showPointFlag == 1 ? true : false;
+            },
+
             // 数据初始化
             async onInit() {
                 // 获取订单中间表id
-                this.orderHdId = this.$route.query.orderHdId;
+                this.orderHdId = parseInt(this.$route.query.orderHdId);
+                if(!this.fissionType) {
+                    // 判断使用是否可使用积分
+                    await this.judgeUsePoint();
+                }
                 // 获取购物清单
                 this.getShopList();
-                // 赠品
-//                await this.getOrderPromotion()
-                // 获取用户折扣
-                this.getVipDiscount();
                 // 获取优惠券列表
                 await this.getCouponsList();
                 // 选中原先选中的折扣券、抵用券
@@ -1589,25 +1752,30 @@
 
             // 订单支付支付
             toPay(billCode) {
-                let successUrl = "/pages/orderPackage/order/orderDetail/order-detail" + "?billCode=" + billCode + "&fromPage=payCode";
+                let successUrl = "/pages/orderPackage/order/orderDetail/order-detail" + "?billCode=" + billCode;
+                successUrl += this.fissionType ? "&fissionType=" + this.fissionType : '';
                 if (this.actualPay <= 0) {
                     this.saving = false;
-                    this.$router.replace(successUrl);
+                    this.$router.replace(successUrl + "&fromPage=payCode");
                     Order.packLevelUp({ billCode: billCode });
-                    Order.lockStock({ billCode: billCode, operType: 'FRONT_PAY' });
+
+                    // 裂变不需要锁库存
+                    if (this.fissionType) {
+                        Order.lockStock({ billCode: billCode, operType: 'FRONT_PAY' });
+                    }
+
                     return;
                 }
 
                 wxPay(billCode, this.actualPay).then(res => {
-                        this.$router.replace(successUrl);
+                        this.$router.replace(successUrl + "&fromPage=payCode");
                     },
                     err => {
-                        Toast("支付出错了~");
-                        this.$router.replace("/pages/orderPackage/order/orderDetail/order-detail?billCode=" + billCode);
+                        this.$router.replace(successUrl);
                     }
                 ).catch(()=>{
                     Toast("支付出错了~");
-                    this.$router.replace("/pages/orderPackage/order/orderDetail/order-detail?billCode=" + billCode);
+                    this.$router.replace(successUrl);
                 }).then(()=>{
                     this.$store.dispatch('user/updateShoppingCart')
                     this.saving = false;
@@ -1674,13 +1842,19 @@
                     goodsCode: item.goodsCode,
                     colorCode: item.colorCode,
                     sizeCode: item.sizeCode,
-                    shopCode: global.Storage.get("USER_INFO").shopCode,
+                    shopCode: global.Storage.get("properties").shopCode,
                     onlineHdId: salePmHdId,
                     groupId: groupId
                 };
                 await Goods.getGoodsStock(data).then((res) => {
-                    if (item.amount <= res.skuList[0].skuQty) {
-                        flag = true
+                    if (item.num) {
+                        if (item.num <= res.skuList[0].skuQty) {
+                            flag = true
+                        }
+                    } else {
+                        if (item.amount <= res.skuList[0].skuQty) {
+                            flag = true
+                        }
                     }
                 });
                 return flag
@@ -1702,11 +1876,16 @@
                 }
                 this.btnLock = true
 
+                if (this.fissionType) {
+                    this.handleEmitBill(false)
+                    return
+                }
+
                 let stockFlag = false
 
                 // 检验商品库存、上下架
                 let goodListObj = {
-                    shopId: global.Storage.get("USER_INFO").shopId,
+                    shopId: global.Storage.get("properties").shopId,
                     usrId: global.Storage.get("USER_INFO").usrId,
                     goodList: []
                 }
@@ -1720,45 +1899,26 @@
                         orderFlag: item.orderFlag               // 0为大货 1为定制
                     })
                 })
-                Goods.getUseableGood(goodListObj).then((res) => {
+                goodListObj.busContsCode = global.baseConstant.busContsCode
+                await Goods.getUseableGood(goodListObj).then((res) => {
                     if (res.sellAll !== 1) {        // 商品已下架
-                        // let unSellList = ''
-                        // let len = res.unSellList.length
-                        // for (let i = 0; i < len; i++) {
-                        //     unSellList += `<p>【${res.unSellList[i].goodsName}】；</p>`
-                        // }
-                        // Toast({
-                        //     type: 'html',
-                        //     message: '<div class="toast-html"><h2>以下商品已下架：</h2>' + unSellList + '</div>'
-                        // })
-
+                        this.btnLock = false
                         this.unSellList = res.unSellList;
                         this.setDialogState('unSell');
 
-                        this.btnLock = false
-                        return
+                        return false
                     }
                     if (res.stockAll !== 1) {       // 商品库存不足
-                        // let unStockList = ''
-                        // let len = res.unStockList.length
-                        // for (let i = 0; i < len; i++) {
-                        //     unStockList += `<p>【${res.unStockList[i].ptiPartHdName}】颜色：${res.unStockList[i].colorName}，尺码：${res.unStockList[i].sizeName}；</p>`
-                        // }
-                        // Toast({
-                        //     type: 'html',
-                        //     message: '<div class="toast-html"><h2>以下商品库存不足：</h2>' + unStockList + '</div>'
-                        // })
-
+                        this.btnLock = false
                         this.unStockList = res.unStockList;
                         this.setDialogState('unStock');
-
-                        this.btnLock = false
-                        return
+                        return false
                     }
-
-                }).then(() => {
-                    this.btnLock = false;
                 })
+
+                if (this.btnLock === false) {
+                    return
+                }
 
                 // 判断赠品库存
                 if (this.sendList && this.sendList.length > 0) {
@@ -1791,8 +1951,6 @@
                                                 this.handleEmitBill()
 
                                             }).catch(async () => {
-                                                // this.sendList = []
-                                                // this.getOrderPromotion()
                                                 this.sendList = []
                                                 await this.getDiscount();
                                                 if (this.price.gifts && this.price.gifts.length > 0) {
@@ -1831,9 +1989,9 @@
                                             this.sendList = []
                                             await this.getDiscount();
                                             if (this.price.gifts && this.price.gifts.length > 0) {
+                                                Toast('请重新选择赠品~')
                                                 this.sendList = await this._giftCommonData(this.price.gifts)
                                             }
-                                            Toast('请重新选择赠品~')
                                             this.btnLock = false
                                         }).catch(async () => {
                                             this.sendList = []
@@ -1897,22 +2055,32 @@
                     this.btnLock = false
                     return;
                 }
+
                 this.saving = true;
                 this.count++;
                 let params = {
+                    billId: this.orderHdId,
+                    busContsCode: global.baseConstant.busContsCode,
+                    shopCode: global.Storage.get("properties").shopCode,
+                    shopId: global.Storage.get("properties").shopId,
+                    ctmUsrId: global.Storage.get("USER_INFO").usrId,
+                    sourceCode: "D_ORDWEIN",
+
                     companyId: global.Storage.get("COMPANYID").company_id,
                     usrId: global.Storage.get("USER_INFO").usrId,
-                    billId: this.orderHdId,
                     balanceFlag: this.isBalanceUsed ? 1 : 0, // 是否使用余额
-                    busContsCode: global.baseConstant.busContsCode,
-                    shopCode: global.Storage.get("USER_INFO").shopCode,
-                    shopId: global.Storage.get("USER_INFO").shopId,
-                    sourceCode: "D_ORDWEIN",
                     cartList: this.shopList, //商品列表
-                    ctmUsrId: global.Storage.get("USER_INFO").usrId,
-                    //                    ctmMessage: this.memo, //订单备注
+                    // ctmMessage: this.memo, //订单备注
                     promotionList: this.cardIdsFormat(), //券数组['123',456]
-                    pointFlag: 0 //是否使用积分
+                    pointFlag: this.usePointFlag, //是否使用积分
+
+                    receiptWayCode: 'kdps',                                         // 快递配送方式
+                    receiptWayId: this.shipParams['kdps'].receiptWayId,             // 快递配送id
+                    buyUsrMobile: this.shipParams['kdps'].cargoMobile,              // 电话
+                    cargoAddr: this.shipParams['kdps'].cargoAddr,                   // 地址
+                    cargoDestrictCode: this.shipParams['kdps'].cargoDestrictCode,   // 邮编
+                    cargoMobile: this.shipParams['kdps'].cargoMobile,
+                    cargoUsrName: this.shipParams['kdps'].cargoUsrName,             // 姓名
                 };
                 if (!!this.memo) params.ctmMessage = this.memo
                 if (promotionArr.length <= 0) {
@@ -1922,29 +2090,83 @@
                     params.promotePartDto = promotionArr;
                 }
                 this.showOnLoading = true;
-                console.log(JSON.stringify(Object.assign(params, deliverParams)))
-                Order.saveOrder(Object.assign(params, deliverParams)).then(
-                    billCode => {
-                        this.showOnLoading = false;
-                        this.toPay(billCode);
 
-                        // todo 调用预约接口
-                        // this.appointMeas(billCode);
-                        global.Storage.remove("reserveParams");
-                        this.btnLock = true
-                    },
-                    err => {
+                if(this.fissionType) {
+                    switch (this.fissionType) {
+                        case 1:
+                            params.fpsCode = 'SECKILL';
+                            break;
+                        case 2:
+                            params.fpsCode = 'GROUP';
+                            break;
+                        case 3:
+                            params.fpsCode = 'BARGAIN';
+                            params.vipInfoDtFssId = this.vipInfoDtFssId;
+                            break;
+                    }
+                    params.onlineHdId = this.onlineHdId        // 促销id
+
+                    Fission.saveFissionOrder(Object.assign(params, deliverParams)).then(async(billCode) => {
                         this.showOnLoading = false;
+                        this.toPay(billCode)
+                        this.btnLock = false
+                    }, err => {
+                        Toast(err.errorMsg)
+                        this.showOnLoading = false
+                        this.saving = false
+                        this.btnLock = false
+                    })
+                } else {
+                    Order.saveOrder(Object.assign(params, deliverParams)).then(
+                        billCode => {
+                            //  开发票操作，当实际支付金额（不包含运费）大于0时开发票
+                            if (this.actualPay > 0) {
+                                if (this.invoiceData.data &&this.invoiceData.data !== undefined &&this.invoiceData.data !== null) {
+                                    let invoiceData = this.invoiceData.data;
+                                    invoiceData.billCode = billCode;
+                                    Invoice.putInvoice(invoiceData).then(() => {
+                                        global.Storage.remove("invoiceData");
+                                        global.Storage.remove("orderDelivery");
+                                    });
+                                }
+                            }
+                            this.showOnLoading = false;
+                            this.toPay(billCode);
+
+                            // todo 调用预约接口
+                            // this.appointMeas(billCode);
+                            global.Storage.remove("reserveParams");
+                            this.btnLock = false
+                        },
+                        async err => {
+                            Toast(err.errorMsg)
+                            this.showOnLoading = false;
 //                        Toast('库存不足~')
 
-                        this.saving = false;
-                        this.btnLock = false
-                    }
-                );
+                            // 重新获取赠品
+                            if (this.price.gifts && this.price.gifts.length > 0) {
+                                this.sendList = []
+                                await this.getDiscount();
+                                this.sendList = this._giftCommonData(this.price.gifts)
+                            }
+
+                            this.saving = false;
+                            this.btnLock = false
+                        }
+                    );
+                }
             },
 
         },
         computed: {
+            /** 是否显示积分行 **/
+            visiblePoint(){
+                return this.showPointFlag == 1 && !this.disabledPoint
+            },
+            /** 积分开关布尔值转换成数字 **/
+            usePointFlag(){
+                return this.switchFlag ? 1 : 0;
+            },
             // 统计所有商品数量
             allAmount() {
                 let count = 0;
@@ -1965,30 +2187,45 @@
 
             //促销优惠计算
             promotions: function () {
-                let keys = Object.keys(this.price);
                 let price = 0;
-                // 要计算属性写死 防止后端之后多返回字段
-                let needComputedKey = ['cashCouponPrice', 'disCouponPrice', 'pointPirce', 'salePrice', 'storedValueCardPrice', 'vipPrice'];
-                if (keys.length > 0) {
-                    keys.forEach(key => {
-                        if (needComputedKey.indexOf(key) !== -1) {
-                            price += this.price[key];
-                        }
-                    });
+                if(this.fissionType) {
+                    if(this.shopList.length && this.shopList[0].amountRebate) {
+                        price = this.shopList[0].amountRebate;
+                    }
+                    return price;
+                }else{
+                    let keys = Object.keys(this.price);
+                    // 要计算属性写死 防止后端之后多返回字段
+                    let needComputedKey = ['cashCouponPrice', 'disCouponPrice', 'pointPirce', 'salePrice', 'storedValueCardPrice', 'vipPrice'];
+                    if (keys.length > 0) {
+                        keys.forEach(key => {
+                            if (needComputedKey.indexOf(key) !== -1) {
+                                price += this.price[key];
+                            }
+
+                        });
+                    }
+                    //  + this.price.rebatePrice
+                    return this.totalPrice > 0 ? this.totalPrice - price  : price;
                 }
-                //  + this.price.rebatePrice
-                return this.totalPrice > 0 ? this.totalPrice - price  : price;
             },
 
             // 实付金额
             actualPay: function () {
                 let actualPay = 0;
-                if (this.isBalanceUsed == 1) {// 使用余额
-                    actualPay = (this.transFee + this.price.salePrice - this.balance);
-                    actualPay = actualPay < 0 ? 0 : actualPay;
-                } else {
-                    actualPay = this.transFee + this.price.salePrice
+                if(this.fissionType) {
+                    if(this.shopList.length && this.shopList[0].amountDeal) {
+                        actualPay = this.shopList[0].amountDeal + this.transFee;
+                    }
+                }else{
+                    if (this.isBalanceUsed == 1) {// 使用余额
+                        actualPay = (this.transFee + this.price.salePrice - this.balance);
+                        actualPay = actualPay < 0 ? 0 : actualPay;
+                    } else {
+                        actualPay = this.transFee + this.price.salePrice
+                    }
                 }
+
                 return +(actualPay.toFixed(2));
             },
             // 赠品数量
@@ -2004,15 +2241,15 @@
                     })
                 }
                 return amount;
-            },
-        },
-        onShow(){
-
+            }
         },
         onLoad() {
+            global.Storage.remove("invoiceData");//清除发票缓存信息
             global.toastLoading();// 开启
-            this.company_id = global.Storage.get('COMPANYID').company_id
+            this.company_id = global.Storage.get('COMPANYID').company_id;
             this.routeParams = this.$route.params;
+            this.fissionType = parseInt(this.$route.query.fissionType)||''; // 1秒杀 2拼团 3砍价
+            this.vipInfoDtFssId = +this.$route.query.vipInfoDtFssId;
             let keyArr = Object.keys(this.routeParams);
             if (keyArr.length) {
                 global.Storage.set("reserveParams", this.routeParams);
@@ -2022,6 +2259,10 @@
             }
             this.onInit();
 
+        },
+        onShow(){
+            this.getInvoice()
+            this.invoiceData = global.Storage.get("invoiceData") || {};//获取发票缓存信息
         },
         onUnload(){
             Object.assign(this.$data, this.$options.data());

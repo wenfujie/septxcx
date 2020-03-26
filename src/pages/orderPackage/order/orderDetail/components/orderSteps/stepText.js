@@ -39,10 +39,10 @@ export default () => {
                 name: "支付",
                 time: " "
             },
-            {
-                name: "备货",
-                time: ""
-            },
+            // {
+            //     name: "备货",
+            //     time: ""
+            // },
             {
                 name: "发货",
                 time: ""
@@ -63,6 +63,29 @@ export default () => {
             },
             {
                 name: "备货",
+                time: ""
+            },
+            {
+                name: "发货",
+                time: ""
+            },
+            {
+                name: "签收",
+                time: ""
+            }
+        ],
+        /* 拼团 */
+        pt: [
+            {
+                name: "下单",
+                time: ""
+            },
+            {
+                name: "支付",
+                time: ""
+            },
+            {
+                name: "拼团",
                 time: ""
             },
             {

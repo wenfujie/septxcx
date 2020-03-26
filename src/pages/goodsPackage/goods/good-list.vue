@@ -1,3 +1,4 @@
+
 /*
 * createTime：2018/11/2
 * author：fujie.wen
@@ -19,7 +20,7 @@
                         v-for="(item,index) in CrumbsName"
                         :key="index"
                         class="content-box"
-                        v-if="item.list && item.list.length!=0"
+                        v-show="item.list && item.list.length!=0"
                     >
                         <div class="title" @click="showDetails(item)">
                             <p>{{item.escrumbsName}}</p>
@@ -58,7 +59,7 @@
                     class="van-search"
                     placeholder="搜索商品"
                     @click="goSearch"
-                    :value="value"
+                    :value="keyWord"
                     disabled
                 />
             </div>
@@ -77,11 +78,7 @@
                         :src="priceSortImgName"
                         alt="价格"
                     />
-                    <img
-                        v-if="item.id === 4"
-                        class="shaixuan"
-                        :src="serverUrl+'images/goods/shaixuan.png'"
-                    />
+                    <i v-if="item.id === 4" class="iconfont iconshaixuanxiao shaixuan"></i>
                 </li>
             </ul>
         </div>
@@ -95,18 +92,17 @@
                 @click="goDetail(item,url)"
                 :key="index"
             >
-                    <!-- 促销标识 -->
-                    <img
-                        :src="filter.imgFilter(item.spmFileUrl,company_id)"
-                        lazy-load="true"
-                        class="cuxiao"
-                         v-if="!!item.spmFileUrl"
-                    />
+                <!-- 促销标识 -->
+                <img
+                    :src="filter.imgFilter(item.spmFileUrl,company_id, '60*60')"
+                    lazy-load="true"
+                    class="cuxiao"
+                    v-if="!!item.spmFileUrl"
+                />
                 <div class="good-item-img">
                     <img
                         alt="商品logo"
-                        @onerror="global.errImg(event)"
-                        :src="filter.imgFilter(item.glbFileUrl,company_id)"
+                        :src="filter.imgFilter(item.glbFileUrl,company_id, '345*345')"
                         lazy-load="true"
                     />
                 </div>
@@ -116,10 +112,8 @@
                         <span class="sale-single">￥</span>
                         <span>{{filter.Fix2(item.salePrice)}}</span>
                     </div>
-                    <del
-                        class="del_line"
-                        v-if="item.tagPrice && item.tagPrice != 0 && (item.salePrice !== item.tagPrice)"
-                    >￥{{filter.Fix2(item.tagPrice)}}</del>
+                    <!-- v-if="item.tagPrice && item.tagPrice != 0 && (item.salePrice !== item.tagPrice) -->
+                    <del v-if="item.tagPrice && item.tagPrice != 0">￥{{filter.Fix2(item.tagPrice)}}</del>
                 </div>
             </li>
         </ul>
@@ -145,7 +139,7 @@ export default {
     data() {
         return {
             showfifter: false, //显示面包屑弹出层
-            value: "", //关键词
+            keyWord: "", //关键词
             activeIndex: -1, //所选过滤项下标
             filterList: [], //过滤列表
             priceSortState: 0, // 0未选中价格 1降序 2升序
@@ -160,8 +154,8 @@ export default {
             couponId: "", //优惠券id
             ptiPartHdId: "", //  获取面包屑详情的id字符串
             company_id: "",
-            serverUrl: "",
-            classId: "" //分类id
+            classId: "", //分类id
+            couponCardId: "" // 新人券的id
         };
     },
 
@@ -170,31 +164,40 @@ export default {
             let imgName = "";
             switch (this.priceSortState) {
                 case 1:
-                    imgName = "Price_down.png";
+                    imgName = "Price_down.jpg";
                     break;
                 case 2:
-                    imgName = "Price_up.png";
+                    imgName = "Price_up.jpg";
                     break;
                 default:
-                    imgName = "Price_ash.png";
+                    imgName = "Price_ash.jpg";
                     break;
             }
-            return this.serverUrl + "images/goods/" + imgName;
+            return require("../images/" + imgName);
         }
     },
     onLoad() {
         Object.assign(this.$data, this.$options.data());
-        this.serverUrl = global.baseConstant.serverUrl;
         this.company_id = global.Storage.get("COMPANYID").company_id;
-        this.value = this.$route.query.keywords
+        this.keyWord = this.$route.query.keywords
             ? this.$route.query.keywords
             : "";
         this.classId = this.$route.query.classId
             ? this.$route.query.classId
             : ""; // 分类页跳转时存在类别id
+        // 自定义埋点
+        if (!!this.keyWord || !!this.classId) {
+            global.gio("track", "searchSuccess", {
+                searchKeywords: this.keyWord,
+                goodsCategory: this.classId
+            });
+        }
         this.couponId = this.$route.query.couponId
             ? this.$route.query.couponId
             : ""; //优惠券id
+        this.couponCardId = this.$route.query.couponCardId
+            ? this.$route.query.couponCardId
+            : ""; //新人券id
         this.userInfo = global.Storage.get("USER_INFO");
         this.filterList = [
             {
@@ -233,12 +236,14 @@ export default {
     },
     //  加载更多商品
     onReachBottom: function() {
-        if (this.finished === true) {
-            Toast("没有更多了~");
-            return;
-        } else {
-            this.pageNum += 1;
-            this.getGoodList();
+        if (this.showfifter == false) {
+            if (this.finished === true) {
+                Toast("没有更多了~");
+                return;
+            } else {
+                this.pageNum += 1;
+                this.getGoodList();
+            }
         }
     },
     methods: {
@@ -250,9 +255,8 @@ export default {
             this.$router.replace({
                 path: "/pages/goodsPackage/goods/good-search",
                 query: {
-                    type: 1,
                     classId: this.classId,
-                    value: this.value
+                    keyWord: this.keyWord
                 }
             });
         },
@@ -268,7 +272,6 @@ export default {
                 (routerSrc.indexOf("?") == -1 ? "?" : "&") +
                 `goodsCode=${item.goodsCode}` +
                 (goodsType ? `&goodsType=${goodsType}` : "");
-            console.log(routerSrc,'routerSrc')
             this.$router.push(routerSrc);
         },
 
@@ -285,15 +288,19 @@ export default {
                 pageSize: 8,
                 origin: "",
                 filters: JSON.stringify(this.crumbs), // 面包屑
-                keyword: this.value,
+                keyword: this.keyWord,
                 sortParam: JSON.stringify(
                     this.filterList[this.activeIndex].sortParam
                 ),
                 queryNullBusFlag: 1,
-                platformCode: this.classId,
+                platformCode: this.classId, //分类页平台运营id
+                onlineFlag: 1, //显示促销标识
                 orderFlags: JSON.stringify([0]),
                 couponId: this.couponId,
-                onilneFlag:1,
+                cardId: this.couponCardId,
+                brandId: this.$route.query.brandId
+                    ? this.$route.query.brandId
+                    : "" //分别品牌id
             };
             global.toastLoading();
             Goods.getGoodsList(data).then(res => {
@@ -319,8 +326,10 @@ export default {
         },
         // 切换导航
         switchNav(item, index) {
+            if (item.id === 1) {
+                this.priceSortState = 0;
+            }
             if (item.id === 2) {
-                console.log(this.priceSortState, "this.priceSortState");
                 if (this.priceSortState === 1) {
                     this.priceSortState = 2; //降序
                     this.filterList[1].sortParam[0].order = "DESC";
@@ -341,24 +350,13 @@ export default {
             this.activeIndex = index;
             this.pageNum = 1;
             this.goodList = [];
-            wx.pageScrollTo({
-                scrollTop: 0,
-                duration: 300
-            });
             this.$nextTick(() => {
-                this.getGoodList(() => {
-                    this.$nextTick(() => {
-                        wx.pageScrollTo({
-                            scrollTop: 0,
-                            duration: 300
-                        });
-                    });
-                });
+                this.getGoodList();
             });
         },
         //  查询面包屑接口所需ids
         getCrumbsIds() {
-            if (this.value || this.classId) {
+            if (this.keyWord || this.classId) {
                 let data = {
                     busContsCode: global.baseConstant.busContsCode, // 业务触点
                     shopId: global.Storage.get("properties").shopId, // Storage获取
@@ -366,7 +364,7 @@ export default {
                     pageSize: 8,
                     origin: "",
                     filters: JSON.stringify(this.crumbs), // 面包屑
-                    keyword: this.value,
+                    keyword: this.keyWord,
                     sortParam: JSON.stringify(
                         this.filterList[this.activeIndex].sortParam
                     ),

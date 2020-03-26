@@ -4,10 +4,10 @@
   "description": "webServer on node by koa2",
   "main": "app.js",
   "scripts": {
-    "dev": "cross-env LOCAL_NODE_ENV=dev nodemon --inspect ./bin/app.js ",
-    "test": "cross-env LOCAL_NODE_ENV=test nodemon --inspect ./bin/app.js ",
+    "dev": "cross-env LOCAL_NODE_ENV=development nodemon --inspect ./bin/app.js ",
+    "test2": "cross-env LOCAL_NODE_ENV=test2 nodemon --inspect ./bin/app.js ",
     "pm": "cross-env LOCAL_NODE_ENV=pm nodemon  --inspect ./bin/app.js",
-    "start": "nodemon  --inspect ./bin/app.js"
+    "start": "node ./bin/app.js"
   },
   "keywords": [
     "koa2",
@@ -29,13 +29,14 @@
     "koa-views": "^6.1.4",
     "log4js": "^2.9.0",
     "moment": "^2.22.2",
-    "nodemon": "^1.8.1",
     "pm2": "^2.10.4",
     "request-promise": "^4.2.2",
     "winston": "^3.0.0",
-    "winston-daily-rotate-file": "^3.2.3"
+    "winston-daily-rotate-file": "^3.2.3",
+    "form-data": "^2.5.1"
   },
   "devDependencies": {
+    "nodemon": "^1.8.1",
     "cross-env": "^5.2.0"
   }
 }

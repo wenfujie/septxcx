@@ -134,6 +134,10 @@ export default {
         // 解决重复进页面数据未初始化
         Object.assign(this.$data, this.$options.data());
     },
+      onUnload() {
+        // 解决重复进页面数据未初始化
+        Object.assign(this.$data, this.$options.data());
+    },
     watch: {
         pkg: function (pkg) {
             this.initState(pkg);

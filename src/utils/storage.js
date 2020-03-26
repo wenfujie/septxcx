@@ -3,7 +3,6 @@
  * Created by en.chen on 2018-05-22.
  */
 var STORAGE_EXPIRE_MAP = 'STORAGE_EXPIRE_MAP'
-// const storage = (process.env.NODE_ENV == "development" ? localStorage : localStorage)
 
 var Storage = {
     /**

@@ -81,7 +81,7 @@
     <wxs module="filter" src="../../../../../../filter/filterCommon.wxs"></wxs>
     <div class="good" @click.stop="viewGoodDetail()">
       <div class="imgBox">
-        <img class="img-responsive" :src="filter.imgFilter(good.thumb,companyId)" alt />
+        <img class="img-responsive" :src="filter.imgFilter(good.thumb,companyId, '140*140')" alt />
       </div>
       <div class="good-info">
         <div class="cloth-name-price fs28">
@@ -112,26 +112,32 @@
 
 <script>
 import check from "@/utils/check";
+import {Goods} from '../../../../../../api/service';
 export default {
   props: {
-    good: Object
+    good: Object,
+    fpsCode: {
+      type: String,
+      default: ""
+     },
+    onlineHdId:{
+      type: String,
+      default: ""
+     }
   },
   data() {
     return {
-
- companyId: global.Storage.get("COMPANYID").company_id,
+      companyId: global.Storage.get("COMPANYID").company_id,
       btnApply: null, //申请按钮,
       btnViewDetail: null, //查看详情按钮
-      unApplyableOrdStatus: ["D_TRANSCLOSE", "D_ORDSPAYING", "D_ORDCANCEL"] //不允许售后的订单状态
+      unApplyableOrdStatus: ["D_TRANSCLOSE", "D_ORDSPAYING", "D_ORDCANCEL"], //不允许售后的订单状态
+      goDetail_lock:false,////跳转商品详情锁
+      fissionType:'',// 裂变类型
     };
   },
   methods: {
     // 售后状态初始化
     initState() {
-      console.log(
-        this.$root.$mp.query.ordStatusCode,
-        "this.$route.query-good-good"
-      );
       const ordStateCode = this.$root.$mp.query.ordStatusCode;
       this.btnViewDetail = !check.isEmpty(this.good.reapplyCodes)
         ? "售后详情"
@@ -167,15 +173,49 @@ export default {
     },
 
     // 查看商品详情
-
     viewGoodDetail() {
-      this.$router.push({
-        path: "/pages/goodsPackage/wares/wares-detail",
-        query: {
-          goodsCode: this.good.goodsCode,
-          isGift: this.good.isGift == 1 ? true : false
+      let params = {
+        ownCompanyId: global.Storage.get("COMPANYID").company_id,
+        goodsCode: this.good.goodsCode,
+        buscontsCode: global.baseConstant.busContsCode
+      };
+      Goods.isShelves(params).then(
+        res => {
+          // 未导入微信平台和全平台跳转至商品未上架页面
+          if (!res) {
+            this.$router.push("/pages/goodsPackage/goods/off-shelves");
+            this.goDetail_lock = false;
+          } else {
+            // fpsCode字段来判断是否为裂变促销
+            if(!this.fpsCode){
+              this.$router.push({
+                path: "/pages/goodsPackage/wares/wares-detail",
+                query: {
+                 goodsCode: this.good.goodsCode,
+                 isGift: this.good.isGift == 1 ? 1 : 0
+               }
+             });
+            }else{
+               let url = `&goodsCode=${this.good.goodsCode}&onlineHdId=${this.onlineHdId}`;
+               if(this.fpsCode==='SECKILL'){
+                //  秒杀
+                 this.$router.push('/pages/goodsPackage/wares/wares-detail?fissionType=1' + url);
+               }else if(this.fpsCode==='GROUP'){
+                //  拼团
+                  this.$router.push('/pages/goodsPackage/wares/wares-detail?fissionType=2' + url);
+               }else if(this.fpsCode==='BARGAIN'){
+                //  砍价
+                  let queryUrl = `?goodsCode=${this.good.goodsCode}&onlineHdId=${this.onlineHdId}`;
+                  this.$router.push('/pages/goodsPackage/fission/bargain/bargain-detail' + queryUrl);
+               }
+            }
+            this.goDetail_lock = false;
+          }
+        },
+        () => {
+          this.goDetail_lock = false;
         }
-      });
+      );
     },
 
     //点击事件
@@ -195,11 +235,15 @@ export default {
   },
   created() {
     this.initState();
+    console.log(this.onlineHdId,'onlineHdId')
   },
-    onHide() {
-        // 解决重复进页面数据未初始化
-        Object.assign(this.$data, this.$options.data());
-    },
+  onLoad() {
+    this.fissionType = this.$route.query.fissionType;
+  },
+  onHide() {
+    // 解决重复进页面数据未初始化
+    Object.assign(this.$data, this.$options.data());
+  },
   watch: {
     good: function() {
       this.initState();

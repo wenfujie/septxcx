@@ -11,7 +11,7 @@
             <ul>
                 <li v-for="(giftItem,giftIndex) in item.giftVoList" :key="giftIndex">
                     <img
-                        :src="filter.imgFilter(giftItem.fileUrl,company_id)"
+                        :src="filter.imgFilter(giftItem.fileUrl,company_id, '148*148')"
                         :key="giftItem.fileUrl"
                     />
                     <div class="info">
@@ -21,10 +21,12 @@
                 </li>
             </ul>
         </div>
+        <van-toast id="van-toast"/>
     </div>
 </template>
 <script>
 import { Goods } from "../../../api/service";
+import Toast from 'vant-weapp/dist/toast/toast';
 export default {
     config: {
         navigationBarTitleText: '赠品列表',
@@ -52,9 +54,11 @@ export default {
                 partId: this.goodsId,
                 dptId: global.Storage.get("properties").shopId
             };
+            global.showLoading({mask:true});
             Goods.getGoodPreferential(data).then(res => {
                 this.mzList = res.mzList;
-            });
+                global.hideLoading()
+            },()=>{global.hideLoading()});
         }
     }
 };

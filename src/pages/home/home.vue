@@ -1,12 +1,12 @@
 <template>
     <div style="height:100%;">
-        <index :isshow="tabIndex===0" ref="index" :query="query"></index>
-        <good-sort v-if="tabValueArr[1]===1" :isshow="tabIndex===1" ref="good_sort" :query="query"></good-sort>
-        <shopping-cart v-if="tabValueArr[2]===1" :isshow="tabIndex===2" ref="shopping_cart"></shopping-cart>
-        <member-center :isshow="tabIndex===3" ref="member_center" :query="query"></member-center>
+        <index v-if="hasBaseInfo" :isshow="tabIndex===0" ref="index" :query="query"></index>
+        <good-sort v-if="hasBaseInfo && tabValueArr[1]===1" :isshow="tabIndex===1" ref="good_sort" :query="query"></good-sort>
+        <shopping-cart v-if="(isDistribution ? tabValueArr[3]===1 : tabValueArr[2]===1) && hasBaseInfo" :isshow="isDistribution ? tabIndex===3 : tabIndex===2" ref="shopping_cart"></shopping-cart>
+        <member-center v-if="hasBaseInfo && (isDistribution ? tabValueArr[4]===1 : tabValueArr[3]===1)" :isshow="isDistribution ? tabIndex===4 : tabIndex===3" ref="member_center" :query="query"></member-center>
         <wxs module="filter" src="../../filter/filterCommon.wxs"></wxs>
         <van-toast id="van-toast" />
-        <scroll-view scroll-y="false" style="z-index:10" :class="isX">
+        <scroll-view scroll-y="false" style="z-index:10" :class="isX" v-if="hasBaseInfo">
             <footer-bar :index="tabIndex" ref="footer_bar"></footer-bar>
         </scroll-view>
     </div>
@@ -30,6 +30,7 @@ export default {
     },
     data() {
         return {
+            hasBaseInfo: false,
             footerData: [],
             companyid: "",
             tabIndex: 0,
@@ -42,7 +43,8 @@ export default {
             tabValueArr: [1, 0, 0, 0], //是否将组件创建出来的数组
             query: {},
             passLoad: false, //是否经过load,用于页面返回时触发一些接口
-            isX: ""
+            isX: "",
+            isDistribution: false
         };
     },
     components: {
@@ -72,7 +74,12 @@ export default {
 
     },
     onShow() {
-        this.companyid = global.Storage.get("COMPANYID").company_id;
+        this.projectInit()
+        //为了解决从商品详情点击首页或者购物车，标题改变
+        this.setNavigationTitleAgain();
+        if(this.$root.tabIndex === 0 && !!this.$refs.index){
+            this.$refs.index.onRefresh()
+        }
     },
     mounted(){
         let option = !!this.$root.$mp.query ? this.$root.$mp.query : {}
@@ -140,12 +147,35 @@ export default {
                 this.$refs.good_sort.tabPullDownRefresh();
                 break;
         }
+
+        // 根据用户是否是分销商决定是否刷新底部导航的任务
+        if(!!global.Storage.get('USER_INFO').isVipMdt) {
+            this.$refs.footer_bar.getDistributionInfo()
+        }
+
         //模拟加载
-        setTimeout(function() {
+        // setTimeout(function() {
             wx.stopPullDownRefresh(); //停止下拉刷新
-        }, 1500);
+        // }, 500);
     },
     methods: {
+
+        // 基础数据初始化
+        async projectInit() {
+            if(!!global.Storage.get('COMPANYID') && global.Storage.get('COMPANYID').company_id && !!global.Storage.get('properties') && global.Storage.get('TEMPLATE_INFO')) {
+                this.hasBaseInfo = true
+                this.companyid = global.Storage.get("COMPANYID").company_id;
+                return true
+            }else{
+                global.getBaseParams().then(() => {
+                    global.getTemplate().then(() => {
+                        this.companyid = global.Storage.get("COMPANYID").company_id;
+                        this.hasBaseInfo = true
+                    })
+                })
+            }
+        },
+
         // 判断当前选中的tab标签
         getTabIndex(path) {
             let index = -1;
@@ -156,13 +186,13 @@ export default {
                     break;
                 }
             }
-            console.log('home页面的标签索引',index)
+//            console.log('home页面的标签索引',index)
             return index;
         },
 
         //点击切换tabbar时触发
         switchMenu(path) {
-            console.log('切换tabbar时触发,跳转路径为',path)
+//            console.log('切换tabbar时触发,跳转路径为',path)
             //  跳转至账户页面需要校验用户绑定手机号
             if (path.indexOf("member-center") !== -1 ) {
                 // 缓存中存在手机号，则默认用户已绑定过
@@ -171,18 +201,20 @@ export default {
                 if (!!userInfo && !!userInfo.mobilePhone ) {
                     this.setPageIndex(path);
                 } else {
-                    this.$router.push("/pages/UserPackage/phone/bind-phone");
+//                    this.$router.push("/pages/UserPackage/phone/bind-phone");
                     // 通过调用用户信息的接口获取用户是否绑定手机号
-                    // return global.c_getUserInfo().then(res => {
-                    //     global.Storage.set('BIND_PHONE_FLAG',{ flag: true })
-                    //     if (!res.mobilePhone) {
-                    //         console.log('未绑定手机号，跳转绑定手机号页面')
-                    //         this.$router.push("/pages/UserPackage/phone/bind-phone");
-                    //     } else {
-                    //         console.log('已绑定手机号，跳转账户页面')
-                    //         this.setPageIndex(path);
-                    //     }
-                    // });
+                     return global.c_getUserInfo().then(res => {
+                         if (!res.mobilePhone) {
+//                             console.log('未绑定手机号，跳转绑定手机号页面')
+                             this.$router.push("/pages/UserPackage/phone/bind-phone");
+                         } else {
+                             let userInfo = global.Storage.get('USER_INFO')
+                             userInfo.mobilePhone = res.mobilePhone
+                             global.Storage.set('USER_INFO',userInfo)
+//                             console.log('已绑定手机号，跳转账户页面')
+                             this.setPageIndex(path);
+                         }
+                     });
                 }
             }else{
                 this.setPageIndex(path);
@@ -194,13 +226,32 @@ export default {
             wx.pageScrollTo({
                 scrollTop: 0,
                 duration: 0
-            });          
+            });
+
+            if(path === '/index'){
+                this.$refs.index.indexShow()
+            }
+
+            // todo 通过footer_bar中的导航栏数量决定
+            if(this.$refs.footer_bar.footerData.length > 4) {
+                this.isDistribution = true
+                this.tabNameArr = [
+                    "/index",
+                    "/good-sort",
+                    "/pages/distributionPackage/task-list",
+                    "/shopping-cart",
+                    "/member-center"
+                ]
+                this.tabValueArr= [1, 0, 0, 0, 0]
+            }
+
+
             let index = this.getTabIndex(path);
             if (index === -1) {
                 return;
             }
 
-            console.log('设置页面索引',index)
+//            console.log('设置页面索引',index)
             this.$refs.footer_bar.tabIndex = index;
             this.setNavigationTitle(index);
             this.small_onRefresh(index);
@@ -208,47 +259,100 @@ export default {
             this.tabIndex = index; //切换tabbar
 
         },
+        //再次设置导航名称，由于从详情跳回来时候，有时候没设置成功
+        setNavigationTitleAgain(){
+            this.setNavigationTitle(this.tabIndex)
+        },
 
         //设置导航顶部名称
         setNavigationTitle(index) {
-            switch (index) {
-                case 0:
-                    wx.setNavigationBarTitle({
-                        title: "首页"
-                    });
-                    break;
-                case 1:
-                    wx.setNavigationBarTitle({
-                        title: "分类"
-                    });
-                    break;
-                case 2:
-                    wx.setNavigationBarTitle({
-                        title: "购物车"
-                    });
-                    break;
-                case 3:
-                    wx.setNavigationBarTitle({
-                        title: "账户"
-                    });
-                    break;
+            if(!this.$refs.footer_bar){
+                return
+            }
+//            console.log(index,this.$refs.footer_bar,'this.$refs.footer_bar')
+            if(this.$refs.footer_bar.footerData.length > 4) {
+                switch (index) {
+                    case 0:
+                        wx.setNavigationBarTitle({
+                            title: "首页"
+                        });
+                        break;
+                    case 1:
+                        wx.setNavigationBarTitle({
+                            title: "分类"
+                        });
+                        break;
+                    case 2:
+                        wx.setNavigationBarTitle({
+                            title: "任务"
+                        });
+                        break;
+                    case 3:
+                        wx.setNavigationBarTitle({
+                            title: "购物车"
+                        });
+                        break;
+                    case 4:
+                        wx.setNavigationBarTitle({
+                            title: "账户"
+                        });
+                        break;
+                }
+            }else{
+                switch (index) {
+                    case 0:
+                        wx.setNavigationBarTitle({
+                            title: "首页"
+                        });
+                        break;
+                    case 1:
+                        wx.setNavigationBarTitle({
+                            title: "分类"
+                        });
+                        break;
+                    case 2:
+                        wx.setNavigationBarTitle({
+                            title: "购物车"
+                        });
+                        break;
+                    case 3:
+                        wx.setNavigationBarTitle({
+                            title: "账户"
+                        });
+                        break;
+                }
             }
         },
+
         //触发有些tabbar再次进入需要触发的方法
         small_onRefresh(index) {
             //判断时候是再次进入tabbar对应的组件
             if (this.tabValueArr[index] == 1) {
                 //触发有些tabbar再次进入需要触发的方法
-                switch (index) {
-                    case 2:
-                        this.$refs.shopping_cart.onRefresh();
-                        break;
-                    case 3:
-                        this.$refs.member_center.onRefresh();
-                        break;
+                if(!this.isDistribution) {
+                    switch (index) {
+                        case 2:
+                            this.$refs.shopping_cart.onRefresh();
+                            break;
+                        case 3:
+//                            console.log(this.$refs.member_center,'this.$refs.member_center')
+                            this.$refs.member_center.onRefresh();
+                            break;
+                    }
+                }else{
+                    switch (index) {
+                        case 3:
+                            this.$refs.shopping_cart.onRefresh();
+                            break;
+                        case 4:
+//                            console.log(this.$refs.member_center,'this.$refs.member_center')
+                            this.$refs.member_center.onRefresh();
+                            break;
+                    }
                 }
             }
         },
+
         //  绑定上下级
         bind(id) {
             let data = {
@@ -262,7 +366,7 @@ export default {
                 busconsCode: global.baseConstant.busContsCode
             };
             Distribution.bindLevel(data);
-        }
+        },
     }
 };
 </script>
@@ -271,7 +375,7 @@ scroll-view {
     position: fixed;
     bottom: 0;
     left: 0;
-    height: computed(90);
+    height: computed(98);
     width: 100%;
 }
 

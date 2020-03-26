@@ -61,39 +61,31 @@
 
             this.showGetUser = false
             global.loginAuthor().then(res => {
-                // if (res == false) {
-                    // 弹窗被拒绝 || 没出现过弹窗
-                    // console.log("未授权，显示提示按钮")
-                    // this.showGetUser = true
-                // } else {
-                    console.log('已授权，跳转Home页面')
-                    // 有授权过
-                    if (!!that.vipId) {
-                        console.log("通过上级vipId绑定上下级！");
-                        that.bindLevel(); //  存在上级分销商id，调用绑定上下级关系的接口
-                        that.isDistribution()
-                    }else{
-                        this.goToWeb();
-                    }
-                // }
+                console.log('已授权，跳转Home页面')
+                // 有授权过
+                if (!!that.vipId) {
+                    console.log("通过上级vipId绑定上下级！");
+                    that.bindLevel(); //  存在上级分销商id，调用绑定上下级关系的接口
+                    that.isDistribution()
+                }else{
+                    this.goToWeb();
+                }
             });
         },
         onReady(options) {
-            this.getProperties();
+            global.getBaseParams().then(()=>{
+                this.getCoupons();
+            })
         },
         data() {
             return {
                 src: "",
                 buttonName: "点击授权登录 >",
                 tips: "授权成功！",
-                buttonPhone: "点击获取手机号 >",
-                phoneTips: "获取手机号成功!",
                 show: false,
                 showGetUser: false, // 是否显示用户授权按钮
-                showGetPhone: false, // 是否显示获取手机号按钮
                 shareUrl: "", //授权后跳转h5的url
                 wxUrl: "", //授权后跳转微信页面url
-                needPhone: "", //判断授权后是否要判断是否绑定手机
                 vipId: null, // 会员id（用于分销商功能）
                 ascriptionId: null, // 归属地id
                 goodsCode: null, // 商品编码（用于分销商任务中扫二维码打开商品详情）
@@ -105,77 +97,34 @@
         methods: {
             // 跳转进入商城
             goToWeb(isBtnAuthor) {
+                console.log("加载中")
                 if (!isBtnAuthor) {
                     this.tips = "加载中...";
                 }
                 this.navToIndex();
             },
-            // 显示获取手机号按钮
-            showGetPhoneBtn() {
-                this.show = true;
-                this.showGetPhone = true;
-            },
 
-            getCoupons(properties) {
-                this.src = properties.ossOpenUrl + "cms/webDtt/septwolvesBg.jpg?companyId=" + properties.ownCompanyId;
+            getCoupons() {
+                this.src = global.baseConstant.serverUrl + "images/septwolvesBg.jpg";
                 global.getTemplate()
-                /* let that = this;
-                global.getTemplate().then(result=>{
-                    let param = {
-                        cmsTemplateCode: result.cmsTemplateCode,
-                        cmsWebCode: "promote",
-                        busContsCode: global.baseConstant.busContsCode,
-                        companyId: properties.ownCompanyId,
-                        ownCompanyId: properties.ownCompanyId
-                    };
-                    
-
-                    Cms.getUsrCmsInfoV2(param).then((res) => {
-                        let cmsBackpageDtDtoList = res.cmsModulepageHdList[0].cmsBackpageDtDtoList;
-                        cmsBackpageDtDtoList.forEach(item => {
-                            //  设置授权页背景图
-                            if (item.cmsBackpageDtCode === "sqy") {
-
-                                that.src =
-                                    global.baseConstant.serverUrl +
-                                    "file-system/getImg?fileUrl=" +
-                                    item.cmsBackpageDttList[0].coverFileUrl +
-                                    "&companyId=" +
-                                    properties.ownCompanyId;
-                            }
-                        });
-                    }) 
-                })*/
-            },
-
-            getProperties() {
-                let that = this;
-                return Cms.getProperties().then((res) => {
-                    global.Storage.set("COMPANYID", {
-                        company_id: res.companyId
-                    });
-                    global.Storage.set("properties", {
-                        wxUnionid: res.mpUuid,
-                        shopId: res.shopIds,
-                        ossOpenUrl: res.ossOpenUrl
-                    });
-                    global.baseConstant.ossOpenUrl = res.ossOpenUrl
-                    that.getCoupons(res);
-                })
             },
 
             // 获取用户授权信息
             bindGetUserInfo(e) {
                 let that = this;
                 let vipId = that.vipId;
+                console.log(e.target)
                 if (!e.target.userInfo) {
                     console.log("拒绝授权");
                 } else {
                     global.loginAuthor(() => {
+                        console.log("------")
                     }).then(res => {
+                        console.log("进入")
                         if (res) {
                             //  存在上级分销商id，调用绑定上下级关系的接口
                             if (!!vipId) {
+                                console.log("vip")
                                 that.bindLevel()
                                 that.isDistribution()
                             }else{
@@ -388,8 +337,16 @@
                         path += `goodsPackage/wares/wares-detail?vipId=${that.vipId}&goodsCode=${that.goodsCode}&isVipMdt=${num}`
                     }else{
                         if (num === 0) {
-                            // 用户不是分销商且不是传参中上级会员的下级,跳转会员中心
-                            path += `UserPackage/member/member-center?vipId=${that.vipId || ''}`
+                            // 用户不是分销商且不是传参中上级会员的下级且绑定了手机号,跳转会员中心
+                            if(!!loginInfo.mobilePhone) {
+                                let memberCenter = `member-center?vipId=${that.vipId || ''}`
+                                path += `home/home?goPath=${memberCenter}`
+                            }else{
+                                // 用户不是分销商且不是传参中上级会员的下级且未绑定手机号,跳转绑定手机号页面
+                                let memberCenter = `member-center?vipId=${that.vipId || ''}`
+                                let successUrl = `/pages/home/home?goPath=${memberCenter}`
+                                path += `UserPackage/phone/bind-phone?successUrl=${successUrl}`
+                            }
                         } else {
                             // 用户是分销商,跳转分销商中心
                             path += `distributionPackage/center?vipId=${that.vipId || ''}`
@@ -437,13 +394,6 @@
         width: 100%;
         height: 100%;
         left: 0;
-    }
-
-    .attract-btn {
-        width: 100%;
-        position: fixed;
-        left: 0;
-        bottom: 100 rpx;
     }
 
     .marginBottom0 {

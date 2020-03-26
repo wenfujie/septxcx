@@ -5,7 +5,7 @@
 */
 
 //  提交企业团购
-const teamPurchaseFun = require('../controller/team-purchase/team-purchase')
+const teamPurchaseFun = require('../controller/team-purchase')
 
 module.exports = {
     "POST/purchase": teamPurchaseFun.postPurchase,  // 提交企业团购

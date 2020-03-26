@@ -8,30 +8,30 @@ const common = require('./common')
 class userAddr {
 
     //  获取用户地址列表
-    static async getAddrListValue(ctx, params) {
+    static async getAddrList(ctx, params) {
         return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.memberService + '/vip-info-dt-addss', params).then((res) => {
             return res
         });
     }
 
     //  新增/修改用户地址信息
-    static async changeAddrValue(ctx, params) {
-        let url = '/vip-info-dt-addss/dest-code/' + params.usrId + '?destCode=' + params.destCode + '&companyId=' + params.companyId
+    static async changeAddrInfo(ctx, params) {
+        let url = `/vip-info-dt-addss/dest-code?companyId=${params.companyId}&usrId=${params.usrId}&vipInfoHdId=${params.vipInfoHdId}&destCode=${params.destCode}`
         return ctx.$post(ctx.nettyUrl + ctx.serverPortUrl.memberService + common.newUrlKey +
-                url, params).then((res) => {
-            return res
-        }, (err) => {});
+            url, params).then((res) => {
+                return res
+            }, (err) => { });
     }
 
     //  删除用户地址
-    static async deleteAddrListValue(ctx, params) {
+    static async deleteAddrList(ctx, params) {
         return ctx.$delete(ctx.baseUrl + ctx.serverPortUrl.memberService + '/vip-info-dt-addss', params).then((res) => {
             return res
         });
     }
 
     //  获取地址详情
-    static async addressDetailValue(ctx, params) {
+    static async getAddrDetail(ctx, params) {
         return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.memberService + '/vip-info-dt-addss/receive-adds-info/id', params).then((res) => {
             return res
         });

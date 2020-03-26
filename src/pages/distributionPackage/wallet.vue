@@ -59,7 +59,7 @@
 
         <van-toast id="van-toast" />
 
-        <footer-bar></footer-bar>
+        <footer-bar ref="footer_bar"></footer-bar>
     </div>
 </template>
 <script>
@@ -102,9 +102,16 @@
         methods: {
             //  获取分销商账户信息
             getVipInfo(){
-                let data = {
-                    vipInfoHdId: global.Storage.get('USER_INFO').vipInfoId
+
+                let data = {}
+
+                //  会员整合新增选中分销商查询
+                if(!!this.$store.state.distribution.accountInfo.id) {
+                    data.vipInfoHdId = this.$store.state.distribution.accountInfo.vipInfoHdId
+                }else{
+                    data.vipInfoHdId = global.Storage.get('USER_INFO').vipInfoId
                 }
+
                 Distribution.getVipInfo(data).then((res) =>{
                     this.vipInfo = res
                 })
@@ -121,6 +128,13 @@
                     vipInfoMdtId: await this.$store.dispatch('distribution/getDistributionId'),
                     type: this.selectedStatus
                 }
+
+                //  会员整合新增选中分销商查询
+                if(!!this.$store.state.distribution.accountInfo.id) {
+                    data.vipInfoMdtId = this.$store.state.distribution.accountInfo.id
+                    data.vipInfoHdId = this.$store.state.distribution.accountInfo.vipInfoHdId
+                }
+
                 Distribution.getWalletList(data).then((res) => {
                     this.walletList.push.apply(this.walletList,res.list)
                     if(this.walletList.length >= res.total || this.pageNum >= res.pages || res.total <= 0) {
@@ -182,12 +196,17 @@
                 }
             }
         },
-        onLoad() {
+        onShow() {
+            Object.assign(this.$data, this.$options.data());
             global.toastLoading();// 开启
-
             this.getVipInfo()
             this.getList()
         },
+        mounted() {
+            this.$refs.footer_bar.tabIndex = -1;
+            this.$refs.footer_bar.getDistributionInfo()
+        },
+        // 点击左上角返回不会触发onHide
         onHide(){
             Object.assign(this.$data, this.$options.data());
         }

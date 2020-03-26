@@ -38,6 +38,7 @@
                 .right {
                     flex: 1;
                     display: flex;
+                    word-break: break-all;
                 }
             }
             .tips {
@@ -140,6 +141,9 @@
     .bg-grey {
         background: whitesmoke;
     }
+    .word-break {
+        word-break: break-all;
+    }
 }
 .selected {
     color: #2ba4f3;
@@ -157,7 +161,7 @@
     }
 }
 </style>
- 
+
  <template>
     <div class="logis-wrap" v-if="renderSelf">
         <div class="logis-info-wrap box-shadow">
@@ -209,7 +213,7 @@
                 </div>
                 <div class="flex-box mgB10">
                     <div class="mgR10">快递单号:</div>
-                    <div class="flex-auto">{{ data.expressCode }}</div>
+                    <div class="flex-auto word-break">{{ data.expressCode }}</div>
                 </div>
             </div>
         </div>
@@ -242,14 +246,12 @@
         </div>
     </div>
 </template>
- 
+
  <script>
-// import { Toast, Field, Icon } from "vant";
 import { getAddrList } from "@/api/service/user-service";
 import check from "@/utils/check";
 import ordStateMap from "../../../../common/stateCodeMap";
 import customField from "./customField";
-import { mapState } from "vuex";
 export default {
     props: {
         data: {},
@@ -445,7 +447,8 @@ export default {
                     query: {
                         fromPage: "postSale",
                         reapplycode: this.$route.query.reapplycode,
-                        addressId: this.addrInfo.id
+                        addressId: this.addrInfo.id,
+                        showList: 2
                     }
                 });
             }
@@ -483,7 +486,6 @@ export default {
                 return this.$store.state.afterSale.detail.kdInfo;
             },
             set() {
-                console.log("change");
                 // 使用vuex中的mutations中定义好的方法来改变
                 this.$store.commit(
                     "afterSale/detail/updateKdInfo",

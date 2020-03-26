@@ -6,6 +6,7 @@
  * @Description: 第三方服务接口
  */
 class thirdPartyModel {
+
   // 获取物流
   static async getLogis(ctx, params) {
     let url = "/expresss?companyId=" + params.companyId;
@@ -14,6 +15,7 @@ class thirdPartyModel {
       params
     );
   }
+
   //获取微信授权
   static async getWxSignature(ctx, params) {
     let url = "/wechat/event/web/get-signature/" + params.wxUUID + "?unAuthorizedUrl=" + params.unAuthorizedUrl;

@@ -5,8 +5,8 @@
 */
 
 //  支付功能模块
-const payment = require('../controller/payment/order-payment')
+const paymentFun = require('../controller/payment')
 
 module.exports = {
-    "POST/orderPayment": payment.orderPayment,  // 订单支付
+    "POST/orderPayment": paymentFun.orderPayment,  // 订单支付
 }

@@ -8,11 +8,11 @@ class distributionModule {
 
     //  发展下级分销商(绑定上下级关系)
     static async bindLevel(ctx, params) {
-        let url=`/vip-info-mdts-aggregate/dev-vipmdt-underling?upVipId=${params.upVipId}&unVipId=${params.unVipId}&busconsCode=${params.busconsCode}&companyId=${params.companyId}&usrId=${params.usrId}`
+        let url = `/vip-info-mdts-aggregate/dev-vipmdt-underling?upVipId=${params.upVipId}&unVipId=${params.unVipId}&busconsCode=${params.busconsCode}&companyId=${params.companyId}&usrId=${params.usrId}`
         let ascriptionId = `&ascriptionId=${params.ascriptionId}`
         let taskId = `&taskId=${params.taskId}`
-        if(!!params.ascriptionId) url += ascriptionId
-        if(!!params.taskId) url += taskId
+        if (!!params.ascriptionId) url += ascriptionId
+        if (!!params.taskId) url += taskId
         return ctx.$post(ctx.baseUrl + ctx.serverPortUrl.memberService + url, params).then((res) => {
             return res
         });
@@ -37,7 +37,9 @@ class distributionModule {
         let url = `/vip-info-mdts-aggregate/apply-to-vipmdt?vipInfoHdId=${params.vipInfoHdId}&ascriptionId=${!!params.ascriptionId ? params.ascriptionId : ''}&busconsCode=${params.busconsCode}&companyId=${params.companyId}&usrId=${params.usrId}`
         return ctx.$post(ctx.baseUrl + ctx.serverPortUrl.memberService + url, params).then((res) => {
             return res
-        },(err) =>{ return err});
+        }, (err) => {
+            return err
+        });
     }
 
     //  分销商账户信息记录
@@ -141,6 +143,22 @@ class distributionModule {
         });
     }
 
+    //  获取分销商任务详情(带商品)
+    static async getTaskDetailInfo(ctx, params) {
+        let url = '/mdt-task-hds/detail'
+        return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.memberService + url, params).then((res) => {
+            return res
+        });
+    }
+
+    //  记录转发任务的次数
+    static async addShareTaskCount(ctx, params) {
+        let url = `/mdt-task-hds/add-count/${params.taskId}?companyId=${params.companyId}&usrId=${params.usrId}`
+        return ctx.$put(ctx.baseUrl + ctx.serverPortUrl.memberService + url, params).then((res) => {
+            return res
+        });
+    }
+
     //  获取分销商任务详情图片
     static async getTaskDetailImg(ctx, params) {
         return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.memberService + '/mdt-task-hds/pic-mix', params).then((res) => {
@@ -195,6 +213,22 @@ class distributionModule {
     //  获取分销商模块配置规则（用于分销商对账单查询传参）
     static async getLevelRule(ctx, params) {
         return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.memberService + '/mdt-rule-level-hds/list', params).then((res) => {
+            return res
+        });
+    }
+
+    //  所有任务标记为已读
+    static async readTask(ctx, params) {
+        let url = `/vip-info-mdt-dt-tasks/all-read/${params.vipInfoHdId}?companyId=${params.companyId}&usrId=${params.usrId}`
+        return ctx.$put(ctx.baseUrl + ctx.serverPortUrl.memberService + url, params).then((res) => {
+            return res
+        });
+    }
+
+    //  会员整合新增查询同账号下的分销商账号列表
+    static async getDistributionList(ctx, params) {
+        let url = `/vip-info-mdts/get-list-by-related-vip-id/${params.vipInfoHdId}`
+        return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.memberService + url, params).then((res) => {
             return res
         });
     }

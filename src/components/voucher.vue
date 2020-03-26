@@ -4,7 +4,7 @@
         <!-- 折扣券 -->
         <div class="mgB30" v-if="isDisCoupon">
             <!-- 卡券 -->
-            <div :class="card.couponMemo!=null?'coupon':'downcoupon'">
+            <div :class="card.couponMemo!=null?'coupon-box':'downcoupon'">
                 <div class="top">
                     <div class="top-left">
                         <span class="fs48">{{filter.saveOneDecimals(card.couponValue)}}</span>
@@ -14,7 +14,12 @@
                         <p class="fs30B">{{card.couponName}}</p>
                         <div class="fs20 date-time">活动有效期至{{valiPeriod}}</div>
                     </div>
-                    <div class="top-right coupon-state" @click="operate()">{{operation.name}}</div>
+                    <div
+                        class="top-right coupon-state"
+                        @click="operate()"
+                        v-if="unRceive==false"
+                    >立即领取</div>
+                    <div class="top-right coupon-state" v-else>已领取</div>
                 </div>
                 <div class="dashed"></div>
                 <div class="bottom">
@@ -41,7 +46,7 @@
         <!-- 现金抵用券 -->
         <div class="mgB30" v-if="isCashCoupon">
             <!-- 卡券 -->
-            <div :class="card.couponMemo!=null?'coupon':'downcoupon'">
+            <div :class="card.couponMemo!=null?'coupon-box':'downcoupon'">
                 <div class="top">
                     <div class="top-left">
                         <span class="fs30">￥</span>
@@ -51,7 +56,12 @@
                         <p class="fs30B">{{card.couponName}}</p>
                         <div class="fs20 date-time">活动有效期至{{valiPeriod}}</div>
                     </div>
-                    <div class="top-right coupon-state" @click="operate()">{{operation.name}}</div>
+                    <div
+                        class="top-right coupon-state"
+                        @click="operate()"
+                        v-if="unRceive==false"
+                    >立即领取</div>
+                    <div class="top-right coupon-state" v-else>已领取</div>
                 </div>
                 <div class="dashed"></div>
                 <div class="bottom">
@@ -79,13 +89,12 @@
 </template>
 
 <script>
-import { Vouchers, Order } from "@/api/service";
+import { Vouchers } from "@/api/service";
 import wxPay from "@/utils/wxPay";
 import payment from "@/utils/payment";
-import Toast from 'vant-weapp/dist/toast/toast'
+import Toast from "vant-weapp/dist/toast/toast";
 export default {
-    components: {
-    },
+    components: {},
     props: {
         card: Object,
         // 来源：默认0为领券中心  1为商品详情页
@@ -103,6 +112,7 @@ export default {
                 D_DISCOUNTCOUPONS: "折扣券",
                 D_RECHARGEABLECARD: "充值卡"
             },
+            unRceive: false,
             timeout:""
         };
     },
@@ -114,46 +124,50 @@ export default {
     },
     computed: {
         // 有效期
-        valiPeriod: function () {
+        valiPeriod: function() {
             if (this.card.couponEndTime == null) return;
             let end = this.card.couponEndTime.split(" ")[0].replace(/\-/g, ".");
             // console.log(end)
             return end;
         },
         // 是否现金券
-        isCashCoupon: function () {
+        isCashCoupon: function() {
             return this.card.cardTypeCode === "D_CASHVOLUME" ? true : false;
             // return this.card.cardTypeCode === "002" ? true : false;
         },
         // 是否折扣券
-        isDisCoupon: function () {
-            return this.card.cardTypeCode === "D_DISCOUNTCOUPONS" ? true : false;
+        isDisCoupon: function() {
+            return this.card.cardTypeCode === "D_DISCOUNTCOUPONS"
+                ? true
+                : false;
         },
         // 是否充值卡
-        isStoredCard: function () {
-            return this.card.cardTypeCode === "D_RECHARGEABLECARD" ? true : false;
+        isStoredCard: function() {
+            return this.card.cardTypeCode === "D_RECHARGEABLECARD"
+                ? true
+                : false;
             // return this.card.cardTypeCode === "czk" ? true : false;
         },
         // 是否一次性储值卡
-        isOnceCard: function () {
+        isOnceCard: function() {
             return this.card.cardTypeCode === "D_AONETIMECARD" ? true : false;
-        },
-        //操作按钮控制
-        operation: function () {
-            if (this.card.isBuy === 0 || this.card.buyPrice <= 0) {
-                return {
-                    name: "立即领取",
-                    type: "draw",
-                    showPrice: false
-                };
-            } else {
-                return {
-                    name: "立即使用",
-                    type: "buy",
-                    showPrice: false
-                };
-            }
         }
+        //操作按钮控制
+        // operation: function() {
+        //     if (this.card.isBuy === 0 || this.card.buyPrice <= 0) {
+        //         return {
+        //             name: "立即领取",
+        //             type: "draw",
+        //             showPrice: false
+        //         };
+        //     } else {
+        //         return {
+        //             name: "立即使用",
+        //             type: "buy",
+        //             showPrice: false
+        //         };
+        //     }
+        // }
     },
     methods: {
         // 使用说明显示控制
@@ -182,177 +196,56 @@ export default {
                 cardId: this.card.valueCardHdId,
                 couponsId: this.card.couponId,
                 ownCompanyId: global.Storage.get("COMPANYID").company_id,
+                shopId: global.Storage.get('properties').shopId
             };
             params = this.paramsFilter(params);
             let result = await Vouchers.saveCoupons(params);
             // console.log('result', result)
             if (result.length == 0) {
-                Toast("来迟一步~已经被领完拉~")
+                Toast("来迟一步~已经被领完拉~");
+                this.unRceive = true;
                 return;
             }
             switch (result[0].state) {
                 case "0":
-                    Toast("领取成功~")
+                    Toast("领取成功");
                     if (this.source === 0) {
                         this.timeout=setTimeout(() => {
-                            this.$router.replace("/pages/UserPackage/vouchers/my-vouchers");
-                        }, 3000);
+                            this.$router.replace(
+                                "/pages/UserPackage/vouchers/my-vouchers"
+                            );
+                        }, 1500);
                     } else {
-                        this.$emit('onSelectSuccess')
+                        this.$emit("onSelectSuccess");
                     }
 
                     break;
                 case "1":
-                    Toast("您已经领取过该优惠券啦~")
+                    Toast("您已经领取过该优惠券啦~");
                     break;
                 case "2":
-                    Toast("该优惠券已经被其他会员绑定~")
+                    Toast("该优惠券已经被其他会员绑定~");
                     break;
                 default:
-                    Toast("领取失败")
+                    Toast("领取失败");
                     break;
             }
         },
         // 操作
         async operate() {
-            switch (this.operation.type) {
-                case "draw":
-                    this.draw();
-                    break;
-                default:
-                    break;
-            }
+            this.draw();
+            // switch (this.operation.type) {
+            //     case "draw":
+            //         this.draw();
+            //         break;
+            //     default:
+            //         break;
+            // }
         }
     }
 };
 </script>
 <style lang='scss' scoped>
-$gray66: #666666;
-$grayB3: #b3b3b3;
-$dataColor: #999999;
-.fs30B {
-    color: $color-white;
-}
-.fs20 {
-    color: $color-white;
-}
-//未使用优惠券
-.coupon {
-    width: 100%;
-    min-height: computed(200);
-    background: $bggradientcolor;
-    background-size: 100% 100%;
-    box-sizing: border-box;
-    .top {
-        padding: computed(37) 0;
-    }
-}
-.describe-detail {
-    margin-left: computed(5);
-    color: $color-white;
-    .desc {
-        width:95%;
-        padding-bottom: computed(15);
-    }
-}
-// 未使用优惠券且没有说明
-.downcoupon {
-    width: 100%;
-    min-height: computed(201);
-    background: $bggradientcolor;
-    background-size: 100% 100%;
-    box-sizing: border-box;
-    .top {
-        padding: computed(37) 0;
-    }
-}
-
-.downcoupon,
-.coupon {
-    position: relative;
-    &::before {
-        content: "";
-        position: absolute;
-        left: computed(-2);
-        top: computed(130);
-        width: computed(25);
-        height: computed(50);
-        background-color: $color-light-gray;
-        border-radius: 0 computed(50) computed(50) 0;
-    }
-    &::after {
-        content: "";
-        position: absolute;
-        right: computed(-2);
-        top: computed(130);
-        width: computed(25);
-        height: computed(50);
-        background-color: $color-light-gray;
-        border-radius: computed(50) 0 0 computed(50);
-    }
-}
-
-.shuoming {
-    display: inline-block;
-    width: 98%;
-    word-wrap: break-word;
-}
-.down {
-    width: 100%;
-    display: inline-block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.describe-detail {
-    width: 95%;
-    padding-left: computed(25);
-}
-.top,
-.bottom {
-    width: 100%;
-    display: flex;
-}
-.dashed {
-    width: 90%;
-    margin-left: 5%;
-    border-top: 1px dashed $color-white;
-}
-.bottom {
-    .describe {
-        width: 97%;
-        padding: computed(15) 0;
-        display: flex;
-        justify-content: space-between;
-        font-size: computed(24);
-        line-height: computed(28);
-    }
-}
-.top-left {
-    font-weight: 500;
-    width: computed(150);
-    margin: computed(10);
-    text-align: center;
-    color: $color-white;
-}
-.top-middle {
-    width: computed(310);
-    margin: 0 0 0 computed(45);
-}
-.top-right {
-    width: computed(132);
-    height: computed(50);
-    line-height: computed(50);
-    background: $color-white;
-    border-radius: $btn-radius25;
-    text-align: center;
-    margin-top: computed(15);
-    font-size: $font-common;
-    color: $domaincolor;
-}
-.date-time {
-    margin-top: computed(5);
-}
+@import "@/assets/scss/common/vouchers.scss";
 </style>
 

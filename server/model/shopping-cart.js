@@ -15,32 +15,32 @@ class cart {
     }
 
     //  删除购物车
-    static async deleteCartValue(ctx, params) {
+    static async deleteCart(ctx, params) {
         return ctx.$delete(ctx.baseUrl + ctx.serverPortUrl.shoppingCart + '/rtl-cart-hds/usr-id', params).then((res) => {
             return res
         });
     }
 
     //  保存购物车列表
-    static async saveCartValue(ctx, params) {
+    static async saveCart(ctx, params) {
         let url = `/rtl-cart-hd-aggregates?companyId=${params.companyId}&flag=${params.flag}`
         return ctx.$post(ctx.nettyUrl + ctx.serverPortUrl.shoppingCart + common.newUrlKey +
-                url, params).then((res) => {
-            return res
-        });
+            url, params).then((res) => {
+                return res
+            });
     }
 
     //  查询购物车列表
-    static async getCartListValue(ctx, params) {
+    static async getCartList(ctx, params) {
         return ctx.$get(ctx.nettyUrl + ctx.serverPortUrl.shoppingCart + common.newUrlKey + '/rtl-cart-hd-aggregates', params).then((res) => {
             return res
         });
     }
 
     //  查询购物车数量
-    static async getCartCountValue(ctx, params) {
-        let url = '/rtl-cart-hds/count/' + params.usrId
-        return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.shoppingCart + url, params).then((res) => {
+    static async getCartCount(ctx, params) {
+        let url = '/rtl-cart-hds/count/' + params.vipInfoHdId
+        return ctx.$get(ctx.nettyUrl + ctx.serverPortUrl.shoppingCart + common.newUrlKey + url, params).then((res) => {
             return res
         });
     }
@@ -62,8 +62,8 @@ class cart {
     }
 
     // 获取购物车促销的详细信息
-    static async getshopDiscountsDetailValue(ctx, params) {
-        let url = '/online-calculate/onilne-info?companyId=' + params.companyId + '&usrId=' + params.usrId
+    static async getShopDiscountsDetail(ctx, params) {
+        let url = '/online-calculate/online-lists?companyId=' + params.companyId + '&usrId=' + params.usrId
         return ctx.$post(ctx.baseUrl + ctx.serverPortUrl.promotion + url, params).then((res) => {
             return res
         });

@@ -1,3 +1,10 @@
+<!--
+ * @Author: yongtian.hong
+ * @Date: 2019-08-05 13:18:56
+ * @LastEditors: yongtian.hong
+ * @LastEditTime: 2019-08-14 17:07:39
+ * @Description: 
+ -->
 <style lang='scss' scoped >
 .post-sale-list-wrap {
     display: flex;
@@ -73,7 +80,7 @@ export default {
             finished: true,
             pageSize: 10,
             pageNum: 1,
-            isEmpty: true,
+            isEmpty: false,
             result: {
                 data: {
                     total: 0
@@ -99,20 +106,18 @@ export default {
 
             try {
                 this.list = [];
-                Toast({
-                    duration: 5000, // 持续展示 toast
-                    message: "数据加载中..."
+                wx.showLoading({
+                    title: "加载中"
                 });
                 this.result = await postSaleApi.getList(this.getParams());
+                wx.hideLoading();
+
                 this.isDownLoading = false;
                 if (!this.result.data) {
                     return false;
                 } else {
                     this.list = this.result.data.list;
                 }
-                setTimeout(() => {
-                    Toast.clear();
-                }, 1000);
 
                 this.isEmpty = this.list.length === 0 ? true : false;
                 this.finished = !this.result.data.hasNextPage;
@@ -127,7 +132,11 @@ export default {
             if (this.result.data.hasNextPage) {
                 this.finished = true;
                 this.pageNum += 1;
+                wx.showLoading({
+                    title: "加载中"
+                });
                 this.result = await postSaleApi.getList(this.getParams());
+                wx.hideLoading();
                 if (this.result) {
                     this.isUpLoading = !this.isUpLoading;
                     this.finished = !this.result.data.hasNextPage;
@@ -149,10 +158,6 @@ export default {
     onPullDownRefresh: function() {
         this.getListData().then(() => {
             wx.stopPullDownRefresh();
-            Toast({
-                duration: 800, // 持续展示 toast
-                message: "刷新成功"
-            });
         });
     },
     // 上拉加载

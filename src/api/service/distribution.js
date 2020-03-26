@@ -23,7 +23,7 @@ import http from "../../utils/http";
  */
 
 export const bindLevel = config => {
-    return http.post("distribution/bind", config);
+    return http.post("distribution/bindLevel", config);
 };
 
 /**
@@ -39,7 +39,7 @@ export const bindLevel = config => {
  */
 
 export const getAgreement = config => {
-    return http.get("distribution/article", config);
+    return http.get("distribution/getArticle", config);
 };
 
 /**
@@ -52,7 +52,7 @@ export const getAgreement = config => {
  */
 
 export const getReward = config => {
-    return http.get("distribution/reward", config);
+    return http.get("distribution/getReward", config);
 };
 
 /**
@@ -68,7 +68,7 @@ export const getReward = config => {
  */
 
 export const applyVip = config => {
-    return http.post("distribution/apply", config);
+    return http.post("distribution/applyVip", config);
 };
 
 /**
@@ -81,7 +81,7 @@ export const applyVip = config => {
  */
 
 export const getVipInfo = config => {
-    return http.get("distribution/vipInfo", config);
+    return http.get("distribution/getVipInfo", config);
 };
 
 /**
@@ -94,7 +94,7 @@ export const getVipInfo = config => {
  */
 
 export const getFailReason = config => {
-    return http.get("distribution/failReason", config);
+    return http.get("distribution/getFailReason", config);
 };
 
 /**
@@ -110,7 +110,7 @@ export const getFailReason = config => {
  */
 
 export const getWalletList = config => {
-    return http.get("distribution/walletList", config);
+    return http.get("distribution/getWalletList", config);
 };
 
 /**
@@ -123,7 +123,7 @@ export const getWalletList = config => {
  */
 
 export const getWithdrawRule = config => {
-    return http.get("distribution/withdrawRule", config);
+    return http.get("distribution/getWithdrawRule", config);
 };
 
 /**
@@ -154,7 +154,7 @@ export const applyWithdraw = config => {
  */
 
 export const getWithdrawList = config => {
-    return http.get("distribution/withdrawList", config);
+    return http.get("distribution/getWithdrawList", config);
 };
 
 /**
@@ -172,7 +172,7 @@ export const getWithdrawList = config => {
  */
 
 export const getSubordinateList = config => {
-    return http.get("distribution/subordinateList", config);
+    return http.get("distribution/getSubordinateList", config);
 };
 
 /**
@@ -190,7 +190,7 @@ export const getSubordinateList = config => {
  */
 
 export const getBillList = config => {
-    return http.get("distribution/billList", config);
+    return http.get("distribution/getBillList", config);
 };
 
 /**
@@ -203,7 +203,7 @@ export const getBillList = config => {
  */
 
 export const getSecondaryBillInfo = config => {
-    return http.get("distribution/secondaryBillInfo", config);
+    return http.get("distribution/getSecondaryBillInfo", config);
 };
 
 /**
@@ -234,7 +234,7 @@ export const sendEmail = config => {
  */
 
 export const getRankList = config => {
-    return http.get("distribution/rankList", config);
+    return http.get("distribution/getRankList", config);
 };
 
 /**
@@ -247,11 +247,11 @@ export const getRankList = config => {
  */
 
 export const getTaskList = config => {
-    return http.get("distribution/taskList", config);
+    return http.get("distribution/getTaskList", config);
 };
 
 /**
- * 获取次级会员对账单信息
+ * 获取分销商任务详情
  * @param config
  * var param = {
     id: '分销商id',
@@ -260,7 +260,7 @@ export const getTaskList = config => {
  */
 
 export const getTaskDetail = config => {
-    return http.get("distribution/taskDetail", config);
+    return http.get("distribution/getTaskDetail", config);
 };
 
 /**
@@ -293,7 +293,7 @@ export const isDistribution = config => {
  */
 
 export const getUserInfo = config => {
-    return http.get("distribution/userInfo", config);
+    return http.get("distribution/getUserInfo", config);
 };
 
 /**
@@ -308,22 +308,7 @@ export const getUserInfo = config => {
  */
 
 export const getWechatQrcode = config => {
-    return http.get("distribution/qrcode", config);
-};
-
-/**
- * 通过会员id、转发文字生成小程序二维码
- * @param config
- * var param = {
-    *vipId: '会员id',
-    firstText: '第一行文字'，
-    secondText: '第二行文字'
-    }
- * @returns {*}
- */
-
-export const getQrcodeWithText = config => {
-    return http.get("distribution/qrcodeWithText", config);
+    return http.get("distribution/getWechatQrcode", config);
 };
 
 /**
@@ -367,5 +352,46 @@ export const setFlag = config => {
  */
 
 export const getLevelRule = config => {
-    return http.get("distribution/levelRule", config);
+    return http.get("distribution/getLevelRule", config);
+};
+
+/**
+ * 记录分销商任务分享、转发人数
+ * @param config
+ * var param = {
+    companyId: '公司id',
+    taskId: 任务id
+    }
+ * @returns {*}
+ */
+
+export const addShareTaskCount = config => {
+    return http.put("distribution/addShareTaskCount", config);
+};
+
+/**
+ * 所有任务标记为已读
+ * @param config
+ * var param = {
+ * vipInfoHdId: '会员id',
+ * companyId: '公司id',
+    }
+ * @returns {*}
+ */
+
+export const readTask = config => {
+    return http.put("distribution/readTask", config);
+};
+
+/**
+ * 会员整合新增查询同账号下的分销商账号
+ * @param config
+ * var param = {
+    companyId: '公司id'
+    }
+ * @returns {*}
+ */
+
+export const getDistributionList = config => {
+    return http.get("distribution/getDistributionList", config);
 };

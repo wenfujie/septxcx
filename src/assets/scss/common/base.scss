@@ -98,10 +98,10 @@ body {
   /* 这代表IPX */
   body, .van-tabbar, .sku-popup, .go-vouchers-btn, .bottom-btn, .qs-wares-btn {
     background-color: #ffffff;
-    padding-bottom: computed(31)
+    padding-bottom: computed(31) !important;
   }
-  .goods-actions{
-    margin-bottom: computed(31)
+  .goods-actions {
+    margin-bottom: computed(31) !important;
   }
 }
 

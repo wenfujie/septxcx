@@ -5,8 +5,6 @@
  * @LastEditTime: 2019-07-25 11:43:47
  * @Description: 绑定手机号弹窗，样式在style.css
  -->
-
-
 <template>
     <div class="popup-phone" ref="phoneBox">
         <div class="phone-box">
@@ -140,7 +138,6 @@ export default {
                 }
             }, 1000);
         },
-
         // 绑定手机号
         bindPhone() {
             if (this.btnLock === true) return;
@@ -183,22 +180,18 @@ export default {
                         };
                         UserService.bindMobile(bindData).then(
                             () => {
-                                Toast("绑定手机号成功");
-                                this.$emit("update:showPopup", false); //绑定成功，弹窗关闭
-                                this.$emit("update:showMessage", true);
-                                this.$emit("getUserInfo");
-                                // setTimeout(() => {
-                                //     if (this.touch == 1)
-                                //         this.$emit("collectFunction");
-                                //     if (this.touch == 2)
-                                //         this.$emit("addCartFunction");
-                                //     if (this.touch == 3)
-                                //         this.$emit("buyNowFunction");
-                                // }, 500);
-                                this.btnLock = false;
-                                let userInfo = global.Storage.get("USER_INFO");
-                                userInfo.mobilePhone = this.phoneNum;
-                                global.Storage.set("USER_INFO", userInfo);
+                                // 绑定手机号成功，缓存usrd
+                                global.updateUserInfo().then(res => {
+                                    Toast("绑定手机号成功");
+                                    this.$emit("update:showPopup", false); //绑定成功，弹窗关闭
+                                    this.$emit("update:showMessage", true);
+                                    this.$emit("success");
+                                    this.btnLock = false;
+                                });
+                                // global.sendCardCoupons()    // 绑定手机号成功发券
+                                // let userInfo = global.Storage.get("USER_INFO");
+                                // userInfo.mobilePhone = this.phoneNum;
+                                // global.Storage.set("USER_INFO", userInfo);
                             },
                             () => {
                                 Toast("绑定手机出错");

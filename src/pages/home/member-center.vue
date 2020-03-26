@@ -1,3 +1,4 @@
+
 /*
 * createTime：2018/11/7
 * author：junyong.hong
@@ -17,7 +18,6 @@
                         >
                             <img
                                 :src="filter.imgFilter(userInfo.thumb,company_id)"
-                                @onerror="global.errImg(event)"
                                 lazy-load="true"
                             />
                         </div>
@@ -44,9 +44,6 @@
                             <div @click="goToOrdList({code:'D_ORDSPAYING',index:1})" class="item">
                                 <div class="item-col num">
                                     <text class="iconfont icon icondaifukuan"></text>
-                                    <!-- <svg class="icon" aria-hidden="true">
-                                        <use xlink:href="#icondaifukuan"></use>
-                                    </svg>-->
                                     <span v-if="ordNum[0] > 0">{{ordNum[0]}}</span>
                                     <p>待付款</p>
                                 </div>
@@ -54,9 +51,6 @@
                             <div @click="goToOrdList({code:'D_ORDSSHIPPING',index:2})" class="item">
                                 <div class="item-col num">
                                     <text class="iconfont icon icondaifahuo"></text>
-                                    <!-- <svg class="icon" aria-hidden="true">
-                                        <use xlink:href="#icondaifahuo"></use>
-                                    </svg>-->
                                     <span v-if="ordNum[1] > 0">{{ordNum[1]}}</span>
                                     <p>待发货</p>
                                 </div>
@@ -64,9 +58,6 @@
                             <div @click="goToOrdList({code:'D_ORDSDELIVERY',index:3})" class="item">
                                 <div class="item-col num">
                                     <text class="iconfont icon icondaishouhuo"></text>
-                                    <!-- <svg class="icon" aria-hidden="true">
-                                        <use xlink:href="#icondaishouhuo"></use>
-                                    </svg>-->
                                     <span v-if="ordNum[2] > 0">{{ordNum[2]}}</span>
                                     <p>待收货</p>
                                 </div>
@@ -77,11 +68,8 @@
                             >
                                 <div class="item-col num">
                                     <text class="iconfont icon icondaipingjia"></text>
-                                    <!-- <svg class="icon" aria-hidden="true">
-                                        <use xlink:href="#icondaipingjia"></use>
-                                    </svg>-->
                                     <span v-if="ordNum[4] > 0">{{ordNum[4]}}</span>
-                                    <p>待评价</p>
+                                    <p>评价</p>
                                 </div>
                             </div>
                             <div
@@ -90,16 +78,34 @@
                             >
                                 <div class="item-col num">
                                     <text class="iconfont icon iconshouhou"></text>
-                                    <!-- <svg class="icon" aria-hidden="true">
-                                        <use xlink:href="#iconshouhou"></use>
-                                    </svg>-->
                                     <span v-if="ordNum[3] > 0">{{ordNum[3]}}</span>
-                                    <p>维修/售后</p>
+                                    <p>售后服务</p>
                                 </div>
                             </div>
                         </van-cell>
                     </van-cell-group>
                     <!-- 我的订单 end -->
+
+                    <!--<p>&nbsp;</p>-->
+
+                    <!-- 裂变 begin -->
+                    <van-cell-group class="common-cell first-cell fission">
+                        <van-cell class="order-status">
+                            <div @click="navigate('/pages/goodsPackage/fission/assemble/assemble-record')" class="item">
+                                <div class="item-col num">
+                                    <text class="iconfont icon iconpintuan"></text>
+                                    <p>拼团</p>
+                                </div>
+                            </div>
+                            <div @click="navigate('/pages/goodsPackage/fission/bargain/bargain-list')" class="item">
+                                <div class="item-col num">
+                                    <text class="iconfont icon iconkanjia"></text>
+                                    <p>砍价</p>
+                                </div>
+                            </div>
+                        </van-cell>
+                    </van-cell-group>
+                    <!-- 裂变 end -->
 
                     <!-- 分销商模块 begin -->
                     <div class="distribution-content" @click="distributionHandle">
@@ -139,11 +145,21 @@
                             @click="navigate('/pages/UserPackage/member/my-collection')"
                         />
                         <van-cell
+                            title="我的积分"
+                            class="title"
+                            is-link
+                            @click="navigate('/pages/UserPackage/member/member-point')"
+                        />
+                        <van-cell
                             title="客服与帮助"
                             class="title"
                             is-link
                             @click="navigate('/pages/UserPackage/help/help-center')"
                         />
+                        <van-cell title="账号整合" @click="isIntegrate" class="title" is-link />
+                        <!-- <van-icon slot="icon" class="iconfont icon-zhanghu" />
+                            <i class="iconfont icon-youfan"></i>
+                        </van-cell>-->
                         <!--<van-cell title="资金账户" class="title" is-link @click="navigate('/fund-detail')"/>-->
                         <!--<van-cell title="我的会员" class="title" is-link @click="navigate('/member-ship')"/>-->
                         <!--<van-cell title="我的积分" class="title" is-link @click="navigate('/point-detail')"/>-->
@@ -165,10 +181,11 @@
                 <!-- 列表 end -->
             </div>
         </scroll-view>
+        <div class="pd-bottom"></div>
     </div>
 </template>
 <script>
-import { UserService, Base, Login, Cms, Distribution } from "../../api/service";
+import { UserService, Base, Distribution } from "../../api/service";
 // 获取订单状态数量
 import { getOrdListNum } from "@/pages/orderPackage/order/order/public/functions";
 import Toast from "vant-weapp/dist/toast/toast";
@@ -182,20 +199,26 @@ export default {
             ordNum: [],
             isVipMdt: null, // 当前用户是否是分销商
             company_id: "",
-            screenHeight: 667
+            screenHeight: 667,
+            memberList: [] //判断是否需要会员整合
         };
     },
     created() {
         this.createdMethods();
+    },
+    onShow() {
+        if (this.isshow) {
+            this.onRefresh();
+        }
     },
     methods: {
         createdMethods() {
             const systemInfo = wx.getSystemInfoSync();
             this.screenHeight = systemInfo.windowHeight;
             this.company_id = global.Storage.get("COMPANYID").company_id;
-            this.vipId = this.$root.$mp.query.vipId
-            this.getVipInfo()
-            this.isDistribution()
+            this.vipId = this.$root.$mp.query.vipId;
+            this.getVipInfo();
+            this.isDistribution();
             // 获取订单数量
             this.getOrdNum();
         },
@@ -245,7 +268,6 @@ export default {
         async getOrdNum() {
             this.ordNum = await getOrdListNum(this);
         },
-
         //  提示分销商上下级关系
         showLevelToast() {
             let data = {
@@ -261,7 +283,6 @@ export default {
         //  判断会员是否是分销商
         isDistribution() {
             let data = {
-                vipInfoHdId: global.Storage.get("USER_INFO").vipInfoId,
                 busconsCode: global.baseConstant.busContsCode
             };
             Distribution.isDistribution(data).then(res => {
@@ -282,33 +303,44 @@ export default {
                 }`;
                 this.$router.push(url);
             }
+        },
+        //判断是否需要会员整合
+        isIntegrate() {
+            let data = {
+                windowFlag: 0 // 1弹窗 0非弹窗
+            };
+            return UserService.memberMergeList(data).then(res => {
+                this.memberList = res && res.length > 0 ? res : [];
+                if (this.memberList.length == 0) {
+                    Toast("暂无匹配的账号需要整合");
+                } else {
+                    this.$router.push(
+                        "/pages/UserPackage/merge/member-merge-form"
+                    );
+                }
+            });
         }
     }
 };
 </script>
 
 <style lang="scss" type="text/scss" scoped>
+    .pd-bottom{
+        padding-bottom: computed(80);
+    }
 .member-center {
-    $whiteColor: #ffffff;
-    $grayColor: #f5f5f5;
-    $titleColor: #333333;
-    $orderStatusColor: #666666;
-    $rightColor: #0d0e09;
-    $redColor: #c41717;
-
     position: relative;
     height: 98%;
-    background-color: $grayColor;
+    background-color: $color-background;
     /* 头部 */
     .member-center-wrap {
         height: 110%;
         width: 100%;
+        overflow-y: auto;
     }
     .center-header {
         width: 100%;
         height: computed(349);
-        /*background: url("../../assets/images/member/member-bg.png");*/
-        /*background-size: 100% 100%;*/
         background: $bggradientcolorbt;
         .header-body {
             box-sizing: border-box;
@@ -332,25 +364,6 @@ export default {
                     font-size: $font-common;
                     line-height: 1;
                     color: $color-white;
-                }
-                .info-vip {
-                    display: inline-block;
-                    margin: computed(22) 0 0 computed(28);
-                    padding: computed(3) computed(17);
-                    font-size: computed(22);
-                    color: $whiteColor;
-                    &.vip-common {
-                        background: url($serverUrl+"images/member/commonCard.png");
-                        background-size: 100% 100%;
-                    }
-                    &.vip-golden {
-                        background: url($serverUrl+"images/member/goldenCard.png");
-                        background-size: 100% 100%;
-                    }
-                    &.vip-black {
-                        background: url($serverUrl+"images/member/blackCard.png");
-                        background-size: 100% 100%;
-                    }
                 }
             }
         }
@@ -409,77 +422,96 @@ export default {
     }
 }
 </style>
-<style lang="scss">
-.member-center {
-    $whiteColor: #ffffff;
-    $grayColor: #f5f5f5;
-    $titleColor: #333333;
-    $orderStatusColor: #666666;
-    $rightColor: #0d0e09;
-    $redColor: #c41717;
-    scroll-view {
-        height: 667px;
-        width: 100%;
-    }
-    .order-status {
-        .van-cell {
-            padding: 0;
+<style lang="scss" >
+    .member-center {
+        scroll-view {
+            height: 667px;
+            width: 100%;
         }
-    }
-    /* 列表 */
-    .center-list {
-        width: calc(100% - #{computed(60)});
-        z-index: 999;
-        margin: computed(-127) computed(30) 0 computed(30);
-        .common-cell {
-            background: $whiteColor;
-            margin-bottom: computed(30);
-            &:last-child {
-                margin-bottom: 0;
+        .order-status {
+            .van-cell {
+                padding: 0;
             }
-            &.first-cell {
-                .order-status {
-                    padding: 0;
-                    .item {
-                        display: inline-block;
-                        width: 20%;
-                        height: computed(154);
-                        vertical-align: middle;
-                        text-align: center;
-                        position: relative;
-                        .item-col {
-                            position: absolute;
-                            top: 50%;
-                            left: 50%;
-                            width: 100%;
-                            transform: translate(-50%, -50%);
+        }
+        /* 列表 */
+        .center-list {
+            width: calc(100% - #{computed(60)});
+            z-index: 999;
+            margin: computed(-127) computed(30) computed(220) computed(30);
+            .common-cell {
+                background: $color-white;
+                margin-bottom: computed(30);
+                &:last-child {
+                    margin-bottom: 0;
+                }
+                &.fission{
+                    margin-top: computed(30);
+                    display: inline-block;
+                    width: 100%;
+                }
+                &.first-cell {
+                    .order-status {
+                        padding: 0;
+                        .item {
+                            display: inline-block;
+                            width: 20%;
+                            height: computed(154);
+                            vertical-align: middle;
                             text-align: center;
-                            .icon {
-                                width: computed(38);
-                                height: computed(38);
-                                background: white;
-                                color: $titleColor;
-                            }
-                            &.num {
-                                position: relative;
-                                span {
-                                    position: absolute;
-                                    top: computed(-17);
-                                    right: computed(30);
-                                    font-style: normal;
+                            position: relative;
+                            float: left;
+                            .item-col {
+                                position: absolute;
+                                top: 50%;
+                                left: 50%;
+                                width: 100%;
+                                transform: translate(-50%, -50%);
+                                text-align: center;
+                                .icon {
+                                    width: computed(38);
+                                    height: computed(38);
+                                    background: white;
+                                    color: $text-primary;
+                                }
+                                &.num {
+                                    position: relative;
+                                    span {
+                                        position: absolute;
+                                        top: computed(-17);
+                                        right: computed(30);
+                                        font-style: normal;
+                                        font-size: computed(24);
+                                        min-width: computed(32);
+                                        height: computed(32);
+                                        line-height: computed(32);
+                                        border-radius: 50%;
+                                        background: $domaincolor;
+                                        color: $color-white;
+                                    }
+                                }
+                                > p {
+                                    color: $text-regular;
                                     font-size: computed(24);
-                                    min-width: computed(32);
-                                    height: computed(32);
-                                    line-height: computed(32);
-                                    border-radius: 50%;
-                                    background: $domaincolor;
-                                    color: $whiteColor;
+                                    line-height: computed(24);
                                 }
                             }
-                            > p {
-                                color: $orderStatusColor;
-                                font-size: computed(24);
-                                line-height: computed(24);
+                        }
+                    }
+                    van-cell {
+                        &:not(:last-child) {
+                            .van-cell::after {
+                                width: calc(100% - 30px);
+                                border: dashed computed(1) $text-placeholder;
+                            }
+                        }
+                        &.title {
+                            position: relative;
+                            color: $text-primary;
+                            font-size: computed(26);
+                            font-weight: bold;
+                            bottom: -1px;
+                            .van-cell__value {
+                                font-weight: normal;
                             }
                         }
                     }
@@ -493,7 +525,7 @@ export default {
                     }
                     &.title {
                         position: relative;
-                        color: $titleColor;
+                        color: $text-primary;
                         font-size: computed(26);
                         font-weight: bold;
                         bottom: -1px;
@@ -503,25 +535,6 @@ export default {
                     }
                 }
             }
-            van-cell {
-                &:not(:last-child) {
-                    .van-cell::after {
-                        width: calc(100% - 30px);
-                        border: dashed computed(1) $text-placeholder;
-                    }
-                }
-                &.title {
-                    position: relative;
-                    color: $titleColor;
-                    font-size: computed(26);
-                    font-weight: bold;
-                    bottom: -1px;
-                    .van-cell__value {
-                        font-weight: normal;
-                    }
-                }
-            }
         }
     }
-}
 </style>

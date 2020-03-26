@@ -5,7 +5,7 @@
 */
 
 //  合成语音
-const synthesizeVoice = require('../controller/base/xf-voice')
+const xfvoiceFun = require('../controller/xf-voice')
 module.exports = {
-    'GET/voice': synthesizeVoice
+    'GET/voice': xfvoiceFun.synthesizeVoice
 }

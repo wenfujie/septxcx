@@ -5,9 +5,9 @@
 */
 
 //  线下沙龙模块
-const salonFun = require('../controller/salon/salon')
+const salonFun = require('../controller/salon')
 
 module.exports = {
-    "GET/list": salonFun.getList,  // 获取文章列表
-    "GET/detail": salonFun.getDetail,  // 获取文章详情
+    "GET/getList": salonFun.getList,  // 获取文章列表
+    "GET/getDetail": salonFun.getDetail,  // 获取文章详情
 }

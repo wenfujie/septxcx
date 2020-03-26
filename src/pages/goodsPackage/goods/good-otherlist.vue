@@ -2,7 +2,7 @@
  * @Author: lan.chen
  * @Date: 2019-06-29 14:02:08
  * @LastEditors: lan.chen
- * @LastEditTime: 2019-07-25 15:35:30
+ * @LastEditTime: 2019-08-14 18:01:07
  * @Description: 满减/满折/更多商品页面
  -->
 
@@ -19,13 +19,13 @@
             >
                 <!-- 满减满折促销标识 -->
                 <img
-                    :src="filter.imgFilter(item.spmFileUrl,company_id)"
+                    :src="filter.imgFilter(item.spmFileUrl,company_id, '60*60')"
                     lazy-load="true"
                     class="cuxiao"
                     v-if="type !=2 && !!item.spmFileUrl"
                 />
                 <img
-                    :src="filter.imgFilter(item.spmFileUrl,company_id)"
+                    :src="filter.imgFilter(item.spmFileUrl,company_id, '60*60')"
                     lazy-load="true"
                     class="cuxiao"
                     v-if="type ==2 && !!item.spmFileUrl"
@@ -34,16 +34,14 @@
                 <div class="good-item-img">
                     <img
                         v-if="type !=2"
-                        :src="filter.imgFilter(item.fileUrl,company_id)"
+                        :src="filter.imgFilter(item.fileUrl,company_id, '345*345')"
                         lazy-load="true"
-                        @onerror="global.errImg(event)"
                     />
                     <!-- 更多商品图片 -->
                     <img
                         v-else
-                        :src="filter.imgFilter(item.goodsFilePath,company_id)"
+                        :src="filter.imgFilter(item.goodsFilePath,company_id, '345*345')"
                         lazy-load="true"
-                        @onerror="global.errImg(event)"
                         alt="商品logo"
                     />
                 </div>
@@ -54,10 +52,7 @@
                         <span class="sale-single">￥</span>
                         <span>{{filter.Fix2(item.salePrice)}}</span>
                     </div>
-                    <del
-                        class="del_line"
-                        v-if="item.tagPrice && item.tagPrice != 0 && (item.salePrice !== item.tagPrice)"
-                    >￥{{filter.Fix2(item.tagPrice)}}</del>
+                    <del v-if="item.tagPrice && item.tagPrice != 0">￥{{filter.Fix2(item.tagPrice)}}</del>
                 </div>
             </li>
         </ul>
@@ -69,7 +64,7 @@
     </div>
 </template>
 <script>
-import { Collection, Cms, Goods } from "../../../api/service";
+import { Cms, Goods } from "../../../api/service";
 import EmptyContent from "@/components/EmptyContent";
 import Toast from "vant-weapp/dist/toast/toast";
 export default {
@@ -129,7 +124,9 @@ export default {
     },
     //  加载更多商品
     onReachBottom: function() {
-        this.loadMore();
+        if (this.type != 2) {
+            this.loadMore();
+        }
     },
     methods: {
         //  加载商品列表
@@ -160,7 +157,7 @@ export default {
                         if (!this.goodsList || this.goodsList.length === 0) {
                             this.showEmpty = true;
                         }
-                        if (parseInt(res.pageNum) >= parseInt(res.pages)) {
+                        if (res.pageNum >= res.pages) {
                             this.finished = true;
                         } else {
                             this.finished = false;
@@ -182,7 +179,7 @@ export default {
                     shopId: global.Storage.get("properties").shopId,
                     pageNum: 0,
                     pageSize: 0,
-                    onilneFlag: 1
+                    onlineFlag: 1 //促销标识
                 };
                 global.toastLoading();
                 Cms.getChoosebuyGoods(data).then(res => {

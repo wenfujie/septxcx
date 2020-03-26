@@ -46,21 +46,17 @@ export default {
 
         //  获取购物车数量信息
         async getShoppingCart({commit, state}) {
-            if(!!state.shoppingCartNum) {
+            if(!!Storage.get('USER_INFO')) {
+                let res = await ShoppingCart.getCartCount()
+                let data = {
+                    storeKey: 'shoppingCartNum',
+                    storeValue: res
+                }
+                commit("setData", data)
+                return res;
+            }
+            else {
                 return state.shoppingCartNum
-            }else{
-                if(!!Storage.get('USER_INFO')) {
-                    let res = await ShoppingCart.getCartCount()
-                    let data = {
-                        storeKey: 'shoppingCartNum',
-                        storeValue: res
-                    }
-                    commit("setData", data)
-                    return res;
-                }
-                else {
-                    return state.shoppingCartNum
-                }
             }
         },
 

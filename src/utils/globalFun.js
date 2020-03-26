@@ -3,15 +3,13 @@
  * author: zhibin.zhao
  * description:
  */
-import Vue from "vue";
 //  图片请求过滤器
 import * as filter from "./filterCommon";
 import {
     Base,
-    Login,
     Cms,
+    Vouchers,
     UserService,
-    Order,
     Distribution
 } from "@/api/service";
 import Storage from "./storage";
@@ -19,22 +17,10 @@ import wechat from "./wechat";
 import "./common";
 import http from './http'
 import Toast from 'vant-weapp/dist/toast/toast';
+import Store from '../store/index'
 
 global.getImg = function (e) {
     return filter.imgFilter(e);
-};
-
-global.getVideo = function (e) {
-    return filter.videoFilter(e);
-};
-// 获取分享图片
-Vue.prototype.getShareImg = function (fileUrl, cpmpanyId) {
-    return filter.getShareImg(fileUrl, cpmpanyId);
-};
-
-//  图片破损或错误时返回
-global.errImg = function (e) {
-    e.target.src = require(global.baseConstant.serverUrl + 'assets/images/common/septwolves.png');
 };
 
 // 验证手机号
@@ -65,42 +51,6 @@ global.getQueryVariable = function (url, variable) {
     return "";
 };
 
-//  将富文本中的图片相对路径替换成文件资源路径
-global.getImgPath = function (str) {
-    return str.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (img, src) {
-        let index = src.indexOf("=") + 1;
-        let imgData = getImg(src.substring(index, img.length));
-        return (
-            '<img src="' +
-            imgData +
-            '" style="width: 100%; display: block; margin: 0;">'
-        );
-    });
-}
-
-// 图片上传 参数为File类型
-global.uploadImg = function (file) {
-    let param = new FormData();
-    param.append("companyId", Storage.get("COMPANYID").company_id);
-    // param.append('file', convertBase64UrlToBlob(file.replace(/^data:image\/(png|jpg|jpeg);base64,/,"")), "file1.png")
-    param.append("file", file);
-    return Base.imgUpload(param).then(
-        res => {
-            return res;
-        },
-        function (err) {
-            return err;
-        }
-    );
-}
-
-// 判断没有OSSOPENURL时候再次获取一次环境变量
-global.getEnv = function(){
-    return Base.getEnv().then(res=>{
-        return res
-    })
-}
-
 // 获取模板
 global.getTemplate = function () {
     let busContsCode = global.baseConstant.busContsCode
@@ -113,54 +63,23 @@ global.getTemplate = function () {
         shopId: Storage.get('properties').shopId
     };
     return Cms.getTemplate(data).then(res => {
-        Storage.set("TEMPLATE_INFO", res[0]);
-        return res[0]
+        let template = res
+        if(res.constructor==Array){
+            template = res[0]
+            Storage.set("TEMPLATE_INFO", res[0]);
+        }else{
+            Storage.set("TEMPLATE_INFO", res);
+        }
+        return template
     });
 };
 
 // 获取用户信息
 global.c_getUserInfo = async function () {
     return UserService.getUserInfo({
+        "vipInfoHdId": Storage.get("USER_INFO").vipInfoId,
         "usrId": Storage.get("USER_INFO").usrId,
         "companyId": Storage.get("COMPANYID").company_id,
-    })
-}
-
-// 获取公共常量配置信息
-global.Const = function () {
-    if (!global.baseConstant.wxUnionid) {
-        return Cms.getProperties().then(res => {
-            global.baseConstant.wxUnionid = res.mpUuid;
-            Storage.set("COMPANYID", {
-                company_id: res.companyId
-            });
-            Storage.set("properties", {
-                iframeUrl: res.iframeUrl,
-                wxUnionid: res.mpUuid,
-                shopId: res.shopIds
-            });
-            return global.getTemplate();
-        });
-    } else {
-        return global.getTemplate();
-    }
-}
-
-//调取微信客服
-global.contact = function () {
-    wx.miniProgram.navigateTo({
-        url: "../contact/contact"
-    });
-}
-
-// 商品提交订单 生成中间表id
-global.c_emitBill = function (orderData) {
-    return Order.saveCartTemp(orderData).then((res) => {
-        return Order.orderPreferCal({
-            ordId: res
-        }).then(() => {
-            return res;
-        });
     })
 }
 
@@ -246,11 +165,23 @@ global.userIsDistribution = function () {
     })
 }
 
-// 来自小程序
-global.showLoading = function () {
-    wx.showLoading({
-        title: '加载中'
+// 获取省市区数据
+global.getCityData = function(){
+    return Base.getCityData().then(res=>{
+        return res
     })
+}
+
+// 来自小程序
+global.showLoading = function (option = {}) {
+    wx.showLoading({
+        title: '加载中',
+        mask: option.mask || false,
+    })
+}
+// 来自小程序
+global.hideLoading = function () {
+    wx.hideLoading();
 }
 
 global.setUserInfoAndNext = function (res) {
@@ -260,6 +191,31 @@ global.setUserInfoAndNext = function (res) {
         global.userInfoReadyCallback(res)
     }
     wx.hideLoading()
+}
+
+// 获取properties，在项目初始化时候请求，在每次登录时更新
+global.getBaseParams = function () {
+    return Base.getBaseParams({appId: global.baseConstant.appId}).then(res=>{
+        if(!res.companyId){
+            Storage.clear()
+            return false
+        }
+        Storage.set('COMPANYID', {company_id: res.companyId})
+        Storage.set('properties', {
+            companyId: res.companyId,
+            shopId: res.dptId,
+            shopCode: res.dptCode,
+            busContsCode: res.platformCode,
+            ossOpenUrl: res.ossOpenUrl,
+            wxUnionid: res.mpUuid,
+            publicAccount: res.publicAccount,
+            appId: res.appId,
+            appSecret: res.appSecret
+        })
+        global.baseConstant.ossOpenUrl = res.ossOpenUrl
+        global.baseConstant.busContsCode = res.platformCode
+        return true
+    })
 }
 
 // 获取用户授权
@@ -317,14 +273,6 @@ global.getPhoneNumber = function (data) {
     })
 }
 
-// 获取手机号sessionKey过期
-global.againGetLogin = function (param) {
-    return wechat.login().then(result => {
-        param.code = result.code
-        return global.bindExpire(param)
-    })
-}
-
 // 调用绑定手机号接口
 global.bindPhoneNumber = function (param) {
     return wechat.putRequest(global.baseConstant.serverUrl + 'analysis/bindPhone', param).then(res => {
@@ -345,90 +293,46 @@ global.bindPhoneNumber = function (param) {
     })
 }
 
-// 绑定手机号2，针对上一个接口绑定失败或者sessionKey过期的
-global.bindExpire = function (param) {
-        return wechat.putRequest(global.baseConstant.serverUrl + 'analysis/bindExpire', param).then(res => {
-            console.log("-------", res, res.data)
-            if (!res.data.usrId) {
-                if (!!res.data.statusCode) {
-                    return res.data
-                } else {
-                    console.log("获取手机号失败！！！")
-                    return false
-                }
-            }
-            return true
-        }, err => {
-            return false
-        }).catch(e => {
-            console.log(e)
-            return false
-        })
-    }
-
 // 联合登录
 global.mergLogin = function (code) {
-        return wechat.getUserInfo().then(res => {
-            return new Promise((reslove, reject) => {
-                http.get(
-                    global.baseConstant.serverUrl + 'login/mergeLogin', {
-                        code: code,
-                        userInfo: res
-                    }
-                ).then(result => {
-                    console.log('联合登陆结果', result)
-                    if (!result.usrId) {
-                        reject(false)
-                    }
-                    /* wx.setStorageSync("USER_INFO", {
-						usrId: result.usrId,
-						shopId: result.shopId,
-						shopCode: result.shopCode,
-						vipInfoId: result.vipInfoId
-					}); */
-                    wx.setStorageSync('USER_INFO', result)
-                    console.log(result)
-                    wx.setStorageSync('WECHAT_INFO', {openid: result.openId})
-                    // global.setUserInfoAndNext();
-                    reslove(result)
-                })
+    return wechat.getUserInfo().then(res => {
+        console.log("res",res)
+        return new Promise((reslove, reject) => {
+            let properties = wx.getStorageSync('properties')
+            http.get(
+                global.baseConstant.serverUrl + 'login/mergeLogin', {
+                code: code,
+                userInfo: res,
+                properties: properties
+            }
+            ).then(result => {
+                console.log('联合登陆结果', result)
+                if (!result.vipInfoId) {
+                    reject(false)
+                }
+                wx.setStorageSync('USER_INFO', result)
+                console.log(result)
+                wx.setStorageSync('WECHAT_INFO', { openid: result.openId })
+                reslove(result)
             })
         })
-    }
-
-// 授权弹窗拒绝、未出现过即从未授权过需要执行的代码（）
-global.authorWindow = function () {
-        wx.reLaunch({
-            url: '../../page/coupons/coupons'
-        })
-    },
-
-// 判断在Storage中有无USER_INFO信息
-global.getStorage = function () {
-        wx.getStorage({
-            key: 'USER_INFO',
-            success: function (res) {
-                return true;
-            },
-            fail: function (res) {
-            },
-            complete: function (res) {
-            },
-        })
-    }
-
-// 跳转首页
-global.goToIndex = function () {
-        wx.navigateTo({
-            url: '../index/index'
-        })
-    }
-
+    })
+}
+// 重新获取用户信息
+global.updateUserInfo = function () {
+    return wechat.login().then(result => {
+        return wechat.getSetting().then(res => {
+            if (res.authSetting['scope.userInfo'] === true) { // 成功授权
+                return global.mergLogin(result.code)
+            }
+        });
+    });
+};
 //类似小程序switchTab跳转
 global.switchTab = function (goPath) {
     var currentPages = getCurrentPages();
     //没有经过首页时,如通过分享进来时
-    if (currentPages.length === 1 && currentPages[0].route != "pages/home/home") {
+    if (currentPages[0].route != "pages/home/home") {
         wx.redirectTo({
             url: '/pages/home/home?goPath=' + goPath
         })
@@ -443,54 +347,26 @@ global.switchTab = function (goPath) {
                 delta: length - 1
             })
         }
-
     }
 }
 
 //封装小程序Toast
 //icon为none	不显示图标，此时 title 文本最多可显示两行
 global.Toast = function (title, icon = 'none') {
-        return new Promise(function (resolve, reject) {
-            wx.showToast({
-                title: title,
-                icon: icon,
-                duration: 3000,
-                success: function () {
-                    resolve();
-                },
-                fail: function (error) {
-                    reject(error);
-                },
-            })
-        });
-    }
-
-//弹窗处理
-global.DialogDeal = function (option, showCancel = true) {
-        return new Promise(function (resolve, reject) {
-            var title = option.title || '';
-            var content = option.message || '';
-            var cancelText = option.cancelButtonText || '取消';
-            var confirmText = option.confirmButtonText || '确定';
-            wx.showModal({
-                title: title,
-                content: content,
-                cancelText: cancelText,
-                confirmText: confirmText,
-                showCancel: showCancel,
-                success(res) {
-                    if (res.confirm) {
-                        resolve(res);
-                    } else if (res.cancel) {
-                        reject(res);
-                    }
-                },
-                fail(res) {
-                    reject(res);
-                },
-            })
+    return new Promise(function (resolve, reject) {
+        wx.showToast({
+            title: title,
+            icon: icon,
+            duration: 3000,
+            success: function () {
+                resolve();
+            },
+            fail: function (error) {
+                reject(error);
+            },
         })
-    }
+    });
+}
 
 /**
  * @action vant toast的loading提示
@@ -540,10 +416,12 @@ global.urlEncode = function (param, key, encode) {
 
 //将网络图片等图片地址转化为本地图片地址，不然canvas上绘画不出来
 global.getImgToLocalUrl = function (imgUrl) {
+    console.log('getImgToLocalUrl，转为本地图片')
     return new Promise(function (resolve, reject) {
         wx.getImageInfo({
             src: imgUrl,
             success: function (res) {
+                console.log('getImageInfo，成功转为本地图片')
                 //res.path是网络图片的本地地址
                 let Path = res.path;
                 resolve(Path);
@@ -554,22 +432,20 @@ global.getImgToLocalUrl = function (imgUrl) {
         });
     })
 }
-
-
-global.randomNum = function(num) {
+global.randomNum = function (num) {
     num = !!num ? num : 2
     let randomNum = '';
-    for (let i = 0; i < num; i ++) {
-        randomNum += Math.floor(Math.random()*10);
+    for (let i = 0; i < num; i++) {
+        randomNum += Math.floor(Math.random() * 10);
     }
     return randomNum;
 }
-
 //将base64转化为本地图片地址，不然canvas上绘画不出来
 global.getImgBase64ToLocalUrl = function (base64Img) {
+    console.log('getImgBase64ToLocalUrl，转临时文件')
     let timeStap = Date.now()
     let root = this;
-    const FILE_BASE_NAME = 'tmp_base64src' + timeStap + global.randomNum(3); //自定义文件名
+    const FILE_BASE_NAME = 'tmp_base64src' + timeStap + global.randomNum(); //自定义文件名
     const [, format, bodyData] = /data:image\/(\w+);base64,(.*)/.exec(base64Img) || [];
     if (!format) {
         return (new Error('ERROR_BASE64SRC_PARSE'));
@@ -579,11 +455,13 @@ global.getImgBase64ToLocalUrl = function (base64Img) {
         let filePath = `${wx.env.USER_DATA_PATH}/${FILE_BASE_NAME}.${format}`;
         let buffer = wx.base64ToArrayBuffer(bodyData);//转二进制的base64需要去掉文件的data:image前面部分
         /// 绘制成图片
-        wx.getFileSystemManager().writeFile({
+        const fsm = wx.getFileSystemManager();
+        fsm.writeFile({
             filePath,
             data: buffer,
             encoding: 'binary',
             async success(res) {
+                console.log('getFileSystemManager，转临时文件成功')
                 let path = await global.getImgToLocalUrl(filePath)
                 resolve(path);
             },
@@ -592,6 +470,11 @@ global.getImgBase64ToLocalUrl = function (base64Img) {
             }
         });
     })
+}
+
+//  绑定手机号成功发券
+global.sendCardCoupons = function () {
+    return Vouchers.sendCardCoupons({ shopId: Storage.get('properties').shopId })
 }
 
 // 获取分享页面参数
@@ -613,6 +496,11 @@ global.getShareUrl = function (url, shareParams = {}) {
     //  转发、分享携带当前用户的会员id，作为绑定上下级的标识
     shareParams.vipId = global.Storage.get('USER_INFO').vipInfoId
 
+    //  会员整合后分销商模块使用选中的分销商id以及对应的会员id
+    if(url.indexOf('distributionPackage') !== -1) {
+        shareParams.vipId = Store.state.distribution.accountInfo.vipInfoHdId
+    }
+
     //  将对象转化成拼接在url上的参数格式
     shareParams = global.urlEncode(shareParams);
     shareParams = shareParams ? '?' + shareParams.substring(1, shareParams.length) : '';
@@ -626,4 +514,32 @@ global.getShareUrl = function (url, shareParams = {}) {
 
     return shareUrl
 
+}
+//商品详情页的数据栈
+global.detail_data = [];
+
+/** 更新已整合用户长度 **/
+global.updateRelationAccountLength = function () {
+    let data = {
+        vipInfoHdId: global.Storage.get('USER_INFO').vipInfoId,
+    }
+    // 增加缓存变量(会员整合用户长度)
+    UserService.getRelationAccountList(data).then(res => {
+        let userInfo = global.Storage.get("USER_INFO");
+        userInfo.relationAccountLength = res.length ? res.length - 1 : 0;
+        global.Storage.set("USER_INFO", userInfo);
+    })
+}
+
+global.c_debounce = function(fn, wait, vm) {
+//        this.timeout = null;
+    if(vm.c_timeout) clearTimeout(vm.c_timeout);
+    vm.c_timeout = setTimeout(fn, wait);
+}
+
+/** 解决苹果手机兼容问题：new Date('2018-09-09 23:23:23').getTime()  值为NaN问题
+ * @param dateStr:  String (如'2018-09-09 23:23:23')
+ * **/
+global.c_getDateStamp = function(dateStr) {
+    return new Date(dateStr.replace(/-/g,'/')).getTime();
 }

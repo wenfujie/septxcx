@@ -8,13 +8,13 @@
         <div>
             <voucherList :cardList="cardList" />
         </div>
-        <empty emptyText="很抱歉，您当前无任何抵用券~" v-if="showEmpty" wrap-style="position:fixed;top:0"></empty>
+        <empty emptyText="很抱歉，您当前无任何抵用券~" v-if="showEmpty"></empty>
         <van-toast id="van-toast" />
     </div>
 </template>
 <script>
-import voucherList from "./components/voucherList";
-import { Vouchers, Payment } from "@/api/service";
+import voucherList from "@/components/voucherList";
+import { Vouchers } from "@/api/service";
 import Empty from "@/components/EmptyContent.vue";
 export default {
     config: {
@@ -72,24 +72,27 @@ export default {
                 busContsCode: global.baseConstant.busContsCode,
                 isWeixin: 2,
                 wxUnionid: global.Storage.get("properties").wxUnionid,
-                shopId: global.Storage.get("USER_INFO").shopId,
+                shopId: global.Storage.get("properties").shopId,
                 pageNum: this.pageNum,
                 pageSize: this.pageSize
             };
             let result = await Vouchers.getVouchersList(params);
-            // console.log(result, 'vouchers')
             if (result && Array.isArray(result.couponTypesList)) {
                 result.couponTypesList.forEach(item => {
                     item.couponsList.forEach(coupon => {
-                        coupon.cardTypeCode = item.couponsTypeCode;
-                        this.isLoading = false;
-                        cardList.push(coupon);
+                        if (coupon.couponCount > 0 &&coupon.isBuy!=1) {
+                            coupon.cardTypeCode = item.couponsTypeCode;
+                            this.isLoading = false;
+                            cardList.push(coupon);
+                        }
                     });
                 });
             }
             this.cardList = cardList;
-            if (!this.cardList.length || this.cardList.length < 1) {
+            if (this.cardList.length===0) {
                 this.showEmpty = true;
+            }else{
+                this.showEmpty = false;
             }
             this.isLoading = false;
             this.finished = true;
@@ -103,7 +106,7 @@ $grayColor: #f5f5f5;
 .vouchers-list {
     background-color: $color-background;
     -webkit-overflow-scrolling: touch;
-    min-height: computed(1800);
+    min-height: 100%;
     position: relative;
 }
 </style>

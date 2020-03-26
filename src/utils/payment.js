@@ -18,7 +18,6 @@ const payment = {
      *  failUrl: String // 失败回调地址，例如('/show')
      */
     miniProgramPay: function (config, successUrl, failUrl) {
-
         //  支付loading
         wx.showLoading({
             title: '支付中~'
@@ -32,10 +31,8 @@ const payment = {
             successUrl: successUrl || '',
             failUrl: failUrl || '/index'
         }
-        console.log(payData,"-=-=-=")
 
         // 小程序内支付
-
         return new Promise((reslove,reject) => {
             wx.requestPayment({
                 'timeStamp': payData.timeStamp,
@@ -55,6 +52,7 @@ const payment = {
                             data: 'success'
                         }
                         reslove(result)
+                        gio('track', 'payOrderSuccess', {})
                     } else {
                         // 失败处理
                         let result = {
@@ -121,7 +119,5 @@ const payment = {
             }
         });
     }
-
-
 }
 export default payment

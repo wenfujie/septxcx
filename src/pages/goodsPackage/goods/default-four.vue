@@ -41,7 +41,6 @@
     </div>
 </template>
 <script>
-import { Collection, Cms } from '@/api/service'
 
 export default {
     config:{},

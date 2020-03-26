@@ -7,7 +7,7 @@ const common = require('./common')
 
 class order {
     //  获取运费
-    static async getFreightValue(ctx, params) {
+    static async getFreight(ctx, params) {
         let url = "/rtl-ord-inter-hds/freight/" + params.id;
         return ctx
             .$get(ctx.baseUrl + ctx.serverPortUrl.shoppingCart + url, params)
@@ -17,7 +17,7 @@ class order {
     }
 
     //  获取订单优惠信息
-    static async getDiscountValue(ctx, params) {
+    static async getOrderDiscount(ctx, params) {
         let url = "/rtl-ord-hds/discount/" + params.billCode;
         return ctx
             .$get(ctx.baseUrl + ctx.serverPortUrl.shoppingCart + url, params)
@@ -27,7 +27,7 @@ class order {
     }
 
     //  获取用户不同状态订单对应的数量
-    static async getorderNum(ctx, params) {
+    static async getOrderNum(ctx, params) {
         return ctx
             .$get(
                 ctx.baseUrl +
@@ -42,7 +42,7 @@ class order {
     }
 
     //  获取订单列表
-    static async getList(ctx, params) {
+    static async getOrderList(ctx, params) {
         let url = "/sp-sales/ord-list";
         return ctx
             .$get(ctx.nettyUrl + ctx.serverPortUrl.shoppingCart + common.newUrlKey +
@@ -82,7 +82,7 @@ class order {
             });
     }
     //确认收货
-    static async confirmRcieved(ctx, params) {
+    static async confirmReceived(ctx, params) {
         let url = "/rtl-ord-hds/firm-receive/bill-codes";
         return ctx
             .$putUrl(ctx.baseUrl + ctx.serverPortUrl.shoppingCart + url, params)
@@ -92,10 +92,8 @@ class order {
     }
 
     // 取消订单
-    static async cancel(ctx, params) {
-        let url =
-            "/rtl-ord-hds/cancel-del-recycle/bill-codes?companyId=" +
-            params.companyId;
+    static async cancelOrder(ctx, params) {
+        let url ="/rtl-ord-hds/cancel-del-recycle/bill-codes?companyId="+params.companyId + "&vipInfoHdId=" + params.vipInfoHdId;
         return ctx
             .$put(ctx.baseUrl + ctx.serverPortUrl.shoppingCart + url, params)
             .then(res => {
@@ -113,21 +111,20 @@ class order {
     }
 
     //  保存更新结算
-    static async saveCartTempValue(ctx, params) {
+    static async saveCartTemp(ctx, params) {
         let url =
             "/sp-sales/cart-temp?companyId=" +
             params.companyId +
             "&usrId=" +
-            params.usrId;
+            params.usrId + "&vipInfoHdId=" + params.vipInfoHdId;
         return ctx
             .$post(ctx.nettyUrl + ctx.serverPortUrl.shoppingCart + common.newUrlKey + url, params)
             .then(res => {
                 return res;
             });
     }
-
     //  订单=》锁库存
-    static async lockStockValue(ctx, params) {
+    static async lockStock(ctx, params) {
         let url = "/lock-or-unlock-inv-aggregates/oper-order-inv-by-billcode";
         return ctx
             .$putUrl(ctx.baseUrl + ctx.serverPortUrl.goodsService + url, params)
@@ -137,7 +134,7 @@ class order {
     }
 
     //  获取订单结算页信息
-    static async getOrderSettlementValue(ctx, params) {
+    static async getOrderSettlementInfo(ctx, params) {
         let url = "/sp-sales/cart-temp";
         return ctx
             .$get(ctx.nettyUrl + ctx.serverPortUrl.shoppingCart + common.newUrlKey +
@@ -146,9 +143,10 @@ class order {
                 return res;
             });
     }
+  
 
     //  获取配送方式
-    static async getShipTypeValue(ctx, params) {
+    static async getShipType(ctx, params) {
         return ctx
             .$get(
                 ctx.baseUrl + ctx.serverPortUrl.shoppingCart + "/rtl-ship-mgrs",
@@ -160,21 +158,21 @@ class order {
     }
 
     //  提交订单
-    static async saveOrderValue(ctx, params) {
+    static async saveOrder(ctx, params) {
         let url =
             "/rtl-ord-hd-aggregates/order-readirect-save?companyId=" +
             params.companyId +
             "&usrId=" +
             params.usrId;
         return ctx
-            .$post(ctx.baseUrl + ctx.serverPortUrl.shoppingCart + url, params)
+            .$post(ctx.nettyUrl + ctx.serverPortUrl.shoppingCart + common.newUrlKey + url, params)
             .then(res => {
                 return res;
             });
     }
 
     //  订单促销优惠计算
-    static async orderPreferCal(ctx, params) {
+    static async getOrderPreferCal(ctx, params) {
         let url = `/online-calculate/${params.ordId}`;
         delete params.ordId;
         return ctx
@@ -185,7 +183,7 @@ class order {
     }
 
     //  预约量体-工单 聚合
-    static async saleCtmmeasureAggregateValue(ctx, params) {
+    static async saleCtmmeasureAggregate(ctx, params) {
         let url =
             "/sale-ctm-measure-aggregates/" + params.ordHdId + "/sale-measure";
         return ctx
@@ -229,18 +227,11 @@ class order {
     }
 
     //  提交订单评价
-    static async ordComment(ctx, params) {
-        let url =
-            "/rtl-ord-hds/ord-comment/usr-id?companyId=" +
-            params.companyId +
-            "&usrId=" +
-            params.usrId;
+    static async saveOrderComment(ctx, params) {
+        let url ="/rtl-ord-hds/ord-comment/usr-id?companyId="+params.companyId +"&usrId=" +params.usrId + "&vipInfoHdId=" + params.vipInfoHdId;
         params.model.ownCompanyId = params.companyId;
         return ctx
-            .$post(
-                ctx.baseUrl + ctx.serverPortUrl.shoppingCart + url,
-                params.model
-            )
+            .$post(ctx.baseUrl + ctx.serverPortUrl.shoppingCart + url,params.model)
             .then(res => {
                 // return ctx.$post('http://1.1.6.103:8806/rtl-ord-hds/ord-comment/usr-id?companyId='+params.companyId+'&usrId='+params.usrId, params.model).then((res) => {
                 return res;

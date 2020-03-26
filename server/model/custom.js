@@ -7,7 +7,7 @@
  */
 
 class custom {
-  static async getList(ctx, params) {
+  static async getCustomList(ctx, params) {
     let url = "/sp-sales/made-list";
     return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.shoppingCart + url, params);
   }

@@ -1,3 +1,4 @@
+
 /*
 * createTime：2018/11/3
 * author：en.chen
@@ -32,15 +33,14 @@
                     @click="showAreaList = true"
                     readonly
                 />
-                <textarea
-                    v-if="showAreaList==true"
-                    placeholder="详细地址：如楼道、楼盘号等"
-                    v-model="addressInfo.detail"
-                    maxlength="300"
-                    class="addressDetail"
-                    @blur="addressDetail"
-                    placeholder-style="color: rgba(0, 0, 0, .7);"
-                />
+                <!-- 小程序textarea会穿透，所以有遮罩层的时候使用div显示 -->
+                <div v-if="showAreaList==true">
+                    <div
+                        v-if="addressInfo.detail"
+                        class="addressDetail overhidden"
+                    >{{addressInfo.detail}}</div>
+                    <div v-else class="add-placeholder">详细地址：如楼道、楼盘号等</div>
+                </div>
                 <textarea
                     v-else
                     placeholder="详细地址：如楼道、楼盘号等"
@@ -48,6 +48,7 @@
                     maxlength="300"
                     class="addressDetail"
                     @blur="addressDetail"
+                    placeholder-style="color: rgba(0, 0, 0, .4);"
                 />
             </van-cell-group>
         </div>
@@ -65,6 +66,7 @@
         <van-popup :show="showAreaList" position="bottom">
             <!--<van-area :value="addressInfo.addressId" :area-list="areaList" @confirm="areaChange" @cancel="showAreaList = false" />-->
             <van-area
+                :value="addressInfo.addressId"
                 :area-list="areaList"
                 @confirm="areaChange"
                 @cancel="showAreaList = false"
@@ -83,14 +85,13 @@
     overflow: hidden;
     .bg-white {
         width: computed(690);
+        height: computed(400);
         margin: computed(30);
         box-shadow: 0px computed(4) computed(12) 0px rgba(0, 0, 0, 0.1);
         border-radius: computed(5);
     }
-    // .addressDetail {
-    //     height: computed(100);
-    // }
-    textarea {
+
+    .addressDetail {
         border: none;
         height: computed(95);
         padding-top: computed(20);
@@ -103,6 +104,15 @@
             /*WebKit browsers*/
             color: #cccccc;
         }
+    }
+    .overhidden {
+        overflow: hidden;
+        padding-top: computed(20);
+    }
+    .add-placeholder {
+        padding: computed(18) 0 0 computed(38);
+        font-size: computed(30);
+        color: rgba(0, 0, 0, 0.4);
     }
     .set-default {
         width: computed(690);
@@ -142,8 +152,8 @@
 </style>
 <script>
 import debounce from "@/utils/debounce";
-import { UserService, Base } from "../../../api/service";
-import { cityData } from "../../../assets/js/cityData";
+import { UserService } from "../../../api/service";
+// import { cityData } from "../../../assets/js/cityData";
 import Toast from "vant-weapp/dist/toast/toast";
 import Dialog from "vant-weapp/dist/dialog/dialog";
 export default {
@@ -168,20 +178,21 @@ export default {
             setDefault: 0,
             defaultStatus: false,
             showAreaList: false,
-            areaList: cityData,
+            areaList: {},
             btnLock: false, // 按钮锁
             errphone: "", //错误提示
             type: "", //判断是否是新增地址，type 0 为编辑地址 1为修改地址
             isNew: false
         };
     },
-    onLoad() {
+    async onLoad() {
         this.id = parseInt(this.$route.query.id) || "";
         this.destId = parseInt(this.$route.query.destId) || "";
         this.type = this.$route.query.type;
         this.isNew = this.$route.query.isNew;
+        this.areaList = await global.getCityData();
         wx.setNavigationBarTitle({
-            title: this.isNew == 0 ? "新增地址" : "编辑地址" //动态修改小程序头部挑剔
+            title: this.isNew == true ? "新增地址" : "编辑地址" //动态修改小程序头部挑剔
         });
         if (this.destId && this.destId !== undefined) {
             let data = {
@@ -190,6 +201,7 @@ export default {
             };
             global.toastLoading();
             UserService.getAddrDetail(data).then(res => {
+                console.log(res, "rrrrr");
                 this.addressInfo.name = res.cargousrName;
                 this.addressInfo.phone = res.cargoPhone;
                 this.addressInfo.addressId = res.districtCode;
@@ -236,7 +248,7 @@ export default {
         },
         submit: debounce(function() {
             this.editAddress();
-        }, 10000),
+        }, 2000),
         // 提交地址信息
         editAddress() {
             if (this.btnLock) return;

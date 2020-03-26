@@ -1,3 +1,10 @@
+<!--
+ * @Author: yongtian.hong
+ * @Date: 2019-08-05 13:18:56
+ * @LastEditors: yongtian.hong
+ * @LastEditTime: 2019-08-13 17:43:29
+ * @Description: 
+ -->
 <style lang='scss' scoped>
 .action-cell-container {
     display: flex;
@@ -28,16 +35,16 @@
     }
     .list-wrap {
         width: 100%;
-        max-height: 50vh;
         padding: computed(10) computed(16);
         margin-bottom: computed(110);
         background: #fff;
         box-sizing: border-box;
     }
     .bottom {
-        position: absolute;
-        bottom: computed(10);
-        z-index: 1000;
+        position: fixed;
+        bottom: 0px;
+        padding-bottom: computed(10);
+        z-index: 1005;
         width: 100%;
         display: flex;
         justify-content: center;
@@ -60,13 +67,13 @@
 <template>
     <overlayer v-model="show">
         <div class="action-cell-container">
-            <div class="header">
+            <!-- <div class="header">
                 <p class="title">{{ title }}</p>
                 <div class="icon-box" @click="onClose()">
                     <i class="iconfont iconguanbi1"></i>
                 </div>
-            </div>
-            <div class="list-wrap overflow-scroll">
+            </div>-->
+            <div class="list-wrap">
                 <van-radio-group :value="sCode">
                     <van-cell-group>
                         <van-cell
@@ -89,7 +96,7 @@
 </template>
 
 <script>
-import overlayer from "@/components/overlayer/index";
+import overlayer from "../../../overlayer/index";
 export default {
     components: {
         overlayer

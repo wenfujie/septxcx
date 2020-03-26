@@ -132,6 +132,13 @@
                     pageSize: this.pageSize,
                     id: await this.$store.dispatch('distribution/getDistributionId')
                 }
+
+                //  会员整合新增选中分销商查询
+                if(!!this.$store.state.distribution.accountInfo.id) {
+                    data.id = this.$store.state.distribution.accountInfo.id
+                    data.vipInfoHdId = this.$store.state.distribution.accountInfo.vipInfoHdId
+                }
+
                 Distribution.getWithdrawList(data).then((res) => {
                     this.withdrawList.push.apply(this.withdrawList, res.list)
                     if (this.withdrawList.length >= res.total || this.pageNum >= res.pages || res.total <= 0) {

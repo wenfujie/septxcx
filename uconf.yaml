@@ -3,9 +3,13 @@ dev:
     env:
       NODE_ENV: dev
       SERVICE_API: http://qishon-zuul-gateway.dev.qs.com
+      NETTY_API: http://1.1.2.50:2081/api
       TOKEN_API: http://qishon-zuul-gateway.dev.qs.com/uaa/oauth-client/token
-      OSS_API: http://qishon-zuul-gateway.dev.qs.com/file/oss
+      OSS_API: http://qishon-zuul-gateway/file/oss
+      OSS_OPEN_API: https://wxxcx.qishon.com/openImg/v2/oss/
       DP_API: http://qishon-zuul-gateway.dev.qs.com
+      SHOP_CLIENT_ID: wissClient
+      SHOP_CLIENT_SECRET: wissClientSecret
     svc:
       nodePort: 
       - from: 3000
@@ -48,15 +52,21 @@ preprod:
       DP_API: http://qishon-zuul-gateway
 business:
   septxcx:
-    replicas: 4
+    replicas: 1
     env:
       NODE_ENV: prod
       SERVICE_API: http://qishon-zuul-gateway
-      NETTY_API: http://qishon-openresty:2080/api/
+      NETTY_API: http://qishon-openresty:2080/api
       TOKEN_API: http://qishon-zuul-gateway/uaa/oauth-client/token
       OSS_API: http://qishon-zuul-gateway/file/oss
+      OSS_OPEN_API: https://wxxcx.qishon.com/septapi/file/open/
       DP_API: http://qishon-zuul-gateway
+      SHOP_CLIENT_ID: wissClient
+      SHOP_CLIENT_SECRET: wissClientSecret
     svc:
       nodePort: 
       - from: 3000
         to: 30183
+    resources:
+      limits:
+        memory: "1024Mi"   

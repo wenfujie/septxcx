@@ -50,22 +50,17 @@
         <div class="goods-box" v-for="(good, index) in data.goodsList" :key="index">
             <div class="goods-box-left">
                 <img
-                    :src="filter.imgFilter(good.thumb,companyId)"
+                    :src="filter.imgFilter(good.thumb,companyId, '150*150')"
                     lazy-load="true"
-                    @onerror="global.errImg(event)"
+
                 />
             </div>
             <div class="goods-box-right">
                 <div class="goodsTitle">{{ good.goodsName }}</div>
-                <!-- <div class="fw-bold mgB15 fs28B">¥ {{good.averagePrice}}</div> -->
                 <div class="flex-between">
                     <span class="good-price">¥ {{ good.averagePrice }}</span>
                     <span class="good-qty">x{{ good.ordQty }}</span>
                 </div>
-                <!-- <div class="flex-between fs28 grey99">
-                                <span>{{good.colorName}} {{good.sizeName}}</span>
-                                <span>x{{good.ordQty}}</span>
-                </div>-->
             </div>
         </div>
     </div>

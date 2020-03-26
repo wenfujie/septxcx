@@ -1,4 +1,11 @@
 /*
+ * @Author: lan.chen
+ * @Date: 2019-06-29 14:02:07
+ * @LastEditors: lan.chen
+ * @LastEditTime: 2019-08-12 09:17:55
+ * @Description:
+ */
+/*
  * createTime：2018/7/14
  * author：en.chen
  * description: 商品模块用于处理前端请求的中间层接口
@@ -7,7 +14,7 @@ const common = require('./common')
 
 class goods {
     // 满减满折活动页
-    static async getDiscountValue(ctx, params) {
+    static async getDiscountList(ctx, params) {
         let url = "/online-dtt-parts";
         return ctx
             .$get(ctx.baseUrl + ctx.serverPortUrl.promotion + url, params)
@@ -27,7 +34,7 @@ class goods {
     }
 
     //  商品墙/商品列表
-    static async getGoodsListValue(ctx, params) {
+    static async getGoodsList(ctx, params) {
         // params.filters = JSON.parse(params.filters)
         params.orderFlags = JSON.parse(params.orderFlags);
         let url =
@@ -40,11 +47,13 @@ class goods {
             "&platformCode=" +
             params.platformCode;
         return ctx
-            .$post(ctx.baseUrl + ctx.serverPortUrl.shoppingCart + url, params)
+            .$post(ctx.nettyUrl + ctx.serverPortUrl.shoppingCart + common.newUrlKey + url, params)
+            // .$post(ctx.baseUrl + ctx.serverPortUrl.shoppingCart + url, params)
             .then(res => {
                 return res;
             });
     }
+
 
     //  商品墙/商品列表 过滤掉orderFlag=1的大件商品
     static async getFilterGoodsListValue(ctx, params) {
@@ -64,10 +73,12 @@ class goods {
             });
     }
     //  热门商品列表
-    static async getHotGoodsValue(ctx, params) {
+    static async getHotGoods(ctx, params) {
         let url = "/iss/bas/cms-searchword-hds?companyId=" + params.companyId;
+        // if(!params.isShop) params.isShop = 2
+        let data = Object.assign({isShop: 2}, params)
         return ctx
-            .$get(ctx.baseUrl + ctx.serverPortUrl.baseService + url, params)
+            .$get(ctx.baseUrl + ctx.serverPortUrl.baseService + url, data)
             .then(res => {
                 return res;
             });
@@ -126,7 +137,7 @@ class goods {
     }
 
     //  查询平台商品的推荐商品列表
-    static async getGoodsRecommendValue(ctx, params) {
+    static async getGoodsRecommend(ctx, params) {
         return ctx
             .$get(
                 ctx.baseUrl +
@@ -140,7 +151,7 @@ class goods {
     }
 
     //  查询猜你喜欢商品
-    static async getGoodsRecommendListValue(ctx, params) {
+    static async getGoodsRecommendList(ctx, params) {
         return ctx
             .$get(
                 ctx.baseUrl +
@@ -153,8 +164,22 @@ class goods {
             });
     }
 
+    //  查询猜你喜欢商品（商品详情）
+    static async getHighestSellingList(ctx, params) {
+        return ctx
+            .$get(
+                ctx.baseUrl +
+                ctx.serverPortUrl.shoppingCart +
+                "/sp-goods/highest-selling-list",
+                params
+            )
+            .then(res => {
+                return res;
+            });
+    }
+
     //  查询商品详情
-    static async getGoodsInfoValue(ctx, params) {
+    static async getGoodsInfo(ctx, params) {
         return ctx
             .$get(
                 ctx.nettyUrl +
@@ -281,7 +306,7 @@ class goods {
     }
 
     //  获取商品评价综合评分
-    static async getGoodsScoreValue(ctx, params) {
+    static async getGoodsScore(ctx, params) {
         return ctx
             .$get(
                 ctx.baseUrl +
@@ -295,7 +320,7 @@ class goods {
     }
 
     //  获取商品评价信息
-    static async getGoodsCommentsValue(ctx, params) {
+    static async getGoodsComments(ctx, params) {
         return ctx
             .$get(
                 ctx.nettyUrl +
@@ -334,13 +359,13 @@ class goods {
     }
 
     //  获取商品库存
-    static async getGoodsStockValue(ctx, params) {
+    static async getGoodsStock(ctx, params) {
         return ctx
             .$get(
                 ctx.nettyUrl +
                 ctx.serverPortUrl.goodsService +
                 common.newUrlKey +
-                "/part-hds/whse-qty/goods-codes",
+                "/part-hds/whse-qty/goods-codes2",
                 params
             )
             .then(res => {
@@ -376,20 +401,21 @@ class goods {
     }
 
     //  商品模块查询商品库存(单品、组合)
-    static async getCommonStockCustValue(ctx, params) {
-        let url = `/sp-goods/inventory-judge?shopId=${params.shopId}&usrId=${
+    static async getCommonStockCust(ctx, params) {
+        let url = `/sp-goods/inventory-judge2?shopId=${params.shopId}&usrId=${
             params.usrId
-            }&companyId=${params.companyId}`;
+            }&companyId=${params.companyId}&buscontsId=${params.busContsCode}`;
         return ctx
             .$post(ctx.nettyUrl + ctx.serverPortUrl.shoppingCart + common.newUrlKey +
                 url, params)
             .then(res => {
                 return res;
             });
+
     }
 
     //  商品分类等级查询
-    static async getGoodsLayerClassValue(ctx, params) {
+    static async getGoodsLayerClass(ctx, params) {
         let url = `/cms-busconcla-hds/layer`;
         return ctx
             .$get(ctx.baseUrl + ctx.serverPortUrl.issBas + url, params)
@@ -399,13 +425,14 @@ class goods {
     }
 
     //  判断商品是否上架
-    static async getGoodSellStateValue(ctx, params) {
+    static async getGoodSellState(ctx, params) {
         let url = "/sp-goods/part-sell-flag";
         return ctx
             .$get(ctx.baseUrl + ctx.serverPortUrl.shoppingCart + url, params)
             .then(res => {
                 return res;
             });
+
     }
 
     //  获取商品部件信息，主面料id
@@ -441,7 +468,7 @@ class goods {
                 ctx.nettyUrl +
                 ctx.serverPortUrl.shoppingCart +
                 common.newUrlKey +
-                "/sp-goods/inventory-judge?companyId=" +
+                "/sp-goods/inventory-judge2?companyId=" +
                 params.companyId +
                 "&shopId=" +
                 params.shopId,
@@ -485,7 +512,7 @@ class goods {
     }
 
     // 获取商品是否上架
-    static async getSellStateValue(ctx, params) {
+    static async getGoodsSellState(ctx, params) {
         let url =
             "/sp-part-goodss/batch-get-sell-flags?companyId=" +
             params.companyId;
@@ -504,10 +531,18 @@ class goods {
     }
 
     // 获取是否有搭配记录
-    static async getCollocationRecord(ctx, params) {
+    static async getCollocate(ctx, params) {
         let url = "/qsc/m-3d-assort-hds/is-assort";
         return ctx.$get(ctx.dpUrl + url, params).then(res => {
             return res;
+        });
+    }
+
+    //  判断商品是否上架
+    static async getIsShelves(ctx, params) {
+        let url = "/sp-part-goodss/simple/";
+        return ctx.$get(ctx.nettyUrl + ctx.serverPortUrl.shoppingCart + common.newUrlKey + url + params.goodsCode, params).then((res) => {
+            return res
         });
     }
 }

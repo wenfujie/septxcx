@@ -33,9 +33,7 @@
                     <ul class="fund-list" v-if="memberList.length>0">
                         <li class="fund-item" v-for="item in memberList" :key="item.id">
                             <div class="avatar">
-                                <img v-if="!!item.photoFileUrl && item.photoFileUrl.indexOf('https') !== -1" :src="item.photoFileUrl" :key="item.photoFileUrl">
-                                <img v-if="!!item.photoFileUrl && item.photoFileUrl.indexOf('https') === -1" :src="filter.imgFilter(item.photoFileUrl,company_id)" :key="item.photoFileUrl">
-                                <img v-else="!item.photoFileUrl" :src="filter.imgFilter('',company_id)" @error="errImg($event)" :key="">
+                                <img :src="filter.imgFilter(item.photoFileUrl,company_id, '100*100')">
                             </div>
                             <div class="mgL20">
                                 <p class="memo">{{item.vipName}}</p>
@@ -105,8 +103,14 @@
                     pageNum: this.pageNum,
                     pageSize: this.pageSize,
                     vipId: global.Storage.get('USER_INFO').vipInfoId,
-                    busconsCode: global.baseConstant.busContsCode
+                    busconsCode: !!global.baseConstant.busContsCode ? global.baseConstant.busContsCode : global.Storage.get('properties').busContsCode
                 }
+
+                //  会员整合新增选中分销商查询
+                if(!!this.$store.state.distribution.accountInfo.id) {
+                    data.vipId = this.$store.state.distribution.accountInfo.vipInfoHdId
+                }
+
                 Distribution.getSubordinateList(data).then((response) => {
                     this.dirUnMdtNum = response.dirUnMdtNum
                     this.secUnMdtNum = response.secUnMdtNum

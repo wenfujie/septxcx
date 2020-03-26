@@ -14,7 +14,7 @@ export default class {
      * }
      */
     static getWays(params) {
-        return http.get("postSale/getWays", params);
+        return http.get("postSale/getPostSaleWays", params);
     }
 
     /***********
@@ -48,7 +48,7 @@ export default class {
      * }
      */
     static getList(params) {
-        return http.get("postSale/getList", params);
+        return http.get("postSale/getPostSaleList", params);
     }
 
     /***********
@@ -58,7 +58,7 @@ export default class {
      * }
      */
     static getDetail(params) {
-        return http.get("postSale/getDetail", params);
+        return http.get("postSale/getPostSaleDetail", params);
 
     }
 
@@ -110,7 +110,7 @@ export default class {
     /***********
    * 取消申请
    * @params={
-   *    reApplyCode: String, //申请单号      
+   *    reApplyCode: String, //申请单号
    * }
    */
 
@@ -148,6 +148,4 @@ export default class {
     static saveLogis(params) {
         return http.post("postSale/savePostSaleLogis", params);
     }
-
-
 }

@@ -80,9 +80,9 @@
         <div class="list-box">
             <div class="left-box">
                 <img
-                    :src="filter.imgFilter(data.pictUrl,data.companyId)"
+                    :src="filter.imgFilter(data.pictUrl,data.companyId, '140*140')"
                     lazy-load="true"
-                    @onerror="global.errImg(event)"
+
                 />
             </div>
             <div class="right-box">
@@ -121,8 +121,7 @@ import Toast from "vant-weapp/dist/toast/toast";
 import {
     cancelApply,
     reApply,
-    modifyApply,
-    btnClickEvent
+    modifyApply
 } from "../../../../common/service";
 import payment from "@/utils/payment";
 import wxPay from "@/utils/wxPay";

@@ -9,16 +9,16 @@
         <wxs module="filter" src="../../filter/filterCommon.wxs"></wxs>
 
         <!-- 广告轮播 begin -->
-        <div class="banner-box">
-            <swiper indicator-dots="true" autoplay="true" interval="3000" class="swiper">
+        <div class="banner-box" v-if="bannerList.length>0">
+            <swiper indicator-dots="true" autoplay="true" interval="3000" class="swiper" :indicator-dots="showDots">
                 <block v-for="(item,index) in bannerList" :key="index">
                     <swiper-item>
                         <img
-                            :src="filter.imgFilter(item.coverFileUrl,company_id)"
+                            :src="filter.imgFilter(item,company_id, '710*262')"
                             :key="item.coverFileUrl"
                             class="index-banner-img"
                             lazy-load="true"
-                            @onerror="global.errImg(event)"
+
                         >
                     </swiper-item>
                 </block>
@@ -28,31 +28,30 @@
 
         <!-- 任务列表 begin -->
         <div class="task-list">
-
             <div>
                 <ul class="list" v-if="taskList.length>0" ref="list">
                     <li class="item-content" v-for="item in taskList" :key="item.id" @click="goDetail(item.id)">
                         <!-- 封面 -->
                         <div class="fl mgR30">
                             <div class="item-cover">
-                                <img :src="filter.imgFilter(item.coverUrl,company_id)" :key="item.coverUrl"
-                                     lazy-load="true" @onerror="global.errImg(event)">
+                                <img :src="filter.imgFilter(item.fileUrl,company_id)" :key="item.fileUrl"
+                                     lazy-load="true" >
                             </div>
                         </div>
 
                         <!-- 详情 -->
                         <div class="fl goods-detail">
-                            <h2 class="item-name item-txt">{{item.taskName}}</h2>
-                            <p class="item-context item-txt">哈雷克之火葬魔咒！康瑞克斯的杀戮之墙！西美尔的精华脉冲！托纳鲁斯之爪！坚甲与意志的摧毁者！</p>
+                            <h2 class="item-name item-txt">{{item.goodsName || item.taskName}}</h2>
+                            <p class="item-context item-txt">{{item.saleContent || ''}}</p>
                             <p class="price">
-                                ￥239
-                                <span class="tag-price">￥439</span>
+                                ￥{{filter.Fix2(item.salePrice) || 0.00}}
+                                <span class="tag-price" v-if="!!item.trgPrice">￥{{filter.Fix2(item.trgPrice)}}</span>
                             </p>
                             <div class="profit">
                                 <i class="iconfont iconzhuanduoshao"></i>
                                 赚
                                 <span class="mini">￥</span>
-                                66.66
+                                {{filter.Fix2(item.benefitAmount)}}
                             </div>
                             <div class="detail-btn">点击查看</div>
                         </div>
@@ -71,7 +70,7 @@
 </template>
 <script>
     // import { Toast, PullRefresh } from 'vant'
-    import {Distribution} from '../../api/service'
+    import {Distribution, Cms} from '../../api/service'
     import Empty from '../../components/EmptyContent.vue'
 
     export default {
@@ -105,16 +104,9 @@
                 taskList: [],  // 下级会员对账单列表
                 emptyText: '暂无数据~',
                 canRefresh: false,
-                bannerList: [
-                    {
-                        id: 1,
-                        coverFileUrl: ''
-                    },
-                    {
-                        id: 2,
-                        coverFileUrl: ''
-                    }
-                ]
+                bannerList: [],
+                company_id: global.Storage.get('COMPANYID').company_id,
+                showDots: false
             }
         },
         methods: {
@@ -129,7 +121,9 @@
             getList() {
                 this.loading = true
                 let data = {
-                    dateFlag: this.activeIndex
+                    dateFlag: this.activeIndex,
+                    busContsCode: !!global.baseConstant.busContsCode ? global.baseConstant.busContsCode : global.Storage.get('properties').busContsCode,
+                    shopId: global.Storage.get('properties').shopId
                 }
                 Distribution.getTaskList(data).then((res) => {
                     if (!!res.length && res.length > 0) {
@@ -150,30 +144,75 @@
                 })
             },
 
+            //  将所有未读任务置为已读
+            readTask() {
+                let data = {
+                    vipInfoHdId: global.Storage.get('USER_INFO').vipInfoId
+                }
+
+                //  会员整合新增选中分销商查询
+                if(!!this.$store.state.distribution.accountInfo.id) {
+                    data.vipInfoHdId = this.$store.state.distribution.accountInfo.vipInfoHdId
+                }
+
+                Distribution.readTask(data).then((res) => {})
+            },
+
             //  下拉刷新
             onRefresh() {
                 this.statusInit()
                 this.getList()
+                this.getBanner()
             },
 
             //  状态初始化
             statusInit() {
                 this.pageNum = 1
                 this.taskList = []
+                this.bannerList = []
                 this.finished = false
                 this.loading = false
             },
 
             //  跳转任务详情
             goDetail(id) {
-                this.$router.push(`/pages/distributionPackage/task-detail?id=${id}`)
+                this.$router.push(`/pages/distributionPackage/task-detail?taskId=${id}`)
             },
+
+            //  获取任务页广告图
+            getBanner() {
+                let data = {
+                    cmsTemplateCode: global.Storage.get("TEMPLATE_INFO").cmsTemplateCode,
+                    cmsWebCode: global.pageCode.distribution.children.task.name,
+                    busContsCode: !!global.baseConstant.busContsCode ? global.baseConstant.busContsCode : global.Storage.get('properties').busContsCode
+                }
+                Cms.getUsrCmsInfoV2(data).then((res) => {
+                    if (res.cmsModulepageHdList.length > 0 && !!res.cmsModulepageHdList[0] && !!res.cmsModulepageHdList[0].cmsBackpageDtDtoList && !!res.cmsModulepageHdList[0].cmsBackpageDtDtoList.length > 0) {
+                        let list = res.cmsModulepageHdList[0].cmsBackpageDtDtoList
+                        list.forEach((item) => {
+                            if (item.cmsBackpageDtCode === global.pageCode.distribution.children.task.code) {
+                                if (!!item.cmsBackpageDttList && !!item.cmsBackpageDttList.length > 0) {
+                                    item.cmsBackpageDttList.forEach((image) => {
+                                        this.bannerList.push(image.coverFileUrl)
+                                    })
+                                }
+                            }
+                        })
+                        if(this.bannerList.length>1) {
+                            this.showDots = true
+                        }else{
+                            this.showDots = false
+                        }
+                    }
+                })
+            }
 
         },
         onLoad() {
             global.toastLoading();// 开启
-
             this.getList()
+            this.getBanner()
+            this.readTask()
         },
         onUnload() {
             Object.assign(this.$data, this.$options.data());
@@ -239,6 +278,7 @@
                             color: $text-primary;
                             line-height: computed(56);
                             border-bottom: solid 1px $color-border;
+                            -webkit-line-clamp: 1 !important;
                         }
                         .item-context {
                             margin-top: computed(18);
@@ -259,6 +299,7 @@
                                 font-weight: normal;
                                 color: $text-placeholder;
                                 vertical-align: text-bottom;
+                                text-decoration: line-through;
                             }
                         }
                         .profit {

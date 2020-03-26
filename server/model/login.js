@@ -22,7 +22,7 @@ class userLogin {
     }
 
     //  联合登陆
-    static async getUesrLoginValue(ctx, params) {
+    static async userLogin(ctx, params) {
         return ctx.$get(ctx.nettyUrl + ctx.serverPortUrl.memberService + common.newUrlKey + '/vip-info-hds/system/usr-logins', params).then((res) => {
             return res
         })
@@ -45,6 +45,13 @@ class userLogin {
         return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.issBas + '/per-usr-dt-unoins/usr-id', params).then((res) => {
             return res
         })
+    }
+
+    //  获取单点登录需要的code
+    static async getSingleCode(ctx, params) {
+        return ctx.$get(ctx.baseUrl + '/uaa/sso/code', params).then((res) => {
+            return res
+        });
     }
 }
 

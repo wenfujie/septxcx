@@ -1,10 +1,11 @@
-/*
+<!--
  * @Author: yongtian.hong
- * @Date: 2018-10-11 15:04:24
+ * @Date: 2019-08-05 13:18:56
  * @LastEditors: yongtian.hong
- * @LastEditTime: 2018-11-17 14:43:42
+ * @LastEditTime: 2019-08-12 13:08:36
  * @Description: 售后详情
- */
+ -->
+
 
 <style lang='scss' scoped>
 .wrap {
@@ -123,7 +124,6 @@ import {
     selectStore,
     selectLogis,
     switchBackMode,
-    saveLogis,
     btnClickEvent
 } from "../../common/service";
 
@@ -204,10 +204,9 @@ export default {
         switchBackMode(code) {
             switchBackMode(this, code);
         },
-        // 按钮事件
-        btnEvent: debounce(function(btnName) {
+        btnEvent(btnName) {
             btnClickEvent(this, btnName);
-        }, 5000)
+        }
     },
 
     onShow() {

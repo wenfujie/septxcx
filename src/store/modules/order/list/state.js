@@ -13,6 +13,7 @@ export default {
         pageSize: 10,
         searchCode: ""
     },
+    curAccountId:'',//会员整合后，多个会员选择，用于上面params的传参
     loadFinished: true,
     isUpLoading: false,
     isDownLoading: false,

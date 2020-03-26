@@ -44,7 +44,12 @@ export default {
       this.seconds = 0;
       this.minutes = 0;
       this.hours = 0;
+      
       this.time = this.order.closeDate - this.order.nowDate;
+      console.log(  this.time,'  this.time')
+      console.log(this.order.nowDate,'this.order.nowDate')
+      console.log(new Date().getTime(),'new Date()')
+
     },
     // 获取结束时间与当前时间差值的毫秒值
     getEndTimeMill() {
@@ -55,6 +60,7 @@ export default {
       this.seconds = Math.floor(maxtime % 60);
       this.minutes = Math.floor(maxtime / 60) % 60;
       this.hours = Math.floor(maxtime / 3600);
+      console.log(this.seconds, this.minutes,this.hours)
     },
     // 判断订单是否待支付状态
     isPayed() {
@@ -68,6 +74,7 @@ export default {
     countDown(maxtime) {
       let that = this;
       that.maxtime = maxtime;
+      console.log(maxtime,'maxtime')
       this.timer = setInterval(function() {
         if (that.maxtime > 0) {
           that.maxtime--;
@@ -88,8 +95,10 @@ export default {
       if (!this.isPayed()) return;
       this.init_Time();
       const maxtime = this.getEndTimeMill();
+      console.log(maxtime,'maxtimemaxtimestartstartstart')
       if (maxtime <= 0) return;
       this.set_Time(maxtime);
+      
       this.countDown(maxtime);
     },
 

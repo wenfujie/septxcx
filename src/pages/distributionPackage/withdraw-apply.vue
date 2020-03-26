@@ -101,6 +101,13 @@
                 let data = {
                     id: await this.$store.dispatch('distribution/getDistributionId')
                 }
+
+                //  会员整合新增选中分销商查询
+                if(!!this.$store.state.distribution.accountInfo.id) {
+                    data.id = this.$store.state.distribution.accountInfo.id
+                    data.vipInfoHdId = this.$store.state.distribution.accountInfo.vipInfoHdId
+                }
+
                 Distribution.getWithdrawRule(data).then((res) =>{
                     this.ruleInfo = res
                     if(!!res.cashTypes && !!res.cashTypes.length >0) {
@@ -138,16 +145,22 @@
                         this.amount = '';
                         return;
                     }
-                    if(this.maxAmount <= 0.00 || this.maxAmount < this.ruleInfo.lamount) {
+
+                    let miniAmount = this.ruleInfo.lamount
+
+                    if(!!this.ruleInfo.isFirst && !!this.ruleInfo.firstMinAmt) miniAmount = this.ruleInfo.firstMinAmt
+
+                    if(this.maxAmount <= 0.00) {
                         this.amount = 0
                         return
                     }
+
                     // 截取两位小数
                     let pointIndex = this.amount.indexOf('.');
                     if(pointIndex >= 0 && this.amount.length - (pointIndex+1) > 2){
                         this.amount = this.amount.substring(0,pointIndex+3);
                     }
-                    if(this.amount < this.ruleInfo.lamount && this.amount != 0) this.amount = ''
+//                    if(this.amount < miniAmount && this.amount != 0) this.amount = ''
                     if(this.amount > this.ruleInfo.maxAmount) this.amount = this.ruleInfo.maxAmount
                 }
             },
@@ -162,6 +175,13 @@
                     cashTypeId:  this.cashTypeId,
                     vipInfoMdtId: await this.$store.dispatch('distribution/getDistributionId')
                 }
+
+                //  会员整合新增选中分销商查询
+                if(!!this.$store.state.distribution.accountInfo.id) {
+                    data.vipInfoMdtId = this.$store.state.distribution.accountInfo.id
+                    data.vipInfoHdId = this.$store.state.distribution.accountInfo.vipInfoHdId
+                }
+
                 Distribution.applyWithdraw(data).then(() =>{
                     Toast('提交成功，等待后台人员审核，审核通过会立马转账到您个人微信号~')
                     // 由于getWithdrawInfo中会异步关闭toast 所以延迟一秒执行
@@ -205,10 +225,20 @@
                     Toast('提现金额超过最大限制~')
                     return false
                 }
-                if(this.amount < this.ruleInfo.lamount) {
-                    Toast('当前提现金额不足最小提现金额~')
-                    return false
+                // 是否首次提现
+                if(this.ruleInfo.isFirst) {
+                    let miniAmount = this.ruleInfo.firstMinAmt || this.ruleInfo.lamount
+                    if(this.amount < miniAmount) {
+                        Toast('当前提现金额不足最小提现金额~')
+                        return false
+                    }
+                }else{
+                    if(this.amount < this.ruleInfo.lamount) {
+                        Toast('当前提现金额不足最小提现金额~')
+                        return false
+                    }
                 }
+
                 return true
             },
 
@@ -223,7 +253,7 @@
 
             // 选择提现方式
             selectType(item) {
-                console.log(item.target,"===")
+//                console.log(item.target,"===")
                 this.cashTypeId = item.target.cashTypeId
                 this.showTypeList = false
             },
@@ -253,6 +283,9 @@
         },
         computed: {
             lowAmount: function () {
+                if(this.ruleInfo.isFirst && this.ruleInfo.firstMinAmt) {
+                    return `提现金额(首次提现最低提现金额${this.ruleInfo.firstMinAmt}元)`
+                }
                 return !!this.ruleInfo.lamount ? `提现金额(最低提现金额${this.ruleInfo.lamount}元)` : `提现金额`
             },
             maxAmount: function () {

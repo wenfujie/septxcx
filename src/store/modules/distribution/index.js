@@ -56,7 +56,8 @@ export default {
                     name: '三级会员'
                 },
             ],
-        }
+        },
+        accountInfo: {},  // 分销商中心选中的分销商信息
     },
 
     actions: {

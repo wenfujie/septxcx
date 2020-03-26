@@ -13,21 +13,21 @@ class invoice {
     }
 
     //  获取发票字典表信息（发票类型）
-    static async getInvoiceInfo(ctx, params) {
+    static async getInvoiceType(ctx, params) {
         return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.systemService + '/dict-simples/up-dict-code/' + params.type, params).then((res) => {
             return res
         });
     }
 
     //  获取发票设置（是否可以开发票）
-    static async canSetInvoice(ctx, params) {
+    static async getCanSetInvoice(ctx, params) {
         return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.systemService + '/sp-ord-invoices', params).then((res) => {
             return res
         });
     }
 
     //  获取发票详情
-    static async getDetail(ctx, params) {
+    static async getInvoiceDetail(ctx, params) {
         return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.shoppingCart + '/sp-ord-invoices', params).then((res) => {
             return res
         });

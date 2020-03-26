@@ -1,10 +1,11 @@
-/*
+<!--
  * @Author: yongtian.hong
- * @Date: 2018-08-09 15:18:01
+ * @Date: 2019-08-05 13:18:56
  * @LastEditors: yongtian.hong
- * @LastEditTime: 2018-11-14 16:13:59
- * @Description: 售后申请页面
- */
+ * @LastEditTime: 2019-08-13 16:02:35
+ * @Description:
+ -->
+
 <style lang='scss' scoped>
 .wrap {
     display: flex;
@@ -243,11 +244,7 @@ textarea::placeholder {
         <div class="main">
             <div class="goods">
                 <div class="img-box">
-                    <img
-                        :src="filter.imgFilter(good.thumb, companyId)"
-                        lazy-load="true"
-                        @onerror="global.errImg(event)"
-                    />
+                    <img :src="filter.imgFilter(good.thumb, companyId, '150*150')" lazy-load="true" />
                 </div>
                 <div class="info">
                     <div class="name">{{ good.goodsName }}</div>
@@ -377,15 +374,6 @@ textarea::placeholder {
                     </div>
                     <div class="return-money bg-grey">
                         {{returnsAmount}}
-                        <!-- <input
-                            v-model="returnsAmount"
-                            readonly
-                            @focus="isKeyBoardHide = false"
-                            @blur="isKeyBoardHide = true"
-                            class="flex-auto h100 pd10 no-border bg-grey"
-                            placeholder="请输入退款金额"
-                        />-->
-                        <!-- <div class="grey66">(最多可退款退 {{ placeholder}} 元 )</div> -->
                     </div>
                 </div>
                 <!-- 售后说明 -->
@@ -400,7 +388,7 @@ textarea::placeholder {
                 <upload max="5" :images.sync="images" />
             </div>
             <div class="bottom" v-show="isKeyBoardHide">
-                <button @click="submit()">提 交</button>
+                <button @click="submitPostSale()">提 交</button>
             </div>
         </div>
 
@@ -430,9 +418,6 @@ textarea::placeholder {
 
 <script>
 import Toast from "vant-weapp/dist/toast/toast";
-// import Dialog from "vant-weapp/dist/dialog/dialog";
-
-// import wheelPicker from "@/components/WheelPicker";
 import UpLoad from "@/components/UpLoad";
 import actionCell from "./components/actionCell/index";
 import stepper from "./components/stepper/index";
@@ -477,7 +462,7 @@ export default {
             params: {
                 amount: 1, //退回数量
                 returnsAmount: null, //退款金额
-                busCountsCode: global.baseConstant.busContsCode,
+                busCountsCode: 'D_ORDWEIN',
                 changeReplayCode: null,
                 ordDtId: 0,
                 reaSonCode: "",
@@ -517,7 +502,6 @@ export default {
                 this.hideTextarea = false;
             }, 10);
             const params = this.$store.state.afterSale.apply.good;
-            // console.log("good", params);
             this.initParams(params);
             // 参数没有退货类型,则非修改申请或者重新申请,直接返回
             if (!params.returnTypeCode) return;
@@ -525,19 +509,19 @@ export default {
             this.isRefund =
                 params.returnTypeCode == "D_ONLYDRAWBACK" ? true : false;
             // 退款金额回款
-            this.returnsAmount =
-                params.returnTypeCode == "D_ONLYDRAWBACK"
-                    ? this.good.averagePrice * this.good.applyNum
-                    : null;
-            this.params.returnsAmount = this.returnsAmount;
+            if (params.returnTypeCode == "D_ONLYDRAWBACK") {
+                this.returnsAmount = this.totalAmount;
+            }
+
+            // this.params.returnsAmount = this.returnsAmount;
             // 是否为退货
             this.isReturn =
                 params.returnTypeCode == "D_RETURNSALES" ? true : false;
             // 退货数量
-            this.params.amount =
-                params.returnTypeCode == "D_RETURNSALES"
-                    ? params.applyAmountQty
-                    : 1;
+            if (params.returnTypeCode == "D_RETURNSALES") {
+                this.params.amount = params.applyAmountQty;
+                this.returnsAmount = null;
+            }
 
             // 回显类型
             this.way = types[params.returnTypeCode] || {};
@@ -567,54 +551,65 @@ export default {
         async onSelectWayStart() {
             const result = await this.getPostSaleWay();
             if (!result) return;
-            this.hideTextarea = true;
+
             const { data } = result;
             this.ways = data.returnTypeList || [];
             if (this.ways.length > 0) {
                 this.showWays = true;
+                this.hideTextarea = true;
             } else {
                 this.showWays = false;
+                this.hideTextarea = false;
                 Toast("该商品暂不支持售后");
             }
         },
         // 选择售后类型
         async selectWay(way) {
-            this.isChange = false;
-            this.isRepair = false;
-            this.isReturn = false;
-            this.isRefund = false;
-            this.hideTextarea = false;
-            this.way = way;
+            if (!way.returnTypeCode || way.returnTypeCode === undefined) {
+                Toast("请选择售后类型");
+                return false;
+            } else {
+                this.isChange = false;
+                this.isRepair = false;
+                this.isReturn = false;
+                this.isRefund = false;
+                this.hideTextarea = false;
+                this.way = way;
 
-            if (way.returnTypeCode === "D_CHANGEPART") {
-                this.getSkuInfo();
-                this.isChange = true;
-                this.returnsAmount = null;
-            } else if (way.returnTypeCode === "D_REPAIR") {
-                this.isRepair = true;
-                this.params.amount = 1;
-                this.returnsAmount = null;
-            } else if (way.returnTypeCode === "D_RETURNSALES") {
-                this.isReturn = true;
-                this.params.amount = 1;
-                this.returnsAmount = null;
-            } else if (way.returnTypeCode === "D_ONLYDRAWBACK") {
-                this.isRefund = true;
+                if (way.returnTypeCode === "D_CHANGEPART") {
+                    this.getSkuInfo();
+                    this.isChange = true;
+                    this.returnsAmount = null;
+                } else if (way.returnTypeCode === "D_REPAIR") {
+                    this.isRepair = true;
+                    this.params.amount = 1;
+                    this.returnsAmount = null;
+                } else if (way.returnTypeCode === "D_RETURNSALES") {
+                    this.isReturn = true;
+                    this.params.amount = 1;
+                    this.returnsAmount = null;
+                } else if (way.returnTypeCode === "D_ONLYDRAWBACK") {
+                    this.isRefund = true;
+                    this.returnsAmount = this.totalAmount;
+
+                    this.params.amount = this.good.applyNum;
+                }
+
+                //更换售后类型时,清空选中原因
+                if (this.params.returnTypeCode != way.returnTypeCode) {
+                    this.reason = {};
+                    this.params.reaSonCode = "";
+                }
+                //重置类型参数
+                this.params.returnTypeCode = way.returnTypeCode;
+
+                //选择完成售后类型,更新对应的售后原因
+                const result = await this.getReasonsforCurType();
+                if (result.data) {
+                    this.reasons = result.data;
+                }
             }
 
-            //更换售后类型时,清空选中原因
-            if (this.params.returnTypeCode != way.returnTypeCode) {
-                this.reason = {};
-                this.params.reaSonCode = "";
-            }
-            //重置类型参数
-            this.params.returnTypeCode = way.returnTypeCode;
-
-            //选择完成售后类型,更新对应的售后原因
-            const result = await this.getReasonsforCurType();
-            if (result.data) {
-                this.reasons = result.data;
-            }
         },
         // 获取可选的售后原因
         async getReasons() {
@@ -636,7 +631,7 @@ export default {
             const params = this.good;
             const result = await postSaleApi.getReasonCodes({
                 dictCode: this.params.returnTypeCode || params.returnTypeCode,
-                companyId: global.Storage.get("USER_INFO").companyId
+                companyId: global.Storage.get("properties").companyId
             });
             return result;
         },
@@ -644,8 +639,8 @@ export default {
         // 触发选择原因弹窗
         async onSelectReasonStart() {
             if (!this.params.returnTypeCode) {
-                Toast("请先选择售后类型");
-                return;
+                Toast("请选择售后类型");
+                return false;
             } else {
                 this.hideTextarea = true;
                 this.showReason = true;
@@ -653,10 +648,15 @@ export default {
         },
         // 选择原因
         selectReason(reason) {
-            this.hideTextarea = false;
-            this.reason = reason;
-            this.params.reaSonCode = reason.reasonCode;
-            this.showReason = false;
+            if (!reason.reasonCode || reason.reasonCode === undefined) {
+                Toast("请选择售后原因");
+                return;
+            } else {
+                this.hideTextarea = false;
+                this.reason = reason;
+                this.params.reaSonCode = reason.reasonCode;
+                this.showReason = false;
+            }
         },
 
         // 点击换货,弹出换货弹窗
@@ -677,7 +677,7 @@ export default {
             let params = {
                 busContsCode: "D_BUSCONTS_WSC",
                 goodsCode: this.$route.params.goodsCode,
-                shopCode: global.Storage.get("shopCode").code
+                shopCode: global.Storage.get("properties").shopCode
             };
             let goodsInfo = await postSaleApi.getSku(params);
 
@@ -728,38 +728,6 @@ export default {
         close() {
             this.show = false;
         },
-        //判断是否可用的售后类原因
-        async judgeIsEnableTypeBeforeSubmit() {
-            let msg = null;
-            const typeResult = await this.getPostSaleWay();
-
-            const types = typeResult.data.returnTypeList || [];
-            let typeCodes = [];
-            types.forEach(type => {
-                typeCodes.push(type.returnTypeCode);
-            });
-            // 判断当前选中售后类型是否在可用类型之内
-            if (!typeCodes.includes(this.params.returnTypeCode)) {
-                msg = "当前订单不可提交此售后类型!";
-                return msg;
-            }
-
-            const reasonResult = await this.getReasonsforCurType();
-
-            const reasons = reasonResult.data || [];
-
-            let reasonCodes = [];
-            reasons.forEach(reason => {
-                reasonCodes.push(reason.reasonCode);
-            });
-            // 判断当前选中售后原因是否在可用原因之内
-            if (!reasonCodes.includes(this.params.reaSonCode)) {
-                msg = "请重新修改售后原因!";
-                return msg;
-            }
-            return msg;
-        },
-
         //计算换货商品数
         calNumOfChange() {
             let num = 0;
@@ -770,7 +738,7 @@ export default {
         },
 
         // 提交售后申请
-        async submitPostSale() {
+        submitPostSale() {
             // 必填字段判空处理
             if (check.isEmpty(this.params.returnTypeCode)) {
                 Toast("请选择售后类型");
@@ -779,25 +747,14 @@ export default {
                 Toast("请选择售后原因");
                 return;
             }
-            // 判断售后原因与类型是否可用
-            const msg = await this.judgeIsEnableTypeBeforeSubmit();
-            if (msg) {
-                Toast(msg);
-                return;
-            }
             //根据特殊售后类型执行处理
             switch (this.way.returnTypeCode) {
                 case "D_ONLYDRAWBACK": // 仅退款
-                    //提交前赋值退款金额
-                    this.params.returnsAmount = this.returnsAmount;
-                    if (this.params.returnsAmount <= 0) {
+                    if (+this.returnsAmount === 0) {
                         Toast("退款金额必须大于0！");
                         return;
-                    } else if (!+this.params.returnsAmount) {
-                        Toast("请填写正确的退款金额！");
-                        return;
-                    } else this.params.amount = this.good.applyNum;
-
+                    }
+                    this.params.amount = this.good.applyNum;
                     break;
 
                 case "D_CHANGEPART": // 换货
@@ -816,22 +773,30 @@ export default {
                     this.returnsAmount = null;
                     break;
             }
-
             // 提交图片
             this.params.savePictInfo = this.images;
-            // 提交申请
-            let result = await postSaleApi.submitApply(this.params);
 
-            if (result.status === 200) {
-                Toast(result.data);
-                this.$router.go(-1);
-            } else {
-                Toast(result.data);
-            }
+            this.submit(this.params);
         },
 
-        submit: debounce(function() {
-            this.submitPostSale();
+        submit: debounce(function(params) {
+            // 提交申请
+            postSaleApi
+                .submitApply(params)
+                .then(result => {
+                    Toast(result.data);
+                    setTimeout(() => {
+                        this.$router.go(-1);
+                    }, 500);
+                })
+                .catch(err => {
+                    if (err.data === '服务器内部异常') {
+                      Toast('保存失败');
+                    } else {
+                      Toast(err.data);
+                    }
+                });
+            // this.submitPostSale();
         }, 5000),
 
         // 保留输入值为2位小数
@@ -855,45 +820,11 @@ export default {
             });
             return this.good.applyNum - num;
         },
-        // 退款金额
-        placeholder: function() {
-            return (
-                (this.good.amountAverage / this.good.allQty) *
-                this.good.applyNum
-            );
+        totalAmount: function() {
+            return (this.good.averagePrice * this.good.applyNum).toFixed(2);
         }
     },
     watch: {
-        // returnsAmount: function(val) {
-        //     const allowApplyPrice = this.placeholder || 0;
-        //     if (val > allowApplyPrice) {
-        //         this.returnsAmount = allowApplyPrice.toFixed(2);
-        //         this.params.returnsAmount = this.returnsAmount;
-        //     } else {
-        //         let res = "";
-        //         if (val) {
-        //             res = this.fixedValue(val) || this.params.returnsAmount;
-        //         } else {
-        //             res = val;
-        //         }
-        //         this.returnsAmount = res;
-        //         this.params.returnsAmount = this.returnsAmount;
-        //     }
-        // },
-        "params.amount": function(val) {
-            if (val <= 1) {
-                this.params.amount = 1;
-            } else if (val >= this.remainQty) {
-                // if (this.params.returnTypeCode == "D_REPAIR") {
-                //     Toast("返修数量不能大于购买数量！");
-                // } else if (this.params.returnTypeCode == "D_RETURNSALES") {
-                //     Toast("退货数量不能大于购买数量！");
-                // }
-                this.params.amount = this.remainQty;
-            } else {
-                this.params.amount = val;
-            }
-        },
         "skuInfo.partAmount": function() {
             if (this.skuInfo.partAmount < this.remainQty) {
                 this.params.amount -= 1;

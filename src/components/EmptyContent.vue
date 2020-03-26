@@ -17,16 +17,9 @@ export default {
             default: '当前暂无数据~'
         },
         wrapStyle: ""
-    },
-    data() {
-        return {}
-    },
-    methods: {},
-    created() {
     }
 }
 </script>
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .empty-box {
     display: flex;
@@ -34,15 +27,12 @@ export default {
     justify-content: center;
     width: 100%;
     flex: 1;
-    background: url($serverUrl+"images/common/empty.png") no-repeat center 20%;
+    background: url("../assets/images/empty.png") no-repeat center 20%;
     background-size: 40%;
     font-size: $font-common;
     line-height: 1;
     color: $text-secondary;
     height: computed(300);
     padding-top: computed(300);
-    .content {
-        // padding-top: computed(400);
-    }
 }
 </style>

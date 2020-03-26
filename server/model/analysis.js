@@ -32,16 +32,7 @@ class analysis {
     }
     // 获取用户openid、session_key会话密钥
     static async getWxOpenId(ctx, code, appid, secret){
-        let data = fs.readFileSync(path.join(__dirname, '..') + '/properties/constant.json', 'utf8')
-        let constData = JSON.parse(data)
-        let properties = constData.prod
-        if(ctx.env ==='dev' || ctx.env ==='test'){
-            properties = constData.dev
-        }else if(ctx.env ==='preprod'){
-            properties = constData.preprod
-        }
-        console.log("ctx.env=========================",ctx.env)
-        let url = 'https://api.weixin.qq.com/sns/jscode2session?appid=' + appid + '&secret=' + secret + '&js_code=' + code + '&grant_type=' + properties.grantType
+        let url = 'https://api.weixin.qq.com/sns/jscode2session?appid=' + appid + '&secret=' + secret + '&js_code=' + code + '&grant_type=authorization_code'
         return axios.get(url).then((res) => {
             return res
         })

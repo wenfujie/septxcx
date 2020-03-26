@@ -44,20 +44,6 @@
                 }
                 Salon.getDetail(data).then((res) =>{
                     this.pageInfo = res
-
-                    // let pageInfo = res.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (img, src) {
-                    //     let index = src.indexOf('=') + 1
-                    //     let imgData = root.filter.imgFilter(src.substring(index, img.length),root.company_id)
-                    //     return '<img src="' + imgData + '" style="width: 100%; display: block; margin: 0;">'
-                    // })
-                    // let newPre = pageInfo.replace(/\<pre\>/gi, function () {
-                    //     return '<pre style="word-wrap: break-word;white-space:pre-wrap;">'
-                    // })
-
-                    // let newP = newPre.replace(/\<p\>/gim, function () {
-                    //     return '<p style="word-wrap: break-word;white-space:pre-wrap;">'
-                    // })
-                    
                     let newImg = res.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (img, src) {
                         let index = src.indexOf('=') + 1
                         let imgData = root.filter.imgFilter(src.substring(index, img.length),root.company_id)

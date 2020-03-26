@@ -1,5 +1,6 @@
 //  获取常数值
-const Account = require("../controller/account/account");
+const accountFun = require("../controller/account");
+
 module.exports = {
-  "POST/wxCharge": Account.wxCharge
+  "POST/wxCharge": accountFun.wxCharge  // 微信充值
 };

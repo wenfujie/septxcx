@@ -1,3 +1,4 @@
+
 /*
 * createTime：2019/03/01
 * author：junyong.hong
@@ -5,9 +6,8 @@
 * 页面路由配置在：show.router.js
 */
 <template>
-    <div v-show="isshow" style="height:100%;width:100%;">
+    <div v-show="isshow" style="height:100%;width:100%;" class="main">
         <wxs module="filter" src="../../filter/filterCommon.wxs"></wxs>
-
 
         <div class="header">
             <!-- 搜索框 begin -->
@@ -17,7 +17,7 @@
             </div>
             <!-- 搜索框 end -->
 
-            <div class="tab-cont">
+            <div class="tab-cont" v-show="v2ModelLoadSuccess">
                 <div class="tab-item selected">首页</div>
                 <scroll-view scroll-x class="scroll-view">
 
@@ -25,7 +25,7 @@
                         <li class="tab-item"
                             :key="index"
                             @click="navGoto(item.url)"
-                            v-for="(item,index) in sy_dbcdList">{{item.cmsBackpageDttName}}</li>
+                            v-for="(item,index) in sy_dbcdList">{{item.covername}}</li>
                     </ul>
                 </scroll-view>
             </div>
@@ -33,16 +33,18 @@
         </div>
 
         <!-- 页面内容 -->
-        <div class="index" style="height:calc(100% - 275rpx);width:100%;overflow:scroll">
+        <div class="index"
+             v-show="v2ModelLoadSuccess"
+             style="height:calc(100% - 275rpx);width:100%;"
+             ref="contentTop" id="contentTop">
             <div class="index-main">
                 <!-- 首屏背景图 begin -->
                 <img
                     v-for="(item, index) in sy_ad01List"
                     v-if="item.fileType == 1"
                     :key="item.coverFileUrl"
-                    :src="filter.imgFilter(item.coverFileUrl,company_id)"
+                    :src="filter.imgFilter(item.coverFileUrl,company_id, '750*873')"
                     class="index-bg-img"
-                    @onerror="global.errImg(event)"
                     lazy-load="true"
                 >
                 <!-- 首屏背景图 end -->
@@ -58,8 +60,7 @@
                                     class="goods-banner-item flex-box" >
                                     <div class="goods-banner-item__left">
                                         <img class="goods-banner-item__img"
-                                             :src="filter.imgFilter(item.goodsFilePath,company_id)"
-                                             @onerror="global.errImg(event)"
+                                             :src="filter.imgFilter(item.goodsFilePath,company_id, '200*200')"
                                              lazy-load="true">
                                     </div>
 
@@ -76,16 +77,7 @@
                                     </div>
                                 </div>
                             </swiper-item>
-
                     </swiper>
-                    <!--自定义指示器 li的for循环需修改-->
-                    <div class="custom-indicator" slot="indicator" v-if="sy_splbList.goodsList && sy_splbList.goodsList.length > 1">
-                        <ul class="custom-list">
-                            <li :class="['custom-item',{'selected':bannerIndex===index}]"
-                                :key="item.id"
-                                v-for="(item,index) in sy_splbList.goodsList" ></li>
-                        </ul>
-                    </div>
                 </div>
                 <!-- 商品轮播 end -->
             </div>
@@ -93,16 +85,18 @@
             <!-- 点击图片跳转区 begin -->
             <div class="index-img">
                 <!--立领20元红包-->
-                <img
-                    v-for="(item, index) in sy_hbList"
-                    v-if="item.fileType == 1"
-                    :key="item.coverFileUrl"
-                    class="coupon common-img"
-                    :src="filter.imgFilter(item.coverFileUrl,company_id)"
-                    @onerror="global.errImg(event)"
-                    @click="navGoto(item.url)"
-                    lazy-load="true"
-                >
+                <div>
+                    <img
+                        v-for="(item, index) in sy_hbList"
+                        v-if="item.fileType == 1"
+                        :key="item.coverFileUrl"
+                        class="coupon common-img"
+                        :src="filter.imgFilter(item.coverFileUrl,company_id, '365*190')"
+
+                        @click="navGoto(item.url)"
+                        lazy-load="true"
+                    >
+                </div>
                 <div>
                     <!--大家都在买-->
                     <img
@@ -110,9 +104,9 @@
                         v-if="item.fileType == 1"
                         :key="index"
                         class="new common-img"
-                        :src="filter.imgFilter(item.coverFileUrl,company_id)"
-                        @onerror="global.errImg(event)"
-                        @click="navGoto(item.url)"
+                        :src="filter.imgFilter(item.coverFileUrl,company_id, '344*200')"
+
+                        @click="navGoto(item.url, modelCode.sy_buy)"
                         lazy-load="true"
                     >
                     <!--高返佣-->
@@ -121,24 +115,26 @@
                         :key="item.coverFileUrl"
                         v-if="item.fileType == 1"
                         class="special common-img"
-                        :src="filter.imgFilter(item.coverFileUrl,company_id)"
-                        @onerror="global.errImg(event)"
-                        @click="navGoto(item.url)"
+                        :src="filter.imgFilter(item.coverFileUrl,company_id, '344*200')"
+
+                        @click="navGoto(item.url, modelCode.sy_gfy)"
                         lazy-load="true"
                     >
                 </div>
 
                 <!--每日搭配-->
-                <img
-                    v-for="item in sy_mrdpList"
-                    :key="item.coverFileUrl"
-                    v-if="item.fileType == 1"
-                    class="match-img common-img"
-                    :src="filter.imgFilter(item.coverFileUrl,company_id)"
-                    @onerror="global.errImg(event)"
-                    @click="navGoto(item.url)"
-                    lazy-load="true"
-                >
+                <div>
+                    <img
+                        v-for="item in sy_mrdpList"
+                        :key="item.coverFileUrl"
+                        v-if="item.fileType == 1"
+                        class="match-img common-img"
+                        :src="filter.imgFilter(item.coverFileUrl,company_id, '750*450')"
+
+                        @click="navGoto(item.url)"
+                        lazy-load="true"
+                    >
+                </div>
 
                 <!--秋季上新 四块-->
                 <ul class="sort-img-list">
@@ -147,10 +143,10 @@
                             v-for="item in sy_hd01List"
                             :key="item.coverFileUrl"
                             v-if="item.fileType == 1"
-                            :src="filter.imgFilter(item.coverFileUrl,company_id)"
+                            :src="filter.imgFilter(item.coverFileUrl,company_id, '345*200')"
                             class="sort-img"
-                            @onerror="global.errImg(event)"
-                            @click="navGoto(item.url)"
+
+                            @click="navGoto(item.url, modelCode.sy_hd01)"
                             lazy-load="true">
                     </li>
                     <li class="sort-img-item common-img">
@@ -158,10 +154,10 @@
                             v-for="item in sy_hd02List"
                             :key="item.coverFileUrl"
                             v-if="item.fileType == 1"
-                            :src="filter.imgFilter(item.coverFileUrl,company_id)"
+                            :src="filter.imgFilter(item.coverFileUrl,company_id, '345*200')"
                             class="sort-img"
-                            @onerror="global.errImg(event)"
-                            @click="navGoto(item.url)"
+
+                            @click="navGoto(item.url, modelCode.sy_hd02)"
                             lazy-load="true">
                     </li>
                     <li class="sort-img-item common-img">
@@ -169,10 +165,10 @@
                             v-for="item in sy_hd03List"
                             :key="item.coverFileUrl"
                             v-if="item.fileType == 1"
-                            :src="filter.imgFilter(item.coverFileUrl,company_id)"
+                            :src="filter.imgFilter(item.coverFileUrl,company_id, '345*200')"
                             class="sort-img"
-                            @onerror="global.errImg(event)"
-                            @click="navGoto(item.url)"
+
+                            @click="navGoto(item.url, modelCode.sy_hd03)"
                             lazy-load="true">
                     </li>
                     <li class="sort-img-item common-img">
@@ -180,10 +176,10 @@
                             v-for="item in sy_hd04List"
                             :key="item.coverFileUrl"
                             v-if="item.fileType == 1"
-                            :src="filter.imgFilter(item.coverFileUrl,company_id)"
+                            :src="filter.imgFilter(item.coverFileUrl,company_id, '345*200')"
                             class="sort-img"
-                            @onerror="global.errImg(event)"
-                            @click="navGoto(item.url)"
+
+                            @click="navGoto(item.url, modelCode.sy_hd04)"
                             lazy-load="true">
                     </li>
                 </ul>
@@ -191,15 +187,29 @@
             </div>
             <!-- 点击图片跳转区 end -->
 
+            <!--长图模块 暂时替代瀑布流区-->
+            <div v-if="sy_ctmklsList && sy_ctmklsList.length" class="long-model">
+                <img
+                    v-for="item in sy_ctmklsList"
+                    :key="item.coverFileUrl"
+                    v-if="item.fileType == 1"
+                    :src="filter.imgFilter(item.coverFileUrl,company_id)"
+                    class="long-img"
+                    mode="widthFix"
+
+                    @click="navGoto(item.url)"
+                    lazy-load="true">
+            </div>
+
             <!-- 瀑布流区 begin -->
-            <div class="falls">
+            <div class="falls" v-if="sy_ctmkList && sy_ctmkList.length">
                 <img :style="{'width': item.width + 'rpx','height': item.height + 'rpx'}"
                     v-for="(item,index) in sy_ctmkList"
                     :key="item.coverFileUrl"
                     v-if="item.fileType == 1"
                     :src="filter.imgFilter(item.coverFileUrl,company_id)"
                     class="falls-img"
-                    @onerror="global.errImg(event)"
+
                     @click="navGoto(item.url)"
                     @load="loadImg(item,$event)">
             </div>
@@ -216,27 +226,42 @@
                 </div>
 
                 <!-- 底部logo begin -->
-                <img class="footer-logo"
-                     :src="serverUrl + 'images/common/footer-logo.png'"
-                     @onerror="global.errImg(event)"
+                <img v-if="!!serverUrl" class="footer-logo"
+                     :src="serverUrl + 'images/footer-logo.png'"
                      lazy-load="true">
                 <!-- 底部logo end -->
             </div>
             <!-- 专属推荐 begin -->
 
         </div>
+
+        <div class="top-btn" @click="goPageTop" v-show="showGoTopBtn">
+            <i class="iconfont iconhuidaodingbu"></i>
+            <p>顶部</p>
+        </div>
         <!-- 页面内容 -->
+        <div v-show="showTicket" class="ticket-model" catch:touchmove="noop"></div>
+        <div v-show="showTicket" v-if="!!serverUrl" class="ticket-content" catch:touchmove="noop">
+            <img class="ticket" :src="serverUrl + 'images/ticket.png'">
+            <button class="ticket-btn" :style="{background:'url('+serverUrl + 'images/btn.png) no-repeat; background-size: cover;border: none;'}" :open-type=" (!isLogin) ? 'getUserInfo' : ''" @getuserinfo="getLoginInfo" @click="bindPhone"/>
+            <i class="iconfont iconguanbixiao" @click="hideModal"></i>
+        </div>
+
+        <!--会员整合弹窗-->
+        <member-merge-dialog ref="mergeDialog" @changeList="changeList"></member-merge-dialog>
     </div>
 </template>
 <script>
-    import {UserService, Base, Login, Cms, Distribution} from "../../api/service";
+    import {Base, Cms} from "../../api/service";
     import Toast from 'vant-weapp/dist/toast/toast';
     import GoodList from '@/components/GoodList.vue'
-
+    import MemberMergeDialog from '@/components/MemberMergeDialog.vue'
+    import MemberMergeMixins from '@/pages/UserPackage/merge/mixins/MemberMergeMixins'
     export default {
         config: {},
         props: ["isshow", "query",'indexScrollTop'],
-        components:{'good-list': GoodList},
+        components:{'good-list': GoodList,MemberMergeDialog},
+        mixins: [ MemberMergeMixins ],
         data() {
             return {
                 keyWord: "",
@@ -255,6 +280,7 @@
                     sy_hd03: global.pageCode.index.children.sy_hd03, // 秋季上新3
                     sy_hd04: global.pageCode.index.children.sy_hd04, // 秋季上新4
                     sy_ctmk: global.pageCode.index.children.sy_ctmk, // 瀑布流模块
+                    sy_ctmkls: global.pageCode.index.children.sy_ctmkls, // 长图模块（暂时代替瀑布流模块）
                 },
                 // 获取商品列表
                 sy_zstj: global.pageCode.index.children.sy_zstj, // 专属推荐 (商品列表)
@@ -273,6 +299,7 @@
                 sy_hd03List: [],//秋季上新3
                 sy_hd04List: [],//秋季上新4
                 sy_ctmkList: [],//瀑布流模块
+                sy_ctmklsList: [],//长图模块（暂时代替瀑布流模块）
 
 
                 value: "",
@@ -282,6 +309,12 @@
                 bannerIndex: 0,// 商品轮播index
                 bannerList: [],
                 serverUrl: '',// 域名
+                v2ModelLoadSuccess: false,// v2模板加载成功
+                showGoTopBtn: false,// 是否显示返回顶部按钮
+                windowHeight: 0,
+                showTicket: false,
+                showCancelBtn: false,
+                isLogin: false // 用户信息是否授权登陆
             };
         },
         created() {
@@ -290,9 +323,54 @@
             this._getBannerAndNav();
             this._getCommonGoodsList(this.sy_zstj, "sy_zstjList", 8);
             this._getCommonGoodsList(this.sy_splb, "sy_splbList");
+            let that = this
+            wx.getSystemInfo({
+                success(res) {
+                    that.windowHeight = res.windowHeight
+                }
+            });
+            this.onRefresh()
         },
-
+        onPageScroll: function (option) {
+            let query = wx.createSelectorQuery()
+            query.select('#contentTop').boundingClientRect((rect) => {
+                var top = rect.top
+                if (option.scrollTop) {
+                    option.scrollTop > this.windowHeight ? (this.showGoTopBtn = true) : (this.showGoTopBtn = false);
+                }
+            }).exec()
+        },
         methods: {
+            // 会员整合弹窗 列表值改变事件
+            changeList(list) {
+                this.$nextTick(() => {
+                    if (list && list.length) {
+                        this.$refs.mergeDialog.dialogVisibleState();
+                    } else {
+                        this.$refs.mergeDialog.dialogVisibleState(false);
+                    }
+                })
+            },
+            noop() {},
+            hideModal(){
+                this.showTicket = false
+                this.showCancelBtn = true
+            },
+            bindPhone(){
+                if(!this.isLogin) return
+                if(!Storage.get('USER_INFO').usrId){
+                    this.$router.push("/pages/UserPackage/phone/bind-phone?successUrl=/pages/UserPackage/vouchers/my-vouchers");
+                }else{
+                    this.$router.push("/pages/UserPackage/vouchers/my-vouchers");
+                }
+            },
+            /** 返回页面顶部 **/
+            goPageTop(){
+                wx.pageScrollTo({
+                    scrollTop: 0,
+                    duration: 300
+                })
+            },
             /**
              * 热卖商品跳转到详情页
              * @param item 当前对象
@@ -311,10 +389,6 @@
                 let detail = e.mp.detail;
                 item.width = detail.width;
                 item.height = detail.height;
-                console.log(detail,"---",item)
-                wx.nextTick(()=>{
-                    global.toastLoading(false);
-                })
             },
             onBannerChange(val) {
                 this.bannerIndex = val.mp.detail.current;
@@ -322,15 +396,46 @@
 
             //相当于触发onshow
             onRefresh() {
-                this._getBannerAndNav()
+                //  判断用户登陆状态设置购物车、账户的按钮类型
+                if (!!global.Storage.get('USER_INFO')) {
+                    this.isLogin = true
+                } else {
+                    this.isLogin = false
+                }
+                if(!global.Storage.get('USER_INFO').mobilePhone && !this.showCancelBtn) this.showTicket = true
+                else this.showTicket = false
+                // this._getBannerAndNav()
             },
-
+            getLoginInfo() {
+                // 验证登陆
+                if (!global.Storage.get('USER_INFO')) {
+                    global.loginAuthor().then((res) => {
+                        if(!!res) {
+                            this.isLogin = true
+                            this.bindPhone()
+                        }
+                    })
+                }
+            },
+            indexShow(){
+                this.showGoTopBtn = false
+            },
             //  下拉刷新
             tabPullDownRefresh() {
+                this.checkoutMergeDialog();
                 this.sy_ctmkList = [];
                 this._getBannerAndNav();
                 this._getCommonGoodsList(this.sy_zstj, "sy_zstjList", 8);
                 this._getCommonGoodsList(this.sy_splb, "sy_splbList");
+            },
+            /** 判断是否显示会员整合弹窗 **/
+            async checkoutMergeDialog(){
+                let memberList = await this.m_getMemberList(1);
+                if(memberList.length > 0) {
+                    this.$refs.mergeDialog.getMergeList(true);
+                }else{
+                    this.$refs.mergeDialog.dialogVisibleState(false);
+                }
             },
             /**
              * 搜索
@@ -347,12 +452,15 @@
                     cmsWebCode: global.pageCode.index.name,
                     busContsCode: global.baseConstant.busContsCode
                 };
+                this.v2ModelLoadSuccess = false;
                 global.toastLoading();
                 Cms.getUsrCmsInfoV2(data).then(res => {
+                    for(let key in this.modelCode){
+                        this[key+'List'] = [];
+                    }
                     res.cmsModulepageHdList.forEach((item, itemIndex) => {
                         if (!!item.cmsBackpageDtDtoList && item.cmsBackpageDtDtoList.length > 0) {
                             item.cmsBackpageDtDtoList.forEach((itm, itmIndex) => {
-
                                 for(let key in this.modelCode){
                                     if (itm.cmsBackpageDtCode === key && !!itm.cmsBackpageDttList) {
                                         // 瀑布流模块初始化宽高
@@ -363,7 +471,6 @@
                                             })
                                         }
                                         this[key+'List'] = itm.cmsBackpageDttList;
-//                                        console.log(key+'List',"+++++++",this[key+'List'])
 
                                     }
                                 }
@@ -371,6 +478,10 @@
                         }
                     });
 
+                    wx.nextTick(()=>{
+                        this.v2ModelLoadSuccess = true;
+                        global.toastLoading(false);
+                    })
                 });
             },
             /**
@@ -382,6 +493,7 @@
              * cmsWebItemCode： 热卖商品 rmsp  新品推荐 xptj
              */
             _getCommonGoodsList(cmsWebItemCode, listName, sliceLength) {
+                this[listName] = {}
                 let data = {
                     // 模板编号
                     cmsTemplateCode: global.Storage.get("TEMPLATE_INFO").cmsTemplateCode,
@@ -392,6 +504,7 @@
                     busContsCode: global.baseConstant.busContsCode,
                     shopId: global.Storage.get("properties").shopId,
                     onlineFlag: 1,// 是否获取促销图，不获取则不传
+                    benefitFlag: true,// 传了才返回描述
                 };
                 return Cms.getChoosebuyGoods(data).then(res => {
                     Toast.clear()
@@ -408,7 +521,6 @@
                     obj.url = res[0].url;
                     obj.goodsList = currentList;
                     this[listName] = obj;
-                    console.log(listName,this[listName],"====")
                 });
             },
             /**
@@ -429,13 +541,56 @@
             },
             //  跳转搜索页
             goSearch() {
-                this.$router.push("/pages/goodsPackage/goods/good-search?value=" + this.value);
+                this.$router.push("/pages/goodsPackage/goods/good-search?keyWord=" + this.keyWord);
             },
         }
     };
 </script>
 <style lang="scss" type="text/scss" scoped>
-
+    .ticket-model{
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #000;
+        opacity: 0.5;
+        z-index: 10001;
+    }
+    .ticket-content{
+        width: 100%;
+        position: fixed;
+        z-index: 10002;
+        top: computed(280);
+        .ticket{
+            width: computed(750);
+            height: computed(450);
+        }
+        .ticket-btn{
+            position: absolute;
+            bottom: computed(-45);
+            left: computed(240);
+            width: computed(270);
+            height: computed(101);
+            z-index: 10003;
+        }
+        .iconguanbixiao{
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: computed(-200);
+            margin: 0 auto;
+            font-size: computed(56);
+            width: computed(80);
+            z-index: 10003;
+            color: $color-white;
+        }
+    }
+    .main{
+        position: relative;
+    }
     .header{
         width: 100%;
         position: fixed;
@@ -516,11 +671,12 @@
     }
 
     .index {
+        display: block;
         position: absolute;
-        padding-bottom: computed(95);
+        // padding-bottom: computed(95);
         padding-top: computed(190);
-        overflow-y: auto;
-        overflow-x: hidden;
+        // overflow-y: auto;
+        // overflow-x: hidden;
         width: 100%;
         background-color: $color-white;
         -webkit-overflow-scrolling: touch;
@@ -529,18 +685,20 @@
     .index-main{
         width: 100%;
         position: relative;
+        height: computed(873);
         .index-bg-img{
             width: 100%;
-            height: computed(1050);
+            height: 100%;
         }
         .goods-banner{
-            margin: 0 0 computed(155) computed(20);
+            margin: 0 0 0 computed(20);
             width: calc(100% - #{computed(40)});
             background: $color-white;
             border-radius: computed(20);
             position: absolute;
-            bottom: 0;
+            bottom: computed(-35);
             left: 0;
+            box-shadow:0 computed(4) computed(12) 0 rgba(0, 0, 0, 0.1);
         }
     }
     // 轮播商品
@@ -589,32 +747,6 @@
             }
         }
     }
-    // 自定义轮播logo
-    .custom-indicator{
-        position: absolute;
-        bottom: computed(18);
-        left:0;
-        width: 100%;
-        .custom-list{
-            justify-content: center;
-            display: flex;
-            width: 100%;
-
-            .custom-item{
-                width: computed(14);
-                height:computed(14);
-                background: $text-placeholder;
-                border-radius: computed(10);
-                margin: 0 computed(10);
-                overflow: hidden;
-
-                &.selected{
-                    background: $domaincolor;
-                    width: computed(36)
-                }
-            }
-        }
-    }
 
     .common-img{
         padding:computed(10);
@@ -623,7 +755,7 @@
         overflow: hidden;
     }
     .index-img {
-        margin: 0 computed(10) computed(10) computed(10);
+        margin: computed(52) computed(10) computed(10) computed(10);
         > div {
             display: flex;
             border-radius: computed(20);
@@ -645,7 +777,7 @@
             .sort-img-item{
                 width:50%;
                 overflow: hidden;
-                margin-bottom: computed(10);
+                /*margin-bottom: computed(10);*/
                 height: computed(200);
                 .sort-img{
                     width:100%;
@@ -657,15 +789,19 @@
     .coupon{
         width: 100%;
         height: computed(140);
+
     }
     .new,
     .special{
+        padding: 0 !important;
         width: 50%;
         height: computed(200);
+        margin: computed(10);
+        border-radius: computed(20);
     }
 
     .index-hot-goods {
-        padding: computed(20) computed(20) 0 computed(20);
+        padding: computed(20) computed(20) computed(95) computed(20);
         background-color: $color-background;
         .goods-title {
             line-height:computed(90);
@@ -696,5 +832,36 @@
         .falls-img{
         }
     }
-
+    .long-model{
+        width: 100%;
+        .long-img{
+            width: 100%;
+        }
+    }
+    .top-btn {
+        width: computed(88);
+        height: computed(88);
+        border-radius: 50%;
+        overflow: hidden;
+        font-size: computed(20);
+        text-align: center;
+        position: fixed;
+        bottom: computed(200);
+        right: computed(20);
+        background: #ffffff;
+        opacity:.84;
+        i{
+            margin-top: computed(10);
+            font-size: computed(40);
+            color: #333333;
+        }
+        p {
+            margin-top: computed(-5);
+            text-align: center;
+            color: #333333;
+        }
+    }
+    .swiper{
+        height: 120px !important;
+    }
 </style>

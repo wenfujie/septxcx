@@ -7,18 +7,12 @@
  */
 
 class account {
+
   //  微信充值
   static async wxCharge(ctx, params) {
-    return ctx
-      .$post(
-        ctx.baseUrl +
-          ctx.serverPortUrl.memberService +
-          "/vippay-logs/wechat-recharge",
-        params
-      )
-      .then(res => {
-        return res;
-      });
+    return ctx.$post(ctx.baseUrl + ctx.serverPortUrl.memberService + "/vippay-logs/wechat-recharge", params).then(res => {
+      return res;
+    });
   }
 }
 

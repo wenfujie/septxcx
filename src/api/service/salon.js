@@ -17,7 +17,7 @@ import http from '../../utils/http'
  * @returns {*}
  */
 
-export const getList = (config) => {return http.get('salon/list',config); }
+export const getList = (config) => { return http.get('salon/getList', config); }
 
 /**
  * 获取线下沙龙文章详情
@@ -29,4 +29,4 @@ export const getList = (config) => {return http.get('salon/list',config); }
  * @returns {*}
  */
 
-export const getDetail = (config) => {return http.get('salon/detail',config); }
+export const getDetail = (config) => { return http.get('salon/getDetail', config); }

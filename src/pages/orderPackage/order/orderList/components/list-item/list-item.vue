@@ -109,7 +109,7 @@
                 <div class="imgBox">
                     <img
                         class="img-responsive"
-                        :src="filter.imgFilter(good.thumb,companyId)"
+                        :src="filter.imgFilter(good.thumb,companyId, '140*140')"
                         lazy-load="true"
                         alt
                     />
@@ -185,7 +185,8 @@ export default {
                 D_ORDSPAYING: "取消订单", //取消订单
                 D_ORDCANCEL: "删除订单" //删除订单
             },
-            companyId: global.Storage.get("COMPANYID").company_id
+            companyId: global.Storage.get("COMPANYID").company_id,
+            goPage_lock:false,//跳转到别的页面的锁
         };
     },
     methods: {
@@ -203,6 +204,10 @@ export default {
 
         // 查看订单详情
         toViewDetail($event) {
+            if(this.goPage_lock){
+                return
+            }
+            this.goPage_lock=true;
             this.$router.push({
                 path: "/pages/orderPackage/order/orderDetail/order-detail",
                 query: {
@@ -263,20 +268,26 @@ export default {
         },
         //再次购买
         buyAgain() {
-            this.$store
-                .dispatch("order/buyAgain", this.order)
-                .then(orderHdId => {
-                    if (!orderHdId) return;
-                    orderApi.orderPreferCal({ ordId: orderHdId }).then(() => {
-                        this.$router.push({
-                            path:
-                                "/pages/orderPackage/order/order/order-settlement",
-                            query: {
-                                orderHdId: orderHdId
-                            }
-                        });
+            if(this.goPage_lock){
+                return
+            }
+            this.goPage_lock=true;
+            this.$store.dispatch("order/buyAgain", this.order).then(orderHdId => {
+                console.log(orderHdId,'orderHdIdorderHdIdorderHdIdorderHdId')
+                if (!orderHdId) {
+                    this.goPage_lock=false;
+                    return;
+                }
+                orderApi.orderPreferCal({ ordId: orderHdId }).then(() => {
+                    this.$router.push({
+                        path:
+                            "/pages/orderPackage/order/order/order-settlement",
+                        query: {
+                            orderHdId: orderHdId
+                        }
                     });
-                });
+                },()=>{this.goPage_lock=false;});
+            },()=>{this.goPage_lock=false;});
         },
 
         //签收(确认收货)
@@ -290,6 +301,10 @@ export default {
         },
         // 去评价
         toEvaluate() {
+            if(this.goPage_lock){
+                return
+            }
+            this.goPage_lock=true;
             this.$router.push({
                 path: "/pages/orderPackage/order/order/order-evaluate",
                 query: {
@@ -351,6 +366,12 @@ export default {
             this.$forceUpdate();
             this.initState();
         }
-    }
+    },
+    onHide(){
+        this.goPage_lock=false;
+    },
+    onUnload(){
+        this.goPage_lock=false;
+    },
 };
 </script>

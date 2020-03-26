@@ -28,8 +28,13 @@
  
  <template>
     <overlayer v-model="show" @touchmove.prevent="noop()">
-        <div class="wheel-picker-container">
-            <van-picker :columns="leftData" @change="onChange" />
+        <div class="wheel-picker-container" @click.stop="noop()">
+            <van-picker
+                v-if="show"
+                :columns="leftData"
+                @change="onChange"
+                :default-index="defaultIndex"
+            />
             <div class="picker-bottom">
                 <div class="btn-confirm" @click="onConfirm()">确定</div>
             </div>
@@ -38,7 +43,7 @@
 </template>
  
  <script>
-import overlayer from "@/components/overlayer/index";
+import overlayer from "../../../overlayer/index";
 export default {
     props: {
         data: {
@@ -57,7 +62,9 @@ export default {
             leftData: [],
             rightData: [],
             seletedModel: {},
-            rightIndex: null
+            rightIndex: null,
+            defaultIndex: 0,
+            cacheIndex: 0
         };
     },
     methods: {
@@ -76,17 +83,21 @@ export default {
                     this.leftData.push(obj);
                 });
             }
-            this.seletedModel = this.leftData[0];
+            // this.defaultIndex =
+            //     this.leftData.length >= 2 ? this.defaultIndex : 0;
+            this.seletedModel = this.leftData[this.defaultIndex];
         },
         onChange(e) {
             this.seletedModel = e.target.value;
-            console.log("onchange", this.seletedModel);
+            this.cacheIndex = e.target.index;
         },
-
         onConfirm() {
+            this.defaultIndex = this.cacheIndex;
             this.$emit("confirm", this.seletedModel);
             this.show = false;
-            this.$emit("input", this.show);
+        },
+        onClose() {
+            this.show = false;
         }
     },
     created() {
@@ -107,6 +118,9 @@ export default {
                 }
             },
             deep: true
+        },
+        show: function(params) {
+            this.$emit("input", this.show);
         }
     },
     onHide() {

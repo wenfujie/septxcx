@@ -14,7 +14,7 @@
                 <div class>
                     <div class="product clearfix">
                         <div class="imgBox" :class="{'cusTag':item.orderFlag===1}">
-                            <img :src="filter.imgFilter(item.thumb,company_id)" lazy-load="true" />
+                            <img :src="filter.imgFilter(item.thumb,company_id, '160*160')" lazy-load="true" />
                         </div>
                         <div class="details">
                             <div class="goodsName">{{item.goodsName}}</div>
@@ -80,44 +80,25 @@
                         @input="textareaInput"
                         placeholder="说说值得推荐的理由吧~"
                     ></textarea>
-                    <!-- <textarea
-                        cols="200"
-                        maxlength="150"
-                        placeholder="说说值得推荐的理由吧~"
-                        v-model="item.reasonMemo"
-                        @input="textInput"
-                        :data-index="index"
-                        fixed="true"
-                    ></textarea>-->
                     <div class="flex-end">{{item.reasonMemo?item.reasonMemo.length:0}}/150</div>
                 </div>
-                <!-- <upload max=4 :srcs="srcs" :good="item" @imgChange="imgChange(arguments[0],index)"/> -->
                 <upload
-                    max="4"
+                    max="5"
                     :srcs="srcs"
                     :good="item"
                     :images.sync="goodsList[index].commentPictList"
                 />
-                <!-- <upload-file :good="item" :images.sync="goodsList[index].commentPictList"></upload-file> -->
             </div>
         </div>
 
         <cover-view class="com-foot-btn-cont" v-if="goodsList.length > 0">
             <cover-view class="com-foot-btn" @click="submitEvaluate">提交</cover-view>
         </cover-view>
-        <!-- <cover-view class="com-foot-btn" @click="submitEvaluate">提交</cover-view> -->
-        <!-- <div class="com-foot-btn-cont" v-if="goodsList.length > 0">
-            <div class="com-foot-btn" @click="submitEvaluate">提交</div>
-        </div>-->
-        <!-- <van-toast id="van-toast" /> -->
     </div>
 </template>
 
 <script>
-// import { Rate, Toast } from "vant";
-// import Storage from "@/util/storage";
 import { Order } from "@/api/service";
-// import Toast from 'vant-weapp/dist/toast/toast';
 import UpLoad from "@/components/UpLoad";
 export default {
     name: "order-evaluate",
@@ -143,7 +124,8 @@ export default {
                 "满意",
                 "非常满意"
             ],
-            company_id: ""
+            company_id: "",
+            btnDisabled: false
         };
     },
     components: {
@@ -165,15 +147,6 @@ export default {
             goodsList[index].reasonMemo = e.mp.detail.value;
             this.goodsList = goodsList.slice(0, goodsList.length);
         },
-        //选择图片后触发
-        // imgChange(arg,index){
-        //     // let goodsList=this.goodsList;
-        //     // goodsList[index].commentPictList=arg
-        //     // console.log(this.goodsList,'imgChange')
-        //     // this.goodsList=goodsList.slice(0,goodsList.length)
-        //     this.goodsList[index].commentPictList=arg
-        // },
-        // 更改评分触发
         rateChange(e) {
             let position = e.mp.currentTarget.dataset.position;
             let index = e.mp.currentTarget.dataset.index;
@@ -197,6 +170,8 @@ export default {
         },
 
         submitEvaluate() {
+            if(this.btnDisabled) return
+            console.log("点击提交")
             let root = this;
             let companyId = global.Storage.get("COMPANYID").company_id;
             let userInfo = global.Storage.get("USER_INFO");
@@ -207,8 +182,9 @@ export default {
                     anonymousFlag: 0, //1匿名
                     billCode: this.$route.query.billCode,
                     buscontsCode: global.baseConstant.busContsCode,
-                    shopCode: userInfo.shopCode,
-                    usrId: userInfo.usrId
+                    shopCode: global.Storage.get("properties").shopCode,
+                    usrId: userInfo.usrId,
+                    vipInfoHdId: userInfo.vipInfoId
                 }
             };
             let object = this.getEvaluate();
@@ -220,11 +196,13 @@ export default {
                 return;
             }
             param.model.goodsCommentList = object.goodsCommentList;
+            this.btnDisabled = true
             // console.log("评价提交参数", param)
             Order.ordComment(param).then(res => {
                 root.myToast("评价成功");
                 //返回订单列表
                 setTimeout(function() {
+                    this.btnDisabled = false
                     root.$router.replace({
                         path: "/pages/orderPackage/order/orderList/order-list"
                     });

@@ -7,29 +7,6 @@
 import http from '../../utils/http'
 
 /**
- * 批量转移本地购物车
- * @param config
- * var param = {
-   interfaceCode:"SP_MAS_TSFRCART",
-   ctmUsrKey:"用户ID",
-   companyKey:"公司ID",
-   pageSize:"条数",
-   pageNo:"查询页",
-   cookieKey:"cookieID",
-   cartKeys:"key1,key2,key3",
-   cartIds: [
-        购物车ids
-   ],
-   cookieId: cookieId,
-   ctmUsrId: 用户id
-   }
- * @returns {*}
- */
-export const transfer = (config) => {
-  return http.put('shopping-cart/transfer', config);
-}
-
-/**
  * 删除购物车
  * @param config
  * var param = {
@@ -107,7 +84,7 @@ export const saveCart = (config) => {
  * @returns {*}
  */
 export const getCartList = (config) => {
-  return http.get('shopping-cart/cartList', config);
+  return http.get('shopping-cart/getCartList', config);
 }
 
 /**
@@ -119,31 +96,7 @@ export const getCartList = (config) => {
  * @returns {*}
  */
 export const getCartCount = (config) => {
-  return http.get('shopping-cart/cartCount', config);
-}
-
-/**
- * 判断商品及SKU是否上下架
- * @param config
- * var param = {
- * usrId: '用户id'
-   }
- * @returns {*}
- */
-export const isGoodsAndSkuShevel = (config) => {
-  return http.post('shopping-cart/isGoodsAndSkuShevel', config);
-}
-
-/**
- * 获取购物车优惠券列表
- * @param config
- * var param = {
- * usrId: '用户id'
-   }
- * @returns {*}
- */
-export const getshopVouchers = (config) => {
-  return http.post('shopping-cart/getshopVouchers', config);
+  return http.get('shopping-cart/getCartCount', config);
 }
 
 /**
@@ -151,5 +104,5 @@ export const getshopVouchers = (config) => {
  * @returns {*}
  */
 export const getshopDiscountsDetail = (config) => {
-  return http.post('shopping-cart/getshopDiscountsDetail', config);
+  return http.post('shopping-cart/getShopDiscountsDetail', config);
 }

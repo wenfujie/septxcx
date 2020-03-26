@@ -12,36 +12,46 @@
             <img v-for="(item, index) in xrlb_ad01List"
                  v-if="item.fileType == 1"
                  :key="item.coverFileUrl"
-                 :src="filter.imgFilter(item.coverFileUrl,company_id)"
+                 :src="filter.imgFilter(item.coverFileUrl,company_id, '710*262')"
                  class="header-img"
                  @click="goPath(item.url)"
-                 @onerror="global.errImg(event)"
+
                  lazy-load="true">
             <!-- 顶部图片 end -->
 
             <!-- 点击领取 begin -->
             <div class="coupon">
-                <div class="coupon-item coupon-cash" @click="clickCoupon('cash')">
+                <div class="coupon-item coupon-cash" @click="clickCoupon('new')">
                     <div class="coupon-item__cash">
                         <span class="coupon-item__logo">￥</span>
-                        <span class="coupon-item__gold">200</span>
-                        <p class="coupon-item__describe">现金红包</p>
+                        <span class="coupon-item__gold">20</span>
+                        <p class="coupon-item__describe cash_red">现金红包</p>
                     </div>
                     <div class="coupon-item__click">
                         <p>点击</p>
                         <p>领取</p>
                     </div>
+                    <button class="authorization-btn"
+                            @click.stop=""
+                            open-type="getUserInfo"
+                            v-if="!vipInfoId"
+                            @getuserinfo="getuserinfo('new')">授权按钮</button>
                 </div>
-                <div class="coupon-item coupon-new" @click="clickCoupon('new')">
+                <div class="coupon-item coupon-new" @click="clickCoupon('cash')">
                     <div class="coupon-item__cash">
                         <span class="coupon-item__logo">￥</span>
-                        <span class="coupon-item__gold">800</span>
+                        <span class="coupon-item__gold">10</span>
                         <p class="coupon-item__describe">新人专享券</p>
                     </div>
                     <div class="coupon-item__click">
                         <p>点击</p>
                         <p>领取</p>
                     </div>
+                    <button class="authorization-btn"
+                            @click.stop=""
+                            open-type="getUserInfo"
+                            v-if="!vipInfoId"
+                            @getuserinfo="getuserinfo('cash')">授权按钮</button>
                 </div>
             </div>
             <!-- 点击领取 end -->
@@ -53,10 +63,10 @@
             <img v-for="(item, index) in xrlb_thspList"
                  v-if="item.fileType == 1"
                  :key="item.coverFileUrl"
-                 :src="filter.imgFilter(item.coverFileUrl,company_id)"
+                 :src="filter.imgFilter(item.coverFileUrl,company_id, '710*200')"
                  class="header-img promotion"
                  @click="goPath(item.url)"
-                 @onerror="global.errImg(event)"
+
                  lazy-load="true">
 
             <good-list :goodsList="xrlb_thspObj.goodsList"></good-list>
@@ -67,10 +77,10 @@
             <img v-for="(item, index) in xrlb_gwphList"
                  v-if="item.fileType == 1"
                  :key="item.coverFileUrl"
-                 :src="filter.imgFilter(item.coverFileUrl,company_id)"
-                 class="header-img promotion c_pd10"
+                 :src="filter.imgFilter(item.coverFileUrl,company_id, '710*200')"
+                 class="header-img promotion"
                  @click="goPath(item.url)"
-                 @onerror="global.errImg(event)"
+
                  lazy-load="true">
 
             <good-list :goodsList="xrlb_gwphObj.goodsList"></good-list>
@@ -84,7 +94,7 @@
 </template>
 
 <script>
-    import { Cms, Distribution, UserService } from "@/api/service";
+    import { Cms, Distribution } from "@/api/service";
     import Toast from 'vant-weapp/dist/toast/toast';
     import GoodList from '@/components/GoodList.vue'
     import GuessLove from '@/components/GuessLove.vue'
@@ -97,6 +107,7 @@
         data() {
             return {
                 company_id: "",
+                vipInfoId: "",
                 // 模块编码
                 modelCode:{
                     xrlb_ad01: 'xrlb_ad01', // 首屏背景图
@@ -113,6 +124,16 @@
             }
         },
         methods: {
+            /** 授权获取用户信息 **/
+            async getuserinfo(type){
+                let isSuccess = await global.loginAuthor();
+                if(isSuccess) {
+                    this.vipInfoId = global.Storage.get('USER_INFO').vipInfoId;
+                    this.clickCoupon(type);
+                }else{
+//                    Toast('授权失败');
+                }
+            },
             /** 点击领取 跳转 **/
             clickCoupon(type){
                 switch (type) {
@@ -139,12 +160,12 @@
                         break;
                     case 'cash':
                         //  判断用户是否绑定手机号
-                        UserService.getUserInfo().then((res) => {
+                        global.c_getUserInfo().then((res) => {
                             let url = '';
                             if (!!res.mobilePhone) {
                                 url = '/pages/UserPackage/vouchers/my-vouchers';
                             }else{
-                                url = '/pages/UserPackage/phone/bind-phone';
+                                url = '/pages/UserPackage/phone/bind-phone?successUrl=/pages/UserPackage/vouchers/my-vouchers';
                             }
                             this.$router.push(url);
                         }, (err) => {
@@ -229,6 +250,7 @@
             },
         },
         onLoad() {
+            this.vipInfoId = global.Storage.get('USER_INFO').vipInfoId;
             this.company_id = global.Storage.get("COMPANYID").company_id;
             this.getV2Model();
             this._getCommonGoodsList('xrlb_thsp', "xrlb_thspObj");
@@ -279,7 +301,7 @@
             color: $color-white;
             .coupon-item__cash{
                 font-size: $font-title1;
-                margin-left: computed(40);
+                margin-left: computed(60);
                 margin-top: computed(20);
                 .coupon-item__logo{
                     font-size: computed(40);
@@ -291,9 +313,11 @@
                     font-weight: bold;
                 }
                 .coupon-item__describe{
-                    padding-left: computed(40);
                     line-height: 1;
                     font-weight: bold;
+                }
+                .cash_red{
+                    padding-left: computed(10)
                 }
             }
             .coupon-item__click{
@@ -307,11 +331,11 @@
         }
         .coupon-cash{
             margin-left: computed(-10);
-            background-image: url($serverUrl + "images/goods/coupon-cash.png");
+            background-image: url("../images/coupon-cash.png");
         }
         .coupon-new{
             margin-right: computed(-10);
-            background-image: url($serverUrl + "images/goods/coupon-new.png");
+            background-image: url("../images/coupon-new.png");
         }
     }
 </style>

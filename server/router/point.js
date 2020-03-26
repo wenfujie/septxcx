@@ -5,12 +5,14 @@
 */
 
 //  支付功能模块
-const pointFun = require('../controller/point/point')
+const pointFun = require('../controller/point')
 
 module.exports = {
-    "GET/detail": pointFun.getDetail,  // 获取积分详情
-    "GET/pointFlag": pointFun.getUsePointFlag,  // 获取积分详情
-    "GET/computePointer": pointFun.getComputePointer,  // 获取积分详情
-    "PUT/sellCardData": pointFun.sellCardData,//  查询积分券
+    "GET/getPointDetail": pointFun.getPointDetail,  // 获取积分详情
+    "GET/getPointTotal": pointFun.getPointTotal,  // 获取可用积分、冻结积分
+    "GET/getPointDetailList": pointFun.getPointDetailList,  // 获取积分明细列表
+    "GET/getUsePointFlag": pointFun.getUsePointFlag,  // 获取积分详情
+    "GET/getComputePresentPointer": pointFun.getComputePresentPointer,  // 获取积分详情
+    "PUT/sellCardData": pointFun.sellCardData,// 兑换积分
     "GET/getCardData": pointFun.getCardData, //  查询积分券
 }

@@ -18,7 +18,7 @@
   <div class="good-list-wrap">
     <p class="title">商品清单({{ordQty}})</p>
     <!-- 商品信息 -->
-    <good v-for="(good,index) in order.goodsList" :key="index" :good="good"></good>
+    <good v-for="(good,index) in order.goodsList" :key="index" :good="good" :fpsCode="fpsCode" :onlineHdId="onlineHdId"></good>
   </div>
 </template>
 
@@ -32,11 +32,16 @@ export default {
     order: Object
   },
   data(){
-    return {}
+    return {
+       fpsCode:'',
+       onlineHdId:''
+    }
   },
   computed: {
     ordQty: function() {
       const goods = this.order.goodsList || [];
+      this.fpsCode  = this.order.fpsCode? this.order.fpsCode:'';
+      this.onlineHdId  = this.order.onlineHdId? this.order.onlineHdId:'';
       let goodNum = 0;
       if (!goods.length) return goodNum;
       goods.forEach(good => {

@@ -8,32 +8,37 @@
 const common = require('./common')
 
 class postSaleModel {
+
     // 获取售后申请单列表
-    static async getList(ctx, params) {
+    static async getPostSaleList(ctx, params) {
         let url = "/rtl-ord-reapply-hd-aggregates";
         return ctx.$get(
             ctx.nettyUrl + ctx.serverPortUrl.shoppingCart + common.newUrlKey + url,
             params
         );
     }
+
     // 取消售后申请
     static async cancelApply(ctx, params) {
         let url = `/rtl-ord-reapply-hds/cancel/${
             params.reApplyCode
-            }?companyId=${params.companyId}&usrId=${params.usrId}`;
+            }?companyId=${params.companyId}&vipInfoHdId=${params.vipInfoHdId}`;
 
         return ctx.$put(
             ctx.baseUrl + ctx.serverPortUrl.shoppingCart + url,
             params
         );
     }
+
     // 提交售后申请
     static async submitApply(ctx, params) {
         let url =
             "/rtl-ord-reapply-hds/submit-after-sale-application?companyId=" +
             params.companyId +
             "&usrId=" +
-            params.usrId;
+            params.usrId +
+            "&vipInfoHdId=" +
+            params.vipInfoHdId;
         return ctx
             .$post(ctx.baseUrl + ctx.serverPortUrl.shoppingCart + url, params)
             .then(
@@ -45,6 +50,7 @@ class postSaleModel {
                 }
             );
     }
+
     // 获取售后原因
     static async getReason(ctx, params) {
         let url = "/rtl-returnsreasons";
@@ -53,6 +59,7 @@ class postSaleModel {
             params
         );
     }
+
     // 获取售后原因编码
     static async getReasonCodes(ctx, params) {
         let url = "/rtl-returnsreasons/code";
@@ -61,6 +68,7 @@ class postSaleModel {
             params
         );
     }
+
     // 获取允许的售后方式
     static async getPostSaleWay(ctx, params) {
         let url = "/sp-return-ways";
@@ -78,13 +86,16 @@ class postSaleModel {
             params
         );
     }
+
     // 保存售后物流
     static async savePostSaleLogis(ctx, params) {
         let url =
             "/rtl-service-hds/after/sail-logistics?usrId=" +
             params.usrId +
             "&companyId=" +
-            params.companyId;
+            params.companyId +
+            "&vipInfoHdId=" +
+            params.vipInfoHdId;
         return ctx.$post(
             ctx.baseUrl + ctx.serverPortUrl.shoppingCart + url,
             params

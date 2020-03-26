@@ -1,5 +1,3 @@
-// import { Toast } from "vant";
-import Storage from "@/utils/storage";
 import * as payApi from "@/api/service/payment";
 import Payment from "./payment";
 import Toast from 'vant-weapp/dist/toast/toast';
@@ -96,27 +94,19 @@ export default async (billCode, price, orderType, payTypeCode) => {
         paymentCode: "D_WEIXIN",
         tradeTypeCode: "JSAPI",
         paymentTypeCode: payTypeCode ? payTypeCode : "D_FULL",
-        shopCode: global.Storage.get("USER_INFO").shopCode,
+        shopCode: global.Storage.get("properties").shopCode,
         orderList: billCode,
         orderType: orderType ? orderType : null,
-        openId: global.Storage.get("WECHAT_INFO").openid,
+        openId: global.Storage.get("USER_INFO").openId,
         payAmount: Number(price),
         unionId: global.Storage.get("properties").publicAccount
     };
     let wxPayParam = await payApi.payOrder(payParam);
-
-    // if (wxPayParam.code === "200") {
-    //     return wxMiniProgramPay(wxPayParam, price);
-    // } else {
-    //     Toast(wxPayParam.message);
-    //     return Promise.reject();
-    // }
-
     if (wxPayParam.code === "200") {
         return Payment.miniProgramPay(wxPayParam);
     } else {
         Toast(wxPayParam.message);
         return Promise.reject();
     }
-    
+
 };

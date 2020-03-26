@@ -1,3 +1,10 @@
+<!--
+ * @Author: lan.chen
+ * @Date: 2019-06-29 14:02:08
+ * @LastEditors: lan.chen
+ * @LastEditTime: 2019-08-10 19:55:06
+ * @Description:
+ -->
 /*
 * createTime：2019/3/1
 * author：en.chen
@@ -6,11 +13,22 @@
 <template>
     <div class="center">
         <wxs module="filter" src="../../filter/filterCommon.wxs"></wxs>
+
+        <!-- 会员整合-分销商账号列表 begin -->
+        <div class="distribution-list" v-if="accountList.length > 1">
+            <div class="select-content clearfix"  @click="showAccountList = true">
+                <div class="account fl">{{selectAccountInfo.mobilePhone}}</div>
+                <div class="iconfont iconicondown-copy fl"></div>
+            </div>
+        </div>
+        <!-- 会员整合-分销商账号列表 end -->
+
         <!-- 金额模块 begin -->
         <div class="funds-box">
             <ul class="clearfix">
                 <li class="funds-item">
-                    <h2>{{filter.minAmount(!!vipInfo.currentTotalAmount && vipInfo.currentTotalAmount >= 0 ? vipInfo.currentTotalAmount : 0 )}}</h2>
+                    <h2>{{filter.minAmount(!!vipInfo.currentTotalAmount && vipInfo.currentTotalAmount >= 0 ?
+                        vipInfo.currentTotalAmount : 0 )}}</h2>
                     <p>当前账户总金额（元）</p>
                 </li>
                 <li class="funds-item">
@@ -47,15 +65,18 @@
                 <text class="iconfont icontixian"></text>
                 <p class="mgT30">申请提现</p>
             </div>
-            <div @click="routerLink('/pages/distributionPackage/qrcode')" class="user-item flex-box" :class="{'disabled': !vipInfo.effFlag}">
+            <div @click="routerLink('/pages/distributionPackage/qrcode')" class="user-item flex-box"
+                 :class="{'disabled': !vipInfo.effFlag}">
                 <text class="iconfont iconerweima"></text>
                 <p class="mgT30">推广二维码</p>
             </div>
-            <div @click="routerLink('/pages/distributionPackage/subordinate')" class="user-item flex-box" :class="{'disabled': !vipInfo.effFlag}">
+            <div @click="routerLink('/pages/distributionPackage/subordinate')" class="user-item flex-box"
+                 :class="{'disabled': !vipInfo.effFlag}">
                 <text class="iconfont iconwodexiaji"></text>
                 <p class="mgT30">我的团队</p>
             </div>
-            <div @click="routerLink('/pages/distributionPackage/task-list')" class="user-item flex-box" :class="{'disabled': !vipInfo.effFlag}">
+            <div @click="routerLink('/pages/distributionPackage/task-list')" class="user-item flex-box"
+                 :class="{'disabled': !vipInfo.effFlag}">
                 <text class="iconfont iconrenwu"></text>
                 <p class="mgT30">我的任务</p>
             </div>
@@ -78,27 +99,48 @@
             </div>
             <div class="qrcode-box">
                 <p class="image-title">进群获得更多资讯</p>
-                <img :src="serverUrl+'images/distribution/group-qrcode.png'" lazy-load="true" >
+                <img :src="serverUrl+'images/distribution/group-qrcode.png'" lazy-load="true">
             </div>
         </van-popup>
         <!-- 分销商群二维码弹窗 end -->
+
+        <!-- 会员整合-分销商账号列表选择弹窗 begin -->
+        <!--<van-action-sheet-->
+            <!--:show="showAccountList"-->
+            <!--:actions="accountList"-->
+            <!--@select="selectAccount"-->
+        <!--/>-->
+
+        <van-popup :show="showAccountList" position="bottom">
+            <van-picker
+                :columns="accountList"
+                show-toolbar
+                @cancel="showAccountList = false"
+                @confirm="selectAccount"
+                class="picker-fixed"
+            />
+        </van-popup>
+
+        <!-- 会员整合-分销商账号列表选择弹窗 end -->
+
 
         <scroll-view scroll-y="false" style="z-index:10" :class="isX">
             <footer-bar ref="footer_bar"></footer-bar>
         </scroll-view>
 
-        <van-dialog id="van-dialog" />
-        <van-toast id="van-toast" />
+        <van-dialog id="van-dialog"/>
+        <van-toast id="van-toast"/>
     </div>
 </template>
 <script>
     import FooterBar from '@/components/FooterBar'
-    import { Distribution } from '../../api/service'
+    import {Distribution} from '../../api/service'
 
     import Dialog from 'vant-weapp/dist/dialog/dialog';
     import Toast from 'vant-weapp/dist/toast/toast';
+
     export default {
-        config:{
+        config: {
             navigationBarTitleText: '分销商中心'
         },
         components: {
@@ -110,12 +152,15 @@
                 vipInfo: {},  // 分销商信息
                 upVipId: null,  // 上级会员id(出现于扫码登陆流程之后跳转)
                 showQrcode: false,  // 控制是否显示分销商群二维码的弹窗
-                serverUrl: ''
+                serverUrl: '',
+                accountList: [],  // 分销商账号列表
+                selectAccountInfo: {},  // 选中的账号信息
+                showAccountList: false  // 显示账号列表弹窗
             }
         },
         methods: {
             //  通过会员id获取用户信息
-            async getUserInfo(){
+            async getUserInfo() {
                 let data = {
                     vipId: global.Storage.get('USER_INFO').vipInfoId
                 }
@@ -126,7 +171,7 @@
             },
 
             //  存在上级会员id时判断当前用户是否是上级会员的下级
-            async checkLevel(){
+            async checkLevel() {
                 let usrInfo = await this.$store.dispatch('user/getUserInfo')
                 let data = {
                     upVipId: this.upVipId,
@@ -135,7 +180,7 @@
                 Distribution.canBindLevel(data).then(() => {
                     //  当前用户已经是上级会员的下级，不显示任何提示
 //                    this.checkCashStatus() // 需求确认不需要失败提示
-                },() => {
+                }, () => {
                     let toastFlag = global.Storage.get('toastFlag')
                     if (!!toastFlag) {
                         // 需求确认不需要失败提示
@@ -143,13 +188,13 @@
 //                            this.checkCashStatus()
 //                        },3000)
                         return
-                    }else{
+                    } else {
                         //  当前用户不是上级会员的下级，提示已经是分销商
                         Toast({
                             message: `${usrInfo.vipName}已经是分销商了~`,
                             duration: 3000
                         })
-                        global.Storage.set('toastFlag',{'isTip' : 1})
+                        global.Storage.set('toastFlag', {'isTip': 1})
                         // 需求确认不需要失败提示
 //                        setTimeout(() =>{
 //                            this.checkCashStatus()
@@ -159,16 +204,23 @@
             },
 
             //  获取分销商账户信息
-            getVipInfo(){
+            getVipInfo() {
+
                 let data = {
                     vipInfoHdId: global.Storage.get('USER_INFO').vipInfoId
                 }
-                Distribution.getVipInfo(data).then((res) =>{
+
+                //  会员整合新增选中分销商查询
+                if(!!this.$store.state.distribution.accountInfo.id) {
+                    data.vipInfoHdId = this.$store.state.distribution.accountInfo.vipInfoHdId
+                }
+
+                Distribution.getVipInfo(data).then((res) => {
                     this.vipInfo = res
-                    if(res.isFirstFlag === 0) {  // isFirstFlag为0显示弹窗
+                    if (res.isFirstFlag === 0) {  // isFirstFlag为0显示弹窗
                         this.showQrcode = true
                         this.setLoginFlag(res.id)
-                    }else{
+                    } else {
                         this.showQrcode = false
                     }
                     global.toastLoading(false);// 关闭
@@ -176,20 +228,20 @@
             },
 
             //  检查是否存在提现失败
-            async checkCashStatus(){
+            async checkCashStatus() {
                 let data = {
                     id: await this.$store.dispatch('distribution/getDistributionId')
                 }
                 Distribution.getFailReason(data).then((res) => {
                     // 存在失败的提现、转账
-                    if(!!res && res.length>0) {
+                    if (!!res && res.length > 0) {
                         this.failCallback(res.length)
                     }
                 })
             },
 
             //  存在提现失败
-            failCallback(result){
+            failCallback(result) {
                 Dialog.confirm({
                     title: '提现拒绝通知',
                     message: `当前有${result}笔提现失败`,
@@ -197,11 +249,12 @@
                     cancelButtonText: '我知道了'
                 }).then(() => {
                     this.$router.push('/pages/distributionPackage/withdraw-apply')
-                }).catch(() => {});
+                }).catch(() => {
+                });
             },
 
             //  判断是否允许跳转提现页面
-            canWithdraw(){
+            canWithdraw() {
 //                if(this.vipInfo.currentTotalAmount - this.vipInfo.nonWithdrawableAmount > 0) {
 //                    this.$router.push('/distribution/withdraw-apply')
 //                }else{
@@ -216,61 +269,133 @@
                 let data = {
                     id: id
                 }
-                Distribution.setFlag(data).then(() =>{})
+                Distribution.setFlag(data).then(() => {
+                })
             },
 
             //  路由跳转
             routerLink(path) {
-                if(!this.vipInfo.effFlag || this.vipInfo.effFlag === 0){
+                if (!this.vipInfo.effFlag || this.vipInfo.effFlag === 0) {
                     Toast('当前功能不可用~')
                     return
-                }else{
+                } else {
                     this.$router.push(path)
                 }
             },
 
             //  展示二维码弹窗
-            qrcodeHandle(){
-                if(!this.vipInfo.effFlag || this.vipInfo.effFlag === 0){
+            qrcodeHandle() {
+                if (!this.vipInfo.effFlag || this.vipInfo.effFlag === 0) {
+                    return
+                } else {
+                    this.showQrcode = true
+                }
+            },
+
+            //  获取会员整合的分销商
+            getDistributionList() {
+                Distribution.getDistributionList({}).then((res) => {
+                    if(res && res.length) {
+                        res.forEach((item) => {
+                            item.text = item.mobilePhone
+                        })
+                        this.accountList = res
+
+                        //  store中存放选中的用户账号
+                        if(!!this.$store.state.distribution.accountInfo && !!this.$store.state.distribution.accountInfo.id) {
+                            this.selectAccountInfo = this.$store.state.distribution.accountInfo
+                        }else{
+                            for(let i=0;i<res.length;i++) {
+                                let item = res[i]
+                                if(item.vipInfoHdId === global.Storage.get('USER_INFO').vipInfoId) {
+                                    this.selectAccountInfo = item
+                                }
+                            }
+                            this.$store.commit('distribution/setData', {storeKey: 'accountInfo', storeValue: this.selectAccountInfo})
+                        }
+
+                    }
+                })
+            },
+
+            // 选择账号
+            selectAccount(item){
+
+                console.log(item.target.value)
+
+                if(item.target.value.vipInfoHdId === this.selectAccountInfo.vipInfoHdId) {
+                    this.showAccountList = false
                     return
                 }else{
-                    this.showQrcode = true
+                    this.selectAccountInfo = item.target.value
+                    this.$store.commit('distribution/setData', {storeKey: 'accountInfo', storeValue: item.target.value})
+                    this.getVipInfo()
+                    this.showAccountList = false
                 }
             }
         },
         onLoad() {
-
-            global.toastLoading();// 开启
-
+//            global.toastLoading();// 开启
             this.serverUrl = global.baseConstant.serverUrl;
             this.upVipId = this.$route.query.vipId
-            this.getVipInfo()
+            this.getDistributionList()
         },
-        onUnload(){
+        onUnload() {
             global.Storage.remove('toastFlag')
             Object.assign(this.$data, this.$options.data());
         },
-        onShow(){
+        onShow() {
+            this.getVipInfo()
         },
         mounted() {
             this.$refs.footer_bar.tabIndex = -1;
+            this.$refs.footer_bar.getDistributionInfo()
         }
     }
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped type="text/scss" lang="scss">
-    .clearfix:after{
-        content:"";
-        display:block;
-        height:0;
-        clear:both;
-        visibility:hidden
+    .clearfix:after {
+        content: "";
+        display: block;
+        height: 0;
+        clear: both;
+        visibility: hidden
     }
-    .center{
+
+    .center {
         min-height: 100%;
         background: $color-background;
         overflow: hidden;
-        .funds-box{
+        .distribution-list{
+            padding: 0 computed(30);
+            height: computed(80);
+            background: $color-white;
+            overflow: hidden;
+            position: relative;
+            .select-content{
+                margin: 0 auto;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%,-50%);
+            }
+            .account{
+                font-size: $font-regular;
+                line-height: $font-h2;
+                text-align: center;
+                color: $text-regular;
+                height: $font-h2;
+            }
+            .iconicondown-copy{
+                margin-left: computed(20);
+                font-size: $font-h2;
+                line-height: $font-h2;
+                color: $text-placeholder;
+                height: $font-small;
+            }
+        }
+        .funds-box {
             margin: computed(30);
             padding: computed(30);
             box-sizing: border-box;
@@ -278,17 +403,17 @@
             position: relative;
             background: linear-gradient(90deg, $domaincolor, $gradientcolor) !important;
             border-radius: computed(5);
-            .funds-item{
+            .funds-item {
                 box-sizing: border-box;
                 width: 50%;
                 height: computed(120);
                 float: left;
                 overflow: hidden;
-                h2{
+                h2 {
                     font-size: $font-h1;
                     line-height: 1;
                 }
-                p{
+                p {
                     margin-top: computed(23);
                     font-size: $font-regular;
                     line-height: 1;
@@ -326,20 +451,20 @@
                 border-left: dashed 1px $text-placeholder;
             }
         }
-        .tip{
+        .tip {
             margin: 0 computed(30);
             font-size: $font-small;
             line-height: computed(32);
             color: $domaincolor;
-            .icon-tip{
+            .icon-tip {
                 margin-right: computed(12);
                 color: $domaincolor;
             }
         }
-        .user-box{
+        .user-box {
             margin-top: computed(20);
             background: $color-white;
-            .user-item{
+            .user-item {
                 float: left;
                 box-sizing: border-box;
                 width: computed(250);
@@ -352,13 +477,13 @@
                 line-height: 1;
                 color: $text-primary;
                 flex-direction: column;
-                .iconfont{
+                .iconfont {
                     font-size: computed(50);
                     line-height: computed(52);
                 }
-                &.disabled{
+                &.disabled {
                     color: $text-placeholder;
-                    .iconfont{
+                    .iconfont {
                         color: $text-placeholder;
                     }
                 }
@@ -367,19 +492,19 @@
                 }
             }
         }
-        .qrcode-popup{
+        .qrcode-popup {
             box-sizing: border-box;
             background: $color-white;
             width: computed(630);
             overflow: hidden;
-            .popup-title{
+            .popup-title {
                 box-sizing: border-box;
                 font-size: $font-h2;
                 line-height: computed(100);
                 border-bottom: solid computed(1) $text-placeholder;
                 text-align: center;
             }
-            .close-btn{
+            .close-btn {
                 width: computed(100);
                 height: computed(100);
                 position: absolute;
@@ -389,18 +514,18 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                .close-icon{
+                .close-icon {
                     width: computed(30);
                     height: computed(30);
                     color: #ccc;
                 }
             }
-            .qrcode-box{
+            .qrcode-box {
                 position: relative;
                 padding: computed(75);
                 width: computed(480);
                 height: computed(480);
-                .image-title{
+                .image-title {
                     font-size: $font-regular;
                     line-height: 1;
                     color: $text-primary;
@@ -410,7 +535,7 @@
                     left: 0;
                     text-align: center;
                 }
-                img{
+                img {
                     display: block;
                     width: 100%;
                     height: 100%;
@@ -418,6 +543,7 @@
             }
         }
     }
+
     scroll-view {
         position: fixed;
         bottom: 0;

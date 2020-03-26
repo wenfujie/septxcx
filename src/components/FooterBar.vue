@@ -2,29 +2,32 @@
     <div style="position:relative;z-index:10000;" class="footer-bar">
         <wxs module="filter" src="../filter/filterCommon.wxs"></wxs>
         <van-tabbar route :active="active=='/pages/home/home'? tabIndex : -1 " :safe-area-inset-bottom='safe'>
-            <div
+            <button
                 class="van-tabbar-item"
                 v-for="(item,index) in footerData"
                 :key="index"
                 :class="[{'active-style':active === item.navigatUrl}]"
+                :open-type="(item.navigatUrl === '/shopping-cart' || item.navigatUrl=== '/member-center') && (!isLogin) ? 'getUserInfo' : ''"
+                @getuserinfo="getLoginInfo(item.navigatUrl)"
                 @click="switchM(item.navigatUrl)"
             >
-                <!-- switchM(item.navigatUrl) -->
-                <img v-show="tabIndex !== index" :src="filter.imgFilter(item.navigatPicUrl,companyid)" class="foot-img">
-                <img v-show="tabIndex === index" :src="filter.imgFilter(item.adCoverUrl,companyid)"class="foot-img">
-                <p :class="{'van-tabbar-item--active':active === item.navigatUrl}">{{item.cmsNavigatHdName}}</p>
+                <div v-show="tabIndex !== index" :class="'foot-img iconfont '+item.icon_select"></div>
+                <div v-show="tabIndex === index"
+                     :class="'foot-img foot-img-selected iconfont '+item.icon_selected"></div>
+                <p :class="tabIndex === index?'foot-text-selected':''">{{item.cmsNavigatHdName}}</p>
                 <!-- 购物车数量 -->
                 <span
                     v-if="item.navigatUrl === '/shopping-cart' && shoppingCartNum > 0"
                     class="num"
                 >{{shoppingCartNum}}</span>
-            </div>
+                <span v-if="filter.indexOfM(item.navigatUrl,'task')!=-1 && !!taskFlag" class="task-num"></span>
+            </button>
         </van-tabbar>
     </div>
 </template>
 <script>
-import { mapState } from 'vuex'
-import { Cms, ShoppingCart, Distribution } from "../api/service";
+    import {mapState} from 'vuex'
+    import {Cms, ShoppingCart, Distribution} from "../api/service";
 
     export default {
         name: "FooterBar",
@@ -35,7 +38,9 @@ import { Cms, ShoppingCart, Distribution } from "../api/service";
                 footerData: [],
                 companyid: "",
                 tabIndex: 0,
-                safe: false
+                safe: false,
+                taskFlag: false, // 显示任务标识
+                isLogin: false // 用户信息是否授权登陆
             };
         },
         computed: {
@@ -49,32 +54,51 @@ import { Cms, ShoppingCart, Distribution } from "../api/service";
             }
         },
         onLoad() {
-            console.log('-底部导航组建完成加载-')
+//            console.log('-底部导航组建加载-')
             this.companyid = global.Storage.get('COMPANYID').company_id
             this.getNav();
+        },
+        onShow() {
+            //  判断用户登陆状态设置购物车、账户的按钮类型
+            if (!!global.Storage.get('USER_INFO')) {
+                this.isLogin = true
+            } else {
+                this.isLogin = false
+            }
+
+            //  判断用户是否是分销商查询是否有未读任务
+            if (!!global.Storage.get('USER_INFO').isVipMdt) {
+                this.getDistributionInfo()
+            }
         },
         methods: {
             //点击tabbar
             switchM(path) {
+                // 判断当前页和即将要去的是同个页面则拦截
+                if (this.$route.query.goPath === path) return
                 // 分销商任务跳转分销商模块
-                if(path.indexOf('task') !== -1) {
+                if (path.indexOf('task') !== -1) {
                     this.$router.push(path)
-                }else{
+                } else {
                     // 非分销商模块首页切换tab
-                    if (path === "/member-center") {
-                        // 缓存中存在手机号，则默认用户已绑定过
-                        let userInfo = global.Storage.get("USER_INFO");
-                        if (!!userInfo && !!userInfo.mobilePhone) {
-                            global.switchTab(path)
-                        } else {
-                            // 通过调用用户信息的接口获取用户是否绑定手机号
-                            return global.c_getUserInfo().then(res => {
-                                if (!res.mobilePhone) {
-                                    this.$router.push("/pages/UserPackage/phone/bind-phone")
-                                } else {
-                                    global.switchTab(path)
-                                }
-                            });
+                    if (path === "/member-center" || path === '/shopping-cart') {
+                        if(!global.Storage.get('USER_INFO')) {
+                            return
+                        }else{
+                            // 缓存中存在手机号，则默认用户已绑定过
+                            let userInfo = global.Storage.get("USER_INFO");
+                            if (!!userInfo && !!userInfo.mobilePhone) {
+                                global.switchTab(path)
+                            } else {
+                                // 通过调用用户信息的接口获取用户是否绑定手机号
+                                return global.c_getUserInfo().then(res => {
+                                    if (!res.mobilePhone) {
+                                        this.$router.push("/pages/UserPackage/phone/bind-phone")
+                                    } else {
+                                        global.switchTab(path)
+                                    }
+                                });
+                            }
                         }
                     } else {
                         global.switchTab(path)
@@ -82,30 +106,9 @@ import { Cms, ShoppingCart, Distribution } from "../api/service";
                 }
             },
 
-            //  获取千人千面模板
-            getDefaultTemplate() {
-                if (
-                    global.Storage.get("TEMPLATE_INFO") !== null &&
-                    global.Storage.get("TEMPLATE_INFO").cmsTemplateCode
-                ) {
-                    this.getNav();
-                } else {
-                    let data = {
-                        busContsCode: global.baseConstant.busContsCode
-                    };
-                    Cms.getUsrCmsTemplate(data)
-                        .then((res) => {
-                            global.Storage.set("TEMPLATE_INFO", res[0]);
-                        })
-                        .then(() => {
-                            this.getNav();
-                        });
-                }
-            },
-
             //  获取导航栏菜单
             getNav() {
-                let that =this
+                let that = this
                 let temCode = "";
                 if (global.Storage.get("TEMPLATE_INFO") !== null) {
                     temCode = global.Storage.get("TEMPLATE_INFO").cmsTemplateCode;
@@ -116,6 +119,7 @@ import { Cms, ShoppingCart, Distribution } from "../api/service";
                 };
                 Cms.getNavigation(data).then(
                     (res) => {
+                        console.log("成功回调", res)
                         let navList = res.slice(0, 5);
                         let newArr = [];
                         //  按照seq进行排序
@@ -143,13 +147,56 @@ import { Cms, ShoppingCart, Distribution } from "../api/service";
                         for (let i = 0; i < newArr.length; i++) {
                             //  底部导航判断是否显示分销商任务
                             if (newArr[i].navigatUrl.indexOf('task') !== -1) {
-                                that.isDistribution(newArr)
-                                return
+
+                                //  用户未登录不显示分销商任务
+                                if (!global.Storage.get('USER_INFO')) {
+                                    let footerData_tem = []
+                                    for (let i = 0; i < newArr.length; i++) {
+                                        if (newArr[i].navigatUrl.indexOf('task') === -1) {
+                                            footerData_tem.push(navList[i])
+                                        }
+                                    }
+                                    that.footerData = this.getfootData_img(footerData_tem)
+                                    return
+                                } else {
+                                    that.isDistribution(newArr)
+                                    return
+                                }
                             }
                         }
-                        this.footerData = newArr
-                    }, (err) => {}
+
+                        this.footerData = this.getfootData_img(newArr)
+                    }, (err) => {
+                        console.log("失败回调", err)
+                        if (err.statusCode === 401 || err.error === "invalid_token" || err.errorCode === "100500") {    //处理token过期导航空白问题,token过期及连接超时
+                            this.getNav()
+                        }
+                    }
                 );
+            },
+
+            //设置底部选择图片，并返回
+            getfootData_img(newArr) {
+                let footerData = newArr;
+                for (let i = 0; i < newArr.length; i++) {
+                    if (newArr[i].navigatUrl.indexOf('index') != -1) {
+                        footerData[i].icon_select = 'iconshouye_weixuanzhong';
+                        footerData[i].icon_selected = 'iconshouye_xuanzhong';
+                    } else if (newArr[i].navigatUrl.indexOf('good-sort') != -1) {
+                        footerData[i].icon_select = 'iconfenlei_weixuanzhong';
+                        footerData[i].icon_selected = 'iconfenlei_xuanzhong';
+                    } else if (newArr[i].navigatUrl.indexOf('task') != -1) {
+                        footerData[i].icon_select = 'iconrenwu_weixuanzhong';
+                        footerData[i].icon_selected = 'iconrenwu_xuanzhong';
+                    } else if (newArr[i].navigatUrl.indexOf('shopping-cart') != -1) {
+                        footerData[i].icon_select = 'icongouwuche_weixuanzhong';
+                        footerData[i].icon_selected = 'icongouwuche_xuanzhong';
+                    } else if (newArr[i].navigatUrl.indexOf('member-center') != -1) {
+                        footerData[i].icon_select = 'iconwode_weixuanzhong';
+                        footerData[i].icon_selected = 'iconwode_xuanzhong';
+                    }
+                }
+                return footerData;
             },
 
             // 获取购物车数量
@@ -160,28 +207,58 @@ import { Cms, ShoppingCart, Distribution } from "../api/service";
             //  判断当前用户是否是分销商
             isDistribution(navList) {
                 let that = this
-                let loginInfo = wx.getStorageSync('USER_INFO')
-                if(!!loginInfo.isVipMdt) {
-                    this.footerData = navList
-                }else{
+                let userInfo = wx.getStorageSync('USER_INFO')
+                if (!!userInfo.isVipMdt) {
+                    this.footerData = this.getfootData_img(navList)
+                    that.getDistributionInfo()
+                } else {
                     //  判断当前用户是否是分销商
                     let data = {
-                        vipInfoHdId: loginInfo.vipInfoId,
-                        busconsCode: global.baseConstant.busContsCode,
-                        companyId: loginInfo.companyId,
-                        usrId: loginInfo.usrId,
-                        ownCompanyId: loginInfo.companyId
+                        vipInfoHdId: userInfo.vipInfoId,
+                        busconsCode: global.baseConstant.busContsCode
                     }
                     return Distribution.isDistribution(data).then((res) => {
                         // 0代表不是分销商
-                        if(!!res.isVipMdt) {
-                            that.footerData = navList
-                        }else{
+                        if (!!res.isVipMdt) {
+                            userInfo.isVipMdt = true
+                            global.Storage.set('USER_INFO', userInfo)
+                            that.footerData = this.getfootData_img(navList)
+                            that.getDistributionInfo()
+                        } else {
+                            let footerData_tem = []
                             for (let i = 0; i < navList.length; i++) {
                                 if (navList[i].navigatUrl.indexOf('task') === -1) {
-                                    that.footerData.push(navList[i])
+                                    footerData_tem.push(navList[i])
                                 }
                             }
+                            that.footerData = this.getfootData_img(footerData_tem)
+                        }
+                    })
+                }
+            },
+
+            //  获取分销商信息，用于判断
+            getDistributionInfo() {
+                let data = {
+                    vipInfoHdId: global.Storage.get('USER_INFO').vipInfoId
+                }
+                Distribution.getVipInfo(data).then((res) => {
+                    if (!!res.newTaskNumber && res.newTaskNumber > 0) {
+                        this.taskFlag = true
+                    } else {
+                        this.taskFlag = false
+                    }
+                })
+            },
+
+            // getLoginInfo
+            getLoginInfo(path) {
+                // 验证登陆
+                if (!global.Storage.get('USER_INFO')) {
+                    global.loginAuthor().then((res) => {
+                        if(!!res) {
+                            this.isLogin = true
+                            this.switchM(path)
                         }
                     })
                 }
@@ -190,70 +267,98 @@ import { Cms, ShoppingCart, Distribution } from "../api/service";
     };
 </script>
 <style lang="scss" type="text/scss">
-    .van-tabbar {
-        border-top: computed(2) solid #dbdbdb;
+    .footer-bar {
+        .van-tabbar {
+            border-top: computed(2) solid #dbdbdb !important;
+        }
     }
 </style>
 <style lang="scss" type="text/scss" scoped>
-.van-tabbar {
-    height: computed(98);
-    text-align: center;
-    border-top: computed(2) solid #dbdbdb;
-}
-.van-tabbar-item{
-    position: relative;
-    flex: 1;
-    height:100%;
-    display:-webkit-flex;
-    display:flex;
-    line-height:1;
-    font-size:12px;
-    -webkit-align-items:center;
-    align-items:center;
-    -webkit-flex-direction:column;
-    flex-direction:column;
-    -webkit-justify-content:center;
-    justify-content:center;
-}
-.van-tabbar--fixed {
-    z-index: 11 !important;
-    position: fixed !important;
-}
+    .van-tabbar {
+        height: computed(98);
+        text-align: center;
+        border-top: computed(2) solid #dbdbdb;
+    }
+
+    .van-tabbar-item {
+        position: relative;
+        flex: 1;
+        height: 100%;
+        display: -webkit-flex;
+        display: flex;
+        line-height: 1;
+        font-size: 12px;
+        -webkit-align-items: center;
+        align-items: center;
+        -webkit-flex-direction: column;
+        flex-direction: column;
+        -webkit-justify-content: center;
+        justify-content: center;
+        background: $color-white;
+        border: none;
+    }
+
+    .van-tabbar-item::after {
+        content: '';
+        display: none;
+    }
+
+    .van-tabbar--fixed {
+        z-index: 11 !important;
+        position: fixed !important;
+    }
 
     .van-tabbar-item {
         position: relative;
         color: #a8a9ad;
-
-    }
-
-    .van-tabbar-item .iconfont {
-
-        position: relative;
-        font-size: computed(40);
-        line-height: computed(50);
-        left: computed(-2);
-    }
-
-    .van-tabbar-item p {
-        margin: computed(10) 0 computed(13) 0;
-        font-size: computed(20);
-        line-height: computed(22);
-        color: $text-secondary;
-    }
-
-    .van-tabbar-item .num {
-        position: absolute;
-        top: computed(5);
-        right: computed(55);
-        min-width: computed(24);
-        min-height: computed(28);
-        line-height: computed(28);
-        background-color: $domaincolor;
-        color: $color-white;
-        border-radius: 50%;
-        padding: 0 computed(2);
-        text-align: center;
-        font-size: $font-small;
+        .iconfont {
+            position: relative;
+            font-size: computed(48);
+            line-height: computed(50);
+            text-align: center;
+            &.foot-img-selected {
+                color: $color-red;
+            }
+        }
+        p {
+            padding: computed(4) 0 computed(6) 0;
+            font-size: computed(20);
+            line-height: computed(22);
+            color: $text-secondary;
+        }
+        .foot-text-selected {
+            color: $color-red;
+        }
+        .num {
+            position: absolute;
+            top: computed(5);
+            // right: computed(55);
+            left: calc(50% + 24rpx);
+            transform: translate(-50%, 0);
+            min-width: computed(24);
+            min-height: computed(28);
+            line-height: computed(28);
+            background-color: $domaincolor;
+            color: $color-white;
+            border-radius: 50%;
+            padding: 0 computed(2);
+            text-align: center;
+            font-size: $font-small;
+        }
+        .task-num {
+            position: absolute;
+            top: computed(5);
+            left: calc(50% + 20rpx);
+            transform: translate(-50%, 0);
+            width: computed(20);
+            height: computed(20);
+            line-height: computed(20);
+            background-color: $domaincolor;
+            color: $color-white;
+            border-radius: 50%;
+            text-align: center;
+            font-size: $font-small;
+        }
     }
 
     .van-hairline--top-bottom::after {
@@ -264,27 +369,9 @@ import { Cms, ShoppingCart, Distribution } from "../api/service";
         color: $maincolor !important;
     }
 
-    .tabbar-icon {
-        /* 通过设置 font-size 来改变图标大小 */
-        width: computed(70);
-        height: computed(40);
-        /* 图标和文字相邻时，垂直对齐 */
-        vertical-align: -0.15em;
-        /* 通过设置 color 来改变 SVG 的颜色/fill */
-        /*fill: pink;*/
-        /* path 和 stroke 溢出 viewBox 部分在 IE 下会显示 normalize.css 中也包含这行 */
-        overflow: hidden;
-    }
-
-    .foot-img {
-        width: computed(40);
-        height: computed(40);
-    }
-
     .active-style {
         background: $color-btn-bg;
         border-radius: computed(5);
         margin: computed(2) 0;
     }
-
 </style>

@@ -3,6 +3,8 @@
  * author：en.chen
  * description: 基础模块用于处理前端请求的中间层接口
  */
+const fs = require('fs')
+const path = require('path')
 class base {
   //  获取常数值
   static async getContentValue (ctx) {
@@ -11,7 +13,7 @@ class base {
     })
   }
   //  获取门店列表
-  static async getShopListValue (ctx, params) {
+  static async getShopList (ctx, params) {
     let url = '/cud-dpts/dest-code/' + params.code
     return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.issBas + url, params).then((res) => {
       return res
@@ -26,7 +28,7 @@ class base {
   }
 
   //  获取地区信息
-  static async getDestnationValue (ctx, params) {
+  static async getDestnation (ctx, params) {
     return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.issBas + '/destinations', params).then((res) => {
       return res
     })
@@ -58,6 +60,21 @@ class base {
     return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.issBas + '/cud-companys/' + params.companyId, params).then((res) => {
       return res
     })
+  }
+
+  // 通过APPID获取基础参数
+  static async getBaseParams(ctx, params){
+    return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.systemService + '/glb-sp-cfgbasics/multi-brand', params).then((res) => {
+        res.data.ossOpenUrl = ctx.ossOpenUrl
+        res.data.publicAccount = "ZLERKyJX"
+        return res
+    })
+  }
+
+  // 获取省市区数据
+  static async getCityData(ctx, params){
+    let data = fs.readFileSync(path.join(__dirname, '..') + '/assets/data/cityData.json', 'utf8')
+    return data
   }
 }
 

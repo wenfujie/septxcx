@@ -1,5 +1,8 @@
 {
-	"description": "项目配置文件。",
+	"description": "项目配置文件",
+	"packOptions": {
+		"ignore": []
+	},
 	"setting": {
 		"urlCheck": false,
 		"es6": true,
@@ -8,10 +11,15 @@
 		"newFeature": true,
 		"autoAudits": false
 	},
-	"miniprogramRoot": "dist/",
 	"compileType": "miniprogram",
+	"libVersion": "2.8.0",
 	"appid": "wxecab1b2e7d4fd145",
-	"projectname": "mpvue%E5%B0%8F%E7%A8%8B%E5%BA%8F",
+	"projectname": "%E5%B0%8F%E5%B0%8F%E7%A8%8B%E5%BA%8F",
+	"miniprogramRoot": "dist/",
+	"debugOptions": {
+		"hidedInDevtools": []
+	},
+	"scripts": {},
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
 	"condition": {
@@ -28,11 +36,10 @@
 			"list": []
 		},
 		"game": {
-			"currentL": -1,
 			"list": []
 		},
 		"miniprogram": {
-			"current": 27,
+			"current": 39,
 			"list": [
 				{
 					"id": 0,
@@ -72,10 +79,10 @@
 					"query": ""
 				},
 				{
-					"id": 7,
+					"id": 6,
 					"name": "订单结算",
 					"pathName": "pages/orderPackage/order/order/order-settlement",
-					"query": "orderHdId=704559",
+					"query": "orderHdId=41860&fissionType=3&vipInfoDtFssId=3",
 					"scene": null
 				},
 				{
@@ -100,10 +107,10 @@
 					"scene": null
 				},
 				{
-					"id": -1,
+					"id": 10,
 					"name": "商品详情页",
-					"pathName": "pages/wares/wares-detail",
-					"query": "goodsCode=HJ00A",
+					"pathName": "pages/goodsPackage/wares/wares-detail",
+					"query": "goodsCode=QX051309&fissionType=1&dttGrpartId=36&onlineHdId=763",
 					"scene": null
 				},
 				{
@@ -145,13 +152,14 @@
 					"id": 16,
 					"name": "商品满减",
 					"pathName": "pages/goodsPackage/goods/good-otherlist",
-					"query": "type=2"
+					"query": "type=1"
 				},
 				{
 					"id": 17,
 					"name": "收货地址",
 					"pathName": "pages/UserPackage/address/address-list",
-					"query": "showList=1"
+					"query": "showList=1",
+					"scene": null
 				},
 				{
 					"id": -1,
@@ -193,10 +201,10 @@
 					"query": ""
 				},
 				{
-					"id": -1,
+					"id": 24,
 					"name": "订单结算",
 					"pathName": "pages/orderPackage/order/order/order-settlement",
-					"query": "orderHdId=705553",
+					"query": "orderHdId=708368&fissionType=1",
 					"scene": null
 				},
 				{
@@ -215,7 +223,8 @@
 					"id": 27,
 					"name": "每日搭配",
 					"pathName": "pages/goodsPackage/goods/good-collocation",
-					"query": "type=0"
+					"query": "type=0",
+					"scene": null
 				},
 				{
 					"id": -1,
@@ -224,9 +233,115 @@
 					"query": ""
 				},
 				{
-					"id": -1,
+					"id": 29,
 					"name": "新人礼包",
 					"pathName": "pages/goodsPackage/goods/gift-bag",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "首页",
+					"pathName": "pages/home/home",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "会员整合页面",
+					"pathName": "pages/UserPackage/merge/member-merge-form",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "首页",
+					"pathName": "pages/home/home",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 33,
+					"name": "整合页",
+					"pathName": "pages/UserPackage/merge/member-merge-form",
+					"query": "useParent=dialog",
+					"scene": null
+				},
+				{
+					"id": 34,
+					"name": "个人中心",
+					"pathName": "pages/home/home",
+					"query": "?vipId=&ascriptionId=&taskId=",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "我的积分",
+					"pathName": "pages/UserPackage/member/member-point",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "砍价",
+					"pathName": "pages/goodsPackage/fission/bargain/bargain-list",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 37,
+					"name": "秒杀",
+					"pathName": "pages/goodsPackage/fission/flashSale/flashsale-list",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 38,
+					"name": "拼团",
+					"pathName": "pages/goodsPackage/fission/assemble/assemble-list",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 39,
+					"name": "砍价详情",
+					"pathName": "pages/goodsPackage/fission/bargain/bargain-detail",
+					"query": "goodsCode=KJSP004&onlineHdId=971&id=18",
+					"scene": null
+				},
+				{
+					"id": 40,
+					"name": "砍价分享页",
+					"pathName": "pages/coupons",
+					"query": "shareUrl=%2Fpages%2FgoodsPackage%2Ffission%2Fbargain%2Fbargain-detail%3FgoodsCode%3DKJSP005%26onlineHdId%3D976%26id%3D20%26vipInfodtfssId%3D177%26sendVipId%3D1408%26vipId%3D1408",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "帮砍人点我也想要后跳到详情",
+					"pathName": "pages/goodsPackage/fission/bargain/bargain-detail",
+					"query": "goodsCode=QX051309&onlineHdId=737&id=10",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "秒杀列表",
+					"pathName": "pages/goodsPackage/fission/flashSale/flashsale-list",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "商品详情页",
+					"pathName": "pages/goodsPackage/wares/wares-detail",
+					"query": "goodsCode=QX051309&fissionType=2&onlineHdId=789",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "我的积分",
+					"pathName": "pages/UserPackage/member/member-point",
+					"query": "",
 					"scene": null
 				}
 			]

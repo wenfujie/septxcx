@@ -18,7 +18,7 @@
 .flex-vbox{
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;   
+  box-sizing: border-box;
 }
 .flex-between {
   display: flex;
@@ -42,10 +42,10 @@
 .hide-view{
   display: none;
 }
-.show-view-block{ 
+.show-view-block{
   display: block;
 }
-.show-view-flex{ 
+.show-view-flex{
   display: flex;
 }
 .mask{
@@ -57,8 +57,8 @@
   top:0;
   left:0;
   opacity:0.5;
-  -moz-opacity: 0.5;    
-  filter: alpha(opacity=50); 
+  -moz-opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .body-fixed{
   display: block;
@@ -72,4 +72,15 @@
 
 .marginBottom31 {
   padding-bottom: 31rpx;
+}
+
+// 授权按钮
+.authorization-btn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 100;
 }

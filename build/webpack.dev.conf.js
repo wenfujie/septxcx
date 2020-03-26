@@ -3,6 +3,7 @@ const webpack = require('webpack')
 const config = require('../config')
 const merge = require('webpack-merge')
 const baseWebpackConfig = require('./webpack.base.conf')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 // var HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 
@@ -27,6 +28,17 @@ module.exports = merge(baseWebpackConfig, {
     new webpack.DefinePlugin({
       'process.env': config.dev.env
     }),
+    /* new UglifyJsPlugin({
+      sourceMap: true,
+      uglifyOptions: {
+          compress: {
+              warnings: false,
+              drop_console: true,//console
+              drop_debugger: false,
+              pure_funcs: ['console.log']  //移除console
+          }
+      }
+    }), */
     // copy from ./webpack.prod.conf.js
     // extract css into its own file
     new ExtractTextPlugin({

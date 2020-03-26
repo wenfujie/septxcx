@@ -11,35 +11,47 @@ const local = {
     // 微服务接口
     serviceBaseUrl: {
         development: 'http://qishon-zuul-gateway.dev.qs.com',
-        test: 'http://qishon-zuul-gateway.test.qs.com',
+        test2: 'http://qishon-zuul-gateway.test2.qs.com',
         pm: "http://1.1.20.82/api" //压测环境
     },
     serviceNettyUrl: {
-        development: 'http://qishon-zuul-gateway.dev.qs.com',
-        test: 'http://1.1.2.50:2080/api',
+        development: 'http://1.1.2.50:2081/api',
+        test2: 'http://1.1.2.50:2082/api',
         pm: "http://1.1.20.82:2080/api" //压测环境
     },
     //token服务接口 
     tokenServiceUrl: {
         development: "http://qishon-zuul-gateway.dev.qs.com/uaa/oauth-client/token",
-        test: "http://qishon-zuul-gateway.test.qs.com/uaa/oauth-client/token",
+        test2: "http://qishon-zuul-gateway.test2.qs.com/uaa/oauth-client/token",
         pm: "http://qishon-zuul-gateway.test.qs.com/uaa/oauth-client/token",
     },
     //文件系统接口
     ossServiceUrl: {
         development: "http://qishon-zuul-gateway.dev.qs.com/file/oss",
-        test: "http://qishon-zuul-gateway.test.qs.com/file/oss",
+        test2: "http://qishon-zuul-gateway.test2.qs.com/file/oss",
         pm: "http://qishon-zuul-gateway.test.qs.com/file/oss",
     },
     //文件系统接口
     ossOpenServiceUrl: {
-        development: "http://qishon-zuul-gateway.dev.qs.com/file/oss",
-        test: "http://qishon-zuul-gateway.test.qs.com/file/oss",
+        development: "https://wxxcx.qishon.com/openImg/v2/oss/",
+        test2: "http://qsuat.qishon.com/openfile/v2/oss/",
         pm: "https://wxxcx.qishon.com/septapi/file/open/",
     },
     dpServiceUrl: {
         development: "http://qishon-zuul-gateway.dev.qs.com",
-        test: "http://qishon-zuul-gateway.test.qs.com",
+        test2: "http://qishon-zuul-gateway.test2.qs.com",
+    },
+    shopClientId: {     // 获取Token key
+        development: "wissClient",
+        test: "wissClient",
+        test2: "wissClient",
+        pm: "wissClient"
+    },
+    shopClientSecret: {     // 获取Token secret
+        development: "wissClientSecret",
+        test: "wissClientSecret",
+        test2: "wissClientSecret",
+        pm: "wissClientSecret"
     }
 }
 
@@ -47,12 +59,16 @@ const local = {
 let environment = process.env.NODE_ENV;
 // 配置路径全局
 global.axiosBaseUrl = process.env.SERVICE_API;
+global.shopClientId = process.env.SHOP_CLIENT_ID;
+global.shopClientSecret = process.env.SHOP_CLIENT_SECRET;
 let baseUrl = process.env.SERVICE_API;
 let nettyUrl = process.env.NETTY_API;
 let tokenUrl = process.env.TOKEN_API;
 let ossUrl = process.env.OSS_API;
 let ossOpenUrl = process.env.OSS_OPEN_API;
 let dpUrl = process.env.DP_API;
+let shopClientId = process.env.SHOP_CLIENT_ID;
+let shopClientSecret = process.env.SHOP_CLIENT_SECRET;
 
 console.log('environment', environment)
 console.log('baseUrl', baseUrl)
@@ -61,6 +77,8 @@ console.log('tokenUrl', tokenUrl)
 console.log('ossUrl', ossUrl)
 console.log('ossOpenUrl', ossOpenUrl)
 console.log('dpUrl', dpUrl)
+console.log('shopClientId', shopClientId)
+console.log('shopClientSecret', shopClientSecret)
 
 //判断是否为本地开发环境,如果是则采用本地配置的变量路径
 if (process.env.LOCAL_NODE_ENV) {
@@ -74,6 +92,10 @@ if (process.env.LOCAL_NODE_ENV) {
     ossUrl = local.ossServiceUrl[environment];
     ossOpenUrl = local.ossOpenServiceUrl[environment];
     dpUrl = local.dpServiceUrl[environment];
+    shopClientId = local.shopClientId[environment];
+    global.shopClientId = local.shopClientId[environment];
+    shopClientSecret = local.shopClientSecret[environment];
+    global.shopClientSecret = local.shopClientSecret[environment];
 }
 
 // 微服务接口配置优化备用
@@ -115,6 +137,8 @@ module.exports = {
     ossOpenUrl: ossOpenUrl,
     tokenUrl: tokenUrl,
     dpUrl: dpUrl,
+    shopClientId: shopClientId,
+    shopClientSecret: shopClientSecret,
     environment: environment,
     microService: microService
 }

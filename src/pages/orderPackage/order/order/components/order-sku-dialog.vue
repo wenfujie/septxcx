@@ -14,8 +14,7 @@
                 <div class="sku-dialog-info">
                     <div class="info-left">
                         <img
-                            :src="filter.imgFilter(goodsImg,company_id)"
-                            onerror="errImg(event)"
+                            :src="filter.imgFilter(goodsImg,company_id, '186*186')"
                             @click="enlarge()"
                         >
                     </div>
@@ -46,8 +45,7 @@
                                 <li v-for="(item, index) in goodsInfo" :key="index">
                                     <img
                                         :src="filter.imgFilter(item.url,company_id)"
-                                        @click="sendClick(item, index)"
-                                        onerror="errImg(event)"
+                                        @click="sendClick(item, index, true)"
                                         :class="{'active' : currentSendIndex === index}"
                                     >
                                 </li>
@@ -445,7 +443,7 @@ export default {
          * @private
          */
         _reData() {
-            if(!this.goodsInfo) return 
+            if(!this.goodsInfo) return
             this.goodsInfo.forEach((infoItem) => {
                 infoItem.colorList.forEach((item) => {
                     item.active = false
@@ -517,9 +515,13 @@ export default {
          * 选择赠品
          * @param item 当前对象
          * @param index 索引
+         * @param isClick 是否要防止重复点击
          */
-        sendClick(item, index) {
-            //                this.goodsImg = ''
+        sendClick(item, index, isClick = false) {
+            if (index === this.currentSendIndex && isClick) {
+                return
+            }
+
             this.goodsImg = item.url
             this.currentSend = item
             this.currentSendIndex = index

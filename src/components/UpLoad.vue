@@ -1,3 +1,10 @@
+<!--
+ * @Author: lan.chen
+ * @Date: 2019-06-29 14:02:07
+ * @LastEditors: yongtian.hong
+ * @LastEditTime: 2019-08-12 13:12:04
+ * @Description:
+ -->
 <template>
     <div>
         <wxs module="filter" src="../filter/filterCommon.wxs"></wxs>
@@ -21,7 +28,7 @@
                 :style="{'width':width || '120rpx','height':height || '120rpx'}"
             >
                 <img
-                    :src="filter.imgFilter(src,companyId)"
+                    :src="filter.imgFilter(src,companyId, '120*120')"
                     :style="{'width':width || '120rpx','height':height || '120rpx'}"
                     class="img"
                     onerror="errrImg(event)"
@@ -31,16 +38,17 @@
         </div>
     </div>
 </template>
- 
+
 <script>
 import Toast from "vant-weapp/dist/toast/toast";
 export default {
-    props: ["width", "height", "max", "srcs"],
+    props: ["width", "height", "srcs"],
     data() {
         return {
             urls: [],
             images: [],
-            companyId: global.Storage.get("COMPANYID").company_id
+            companyId: global.Storage.get("COMPANYID").company_id,
+            max: 5
         };
     },
     mounted() {
@@ -49,16 +57,22 @@ export default {
 
     methods: {
         uploadImg() {
-            // if (this.urls.length == this.max) {
-            //     Toast("最多上传" + this.max + "张");
-            //     return;
-            // }
             let that = this;
             wx.chooseImage({
                 count: 1,
                 sizeType: ["original", "compressed"],
                 sourceType: ["album", "camera"],
                 success: function(res) {
+                    console.log(res,'chooseImg')
+                    var exp = /(png|jpe?g)$/i;
+                    if (!exp.test(res.tempFilePaths[0])) {
+                        global.Toast('上传图片必须是 JPG/JPEG/PNG 格式!')
+                        return
+                    }
+                    if(res.tempFiles[0].size / 1024 / 1024 > 4){
+                        global.Toast('图片过大，请更换一张或者进行压缩后上传')
+                        return
+                    }
                     wx.uploadFile({
                         url:
                             global.baseConstant.serverUrl +
@@ -83,7 +97,6 @@ export default {
                             that.$emit("update:images", that.images);
                         }
                     });
-                    // that.$emit("choosed",{all:that.urls,currentUpload:res.tempFilePaths});
                 }
             });
         },
@@ -91,23 +104,6 @@ export default {
             this.urls.splice(index, 1);
             this.images.splice(index, 1);
         },
-        previewImg(index) {
-            let that = this;
-            wx.showActionSheet({
-                itemList: ["预览", "删除"],
-                success: function(res) {
-                    if (res.tapIndex === 0) {
-                        wx.previewImage({
-                            current: that.urls[index],
-                            urls: that.urls
-                        });
-                    } else {
-                        that.urls.splice(index, 1);
-                        that.$emit("delete", that.urls);
-                    }
-                }
-            });
-        }
     },
     onUnload() {
         // 解决重复进页面数据未初始化
@@ -115,7 +111,7 @@ export default {
     }
 };
 </script>
- 
+
 <style lang="scss" scoped>
 .i-pic-upload-tips {
     display: flex;
@@ -139,7 +135,7 @@ export default {
     flex-wrap: wrap;
     .imgItem {
         position: relative;
-        margin: 0 20rpx 0 0;
+        margin: 15rpx 20rpx 0 0;
         text {
             position: absolute;
             top: -10rpx;
@@ -156,6 +152,7 @@ export default {
     justify-content: center;
     align-items: center;
     margin-right: 20rpx;
+    margin-top: 15rpx;
 }
 .j-upload-add {
     display: flex;

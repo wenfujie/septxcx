@@ -5,18 +5,18 @@
  * @LastEditTime: 2019-06-20 11:31:15
  * @Description: 售后服务路由适配
  */
-const postSaleService = require("../controller/post-sale/postSale");
+const postSaleFun = require("../controller/postSale");
 
 module.exports = {
-  "GET/getList": postSaleService.getList,
-  "PUT/cancelApply": postSaleService.cancelApply,
-  "POST/submitApply": postSaleService.submitApply,
-  "GET/getReason": postSaleService.getReason,
-  "GET/getReasonCodes": postSaleService.getReasonCodes,
-  "GET/getWays": postSaleService.getPostSaleWay,
-  "GET/getDetail": postSaleService.getPostSaleDetail,
-  "GET/getExpressCompanies": postSaleService.getExpressCompanies,
-  "POST/savePostSaleLogis": postSaleService.savePostSaleLogis,
-  "GET/getApplyNum": postSaleService.getApplyNum
+  "GET/getPostSaleList": postSaleFun.getPostSaleList,
+  "PUT/cancelApply": postSaleFun.cancelApply,
+  "POST/submitApply": postSaleFun.submitApply,
+  "GET/getReason": postSaleFun.getReason,
+  "GET/getReasonCodes": postSaleFun.getReasonCodes,
+  "GET/getPostSaleWays": postSaleFun.getPostSaleWay,
+  "GET/getPostSaleDetail": postSaleFun.getPostSaleDetail,
+  "GET/getExpressCompanies": postSaleFun.getExpressCompanies,
+  "POST/savePostSaleLogis": postSaleFun.savePostSaleLogis,
+  "GET/getApplyNum": postSaleFun.getApplyNum
 
 };

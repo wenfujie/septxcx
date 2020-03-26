@@ -111,7 +111,7 @@
                     </div>
                 </div>
                 <div class="nAddress flex-center w100" v-if="!addressMsg">
-                    <div class="flex-vbox flex-center h100px" @click="onSelectAddr()">
+                    <div class="flex-vbox flex-center h100px">
                         <text class="iconfont icon-daohang fs36"></text>
                         <p class="mgT20 fs24 black-1A">请添加收货地址</p>
                     </div>
@@ -246,21 +246,17 @@ export default {
             });
             this.deliveryTypes.reverse();
             this.shipWay = this.deliveryTypes[0];
-            console.log("shipWay", this.shipWay);
             this.updateKdpsParams();
         },
         // 获取快递配送地址
         async getAddress() {
             let defaultAddr = global.Storage.get("settlementAddr") || null;
-            console.log("--获取到缓存地址-", defaultAddr);
             let addrList = [];
             if (!defaultAddr) {
                 let params = {
                     vipUsrId: global.Storage.get("USER_INFO").usrId
                 };
-                console.log("bbbb");
                 addrList = await UserService.getAddrList(params);
-                console.log("ccc", addrList);
                 if (addrList && addrList.length) {
                     addrList.forEach(function(item) {
                         if (item.defaultFlag === 1) {
@@ -271,7 +267,6 @@ export default {
                     global.Storage.set("settlementAddr", defaultAddr);
 
                     this.addressMsg = defaultAddr;
-                    console.log(defaultAddr, "=====aaaaaaaaaaaaa");
                     this.getTransFee();
                     this.updateKdpsParams();
                 }
@@ -332,7 +327,6 @@ export default {
                 pageSize: 100
             };
             let store = await Base.getShopList(params);
-            console.log("store", store);
             if (check.isEmpty(store.list)) {
                 Toast("该地区暂无可取货的门店~");
                 return;
@@ -396,7 +390,6 @@ export default {
                 receiptWayCode: this.shipWay.shipCode,
                 receiptWayId: this.shipWay.id
             };
-            console.log(this.param, "cccccccccc");
             this.$emit("update:params", this.param);
         },
         //门店自取联系人/联系方式输入更新
@@ -454,7 +447,6 @@ export default {
     },
     watch: {
         Address: function(addr) {
-            console.log(addr, "===");
             if (!addr || !addr[0] || !addr[1] || !addr[2]) {
                 return;
             }
@@ -465,19 +457,17 @@ export default {
             this.updateMdzqParams();
             this.getShopList(addr[2].code);
         },
-        Store: function(store) {
-            if (!store) return;
-            this.storeForm.storeName = store.dptName;
-            this.storeForm.storeId = store.id;
-            this.updateMdzqParams();
-        }
+//        Store: function(store) {
+//            if (!store) return;
+//            this.storeForm.storeName = store.dptName;
+//            this.storeForm.storeId = store.id;
+//            this.updateMdzqParams();
+//        }
     },
     onLoad() {
-        console.log("已经这样了1111");
         this.onInit();
     },
     onShow() {
-        console.log("已经这样了");
         // 获取用户可选地址列表  此处不能注释 否则从选择地址页返回  不会重新从缓存获取地址
         this.getAddress();
     },

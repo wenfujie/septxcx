@@ -22,7 +22,7 @@ class cms {
     }
 
     //  获取模板内容v2
-    static async getCmsInfoV2Value(ctx, params) {
+    static async getUsrCmsInfoV2(ctx, params) {
         let url = '/cms-template-hds/cms-template-code/' + params.cmsTemplateCode
         return ctx.$get(ctx.nettyUrl + ctx.serverPortUrl.issBas + common.newUrlKey +
                 url, params).then((res) => {
@@ -31,21 +31,21 @@ class cms {
     }
 
     //  获取面包屑
-    static async getCrumbsValue(ctx, params) {
+    static async getCrumbs(ctx, params) {
         return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.issBas + '/cms-crumbs', params).then((res) => {
             return res
         })
     }
 
     //  获取面包屑子内容
-    static async getCrumbsDetailValue(ctx, params) {
+    static async getCrumbsDetail(ctx, params) {
         return ctx.$get(ctx.nettyUrl + ctx.serverPortUrl.issBas + common.newUrlKey + '/cms-crumbs/navigation', params).then((res) => {
             return res
         })
     }
 
     //  获取模板导航内容
-    static async getNavigationValue(ctx, params) {
+    static async getNavigation(ctx, params) {
         let url = '/iss/bas/cms-navigat-hds/template-navigations/'
         return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.baseService +  url, params).then((res) => {
             return res
@@ -53,15 +53,15 @@ class cms {
     }
 
     //  获取模板页面模块元素商品列表(现购)
-    static async getGoodsListValue(ctx, params) {
+    static async getGoodsComments(ctx, params) {
         return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.issBas + '/web-item-goodss/item-goods-batch', params).then((res) => {
             return res
         })
     }
 
     //  获取模板页面模块元素商品列表(现购列表)
-    static async getGoodsItemListValue(ctx, params) {
-        return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.issBas + '/web-item-goodss/item-goods-list', params).then((res) => {
+    static async getChooseBuyGoods(ctx, params) {
+        return ctx.$get(ctx.nettyUrl + ctx.serverPortUrl.issBas + common.newUrlKey + '/web-item-goodss/item-goods-list', params).then((res) => {
             return res
         })
     }

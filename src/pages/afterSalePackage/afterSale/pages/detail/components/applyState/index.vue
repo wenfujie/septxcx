@@ -3,7 +3,7 @@
  * @LastEditors: yongtian.hong
  * @Description: 售后状态组件
  * @Date: 2019-03-12 15:58:49
- * @LastEditTime: 2019-07-04 19:29:18
+ * @LastEditTime: 2019-08-05 17:02:40
  -->
 <style lang='scss' scoped>
 .state-wrap {
@@ -21,6 +21,7 @@
         color: #333333;
         font-size: computed(24);
         margin-bottom: computed(10);
+        word-break: break-all;
     }
     .cell {
         font-size: computed(24);
@@ -52,7 +53,7 @@
 </template>
 
 <script>
-import { getDestnation, getShopList } from "@/api/service/base";
+import { getDestnation } from "@/api/service/base";
 import ordStateMap from "../../../../common/stateCodeMap";
 export default {
     props: {
@@ -73,19 +74,15 @@ export default {
             switch (this.data.returnTypeName) {
                 case "仅退款":
                     this.refunds();
-                    console.log("仅退款");
                     break;
                 case "退货退款":
                     this.returnGood();
-                    console.log("退货退款");
                     break;
                 case "返修":
                     this.repaired();
-                    console.log("返修");
                     break;
                 case "换货":
                     this.changeGood();
-                    console.log("换货");
                     break;
             }
         },

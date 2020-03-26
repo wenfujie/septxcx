@@ -21,7 +21,7 @@ import http from '../../utils/http'
     }
  * @returns {*}
  */
-export const getCollectionList = (config) => { return http.get('collect/collectionList',config); }
+export const getCollectionList = (config) => { return http.get('collection/getCollectionList',config); }
 
 /**
  * 加入收藏功能
@@ -35,24 +35,7 @@ export const getCollectionList = (config) => { return http.get('collect/collecti
     }
  * @returns {*}
  */
-export const addCollection = (config) => { return http.post('collect/addCollection',config); }
-
-/**
- * 加入收藏功能(组合商品)
- * @param config
- * var param = {
-        usrId: Storage.get('USER_INFO').usrId,
-        companyId: Storage.get('COMPANYID').company_id,
-        spCombgoodFavoriteDto:{
-                busContsCode:
-                ptiCombgoodHdCode: 组合编码
-                shopId:
-        }
-    }
- * @returns {*}
- */
-export const addCollectionComb = (config) => { return http.post('collect/addCollectionComb',config); }
-
+export const addCollection = (config) => { return http.post('collection/addCollection',config); }
 
 /**
  * 取消收藏功能
@@ -65,16 +48,4 @@ export const addCollectionComb = (config) => { return http.post('collect/addColl
     }
  * @returns {*}
  */
-export const deleteCollection = (config) => { return http.delete('collect/deleteCollection',config); }
-
-/**
- * 取消收藏功能(组合商品)
- * @param config
- * var param = {
-    "usrId":"用户ID",
-    "companyId":"公司",
-    ids: '收藏id'
-    }
- * @returns {*}
- */
-export const deleteCollectionComb = (config) => { return http.put('collect/deleteCollectionComb',config); }
+export const deleteCollection = (config) => { return http.delete('collection/deleteCollection',config); }

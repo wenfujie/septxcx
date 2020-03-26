@@ -13,16 +13,8 @@
     float: right;
 }
 
-.color-red {
-    color: #c41717;
-}
-
 .color-black {
     color: #0D0E09;
-}
-
-.bg-red {
-    background: #c41717;
 }
 
 .bg-gray {
@@ -31,18 +23,6 @@
 
 .bg-white {
     background: #ffffff;
-}
-
-.wd100 {
-    width: 100%;
-}
-
-.wd70 {
-    width: 70%;
-}
-
-.wd30 {
-    width: 30%;
 }
 
 /*  全局通用底部按钮  */
@@ -59,26 +39,6 @@
     text-align: center;
     z-index: 2;
     border: none;
-}
-
-.bottom-btn2 {
-    position: fixed;
-    width: 100%;
-    left: 0;
-    bottom: 0;
-    box-sizing: border-box;
-    height: computed(98);
-    padding: computed(13) computed(30);
-    border: none;
-    background: $color-white;
-    color: $color-white;
-    text-align: center;
-    .btn-txt {
-        font-size: computed(30);
-        line-height: computed(72);
-        background: $text-primary;
-    }
-    z-index: 2;
 }
 
 // 按钮渐变色
@@ -124,17 +84,6 @@
         line-height: computed(30);
         color: #999999;
     }
-}
-
-/* 全局通用svg图标样式 */
-.svg-icon {
-    /* 图标和文字相邻时，垂直对齐 */
-    vertical-align: -0.15em;
-    /* 通过设置 color 来改变 SVG 的颜色/fill */
-    fill: currentColor;
-    /* path 和 stroke 溢出 viewBox 部分在 IE 下会显示
-       normalize.css 中也包含这行 */
-    overflow: hidden;
 }
 
 /*  手机号绑定、更换页面  */

@@ -1,3 +1,4 @@
+
 /*
 * createTime：2018/11/5
 * author：en.chen
@@ -6,7 +7,7 @@
 <template>
     <div class="my-collection">
         <wxs module="filter" src="../../../filter/filterCommon.wxs"></wxs>
-        <div class="collection_title" @click="toogleState()">
+        <div class="collection_title fixed-content flex-between" @click="toogleState()">
             <span>收藏的商品</span>
             <p v-if="goodsList.length>0">
                 <span v-if="flag==true" class="toggle">编辑</span>
@@ -21,20 +22,19 @@
                 v-for="(item,index) in goodsList"
                 :key="index"
             >
-                <van-checkbox
-                    :value="item.checked"
-                    v-if="danxuan==true"
-                    class="checkbox"
-                    @change="danxuanChecked(item)"
-                    checked-color="#FF3636"
-                ></van-checkbox>
                 <div class="good-item-img">
+                    <van-checkbox
+                        :value="item.checked"
+                        v-if="showChecked==true"
+                        class="checkbox"
+                        @change="singleCheckedBtn(item)"
+                        checked-color="#FF3636"
+                    ></van-checkbox>
                     <div :class="flag===false?'img-shadow':'img-box'"></div>
                     <img
-                        :src="filter.imgFilter(item.thumb,company_id)"
+                        :src="filter.imgFilter(item.thumb,company_id, '345*345')"
                         @click="goDetail(item)"
                         lazy-load="true"
-                        @onerror="global.errImg(event)"
                     />
                 </div>
 
@@ -45,10 +45,7 @@
                         <span class="sale-single">￥</span>
                         <span>{{filter.Fix2(item.salePrice)}}</span>
                     </div>
-                    <del
-                        class="del_line"
-                        v-if="item.tagPrice && item.tagPrice != 0 && (item.salePrice !== item.tagPrice)"
-                    >￥{{filter.Fix2(item.tagPrice)}}</del>
+                    <del v-if="item.tagPrice && item.tagPrice != 0">￥{{filter.Fix2(item.tagPrice)}}</del>
                 </div>
             </li>
         </ul>
@@ -59,7 +56,7 @@
         </div>
         <!-- <empty emptyText="暂无收藏商品信息~" v-show="showEmpty" style="position:fixed;top:0"></empty> -->
         <!-- 点击编辑弹出移除框 -->
-        <div class="removeTip" v-if="remove==false">
+        <div class="removeTip fixed-content flex-between" v-if="remove==false">
             <van-checkbox :value="checkedAll" class="checkbox" @change="allChecked">全选</van-checkbox>
             <button class="good-remove" @click="deleteCollected()">移除</button>
         </div>
@@ -69,7 +66,7 @@
     </div>
 </template>
 <script>
-import { Collection, Cms } from "../../../api/service";
+import { Collection, Goods } from "../../../api/service";
 import EmptyContent from "../../../components/EmptyContent";
 import Dialog from "vant-weapp/dist/dialog/dialog";
 import Toast from "vant-weapp/dist/toast/toast";
@@ -87,18 +84,16 @@ export default {
             flag: true, //切换编辑完成开关
             checkedAll: false, //全选
             remove: true,
-            danxuan: false,
+            showChecked: false, //显示复选框
             goodsList: [], // 商品列表
-            loading: false, // 控制loading显示
+            // loading: false, // 控制loading显示
             finished: false, // 控制是否加载更多商品
             pageNum: 1,
             pageSize: 8,
-            isLoading: false,
+            // isLoading: false,
             showEmpty: false,
-            fresh: false,
             company_id: "",
-            pageNums: 0,
-            totalPages: 0
+            goDetail_lock: false //跳转锁
         };
     },
     onLoad() {
@@ -123,6 +118,7 @@ export default {
             return;
         } else {
             this.pageNum += 1;
+            this.checkedAll = false;
             this.getList();
         }
     },
@@ -134,11 +130,14 @@ export default {
                 cltTypeCode: "",
                 collocationCode: "",
                 priceTypeCode: "",
-                busContsCode: global.baseConstant.busContsCode
+                busContsCode: global.baseConstant.busContsCode,
+                shopDptId: global.Storage.get("properties").shopId,
+                pageSize: this.pageSize,
+                pageNum: this.pageNum
             };
             Collection.getCollectionList(data).then(
                 res => {
-                    this.goodsList.push.apply(this.goodsList, res.list);
+                    this.goodsList.push.apply(this.goodsList, res.pages.list);
                     var arr = [];
                     arr = this.goodsList.map(i => {
                         this.$set(i, "checked", false);
@@ -150,8 +149,8 @@ export default {
                         this.showEmpty = true;
                     }
                     if (
-                        res.pageNum >= res.pages ||
-                        this.goodsList.length >= res.total
+                        res.pages.pageNum >= res.pages.pages ||
+                        this.goodsList.length >= res.pages.total
                     ) {
                         this.finished = true;
                     } else {
@@ -166,15 +165,10 @@ export default {
         toogleState() {
             this.flag = !this.flag;
             this.remove = !this.remove;
-            this.danxuan = !this.danxuan;
-            if (this.flag == false) {
-                this.fresh = true;
-            } else {
-                this.fresh = false;
-            }
+            this.showChecked = !this.showChecked;
         },
         // 单选
-        danxuanChecked(item) {
+        singleCheckedBtn(item) {
             item.checked = !item.checked;
             var isExitCheckedNo = this.goodsList.every(item => {
                 return item.checked === true;
@@ -219,8 +213,7 @@ export default {
                         Toast("操作成功~");
                         this.flag = !this.flag;
                         this.remove = !this.remove;
-                        this.danxuan = !this.danxuan;
-                        this.fresh = false;
+                        this.showChecked = !this.showChecked;
                         this.$nextTick(() => {
                             this.pageNum = 1;
                             this.goodsList = [];
@@ -236,12 +229,40 @@ export default {
         },
         //  跳转商品详情
         goDetail(item) {
+            if (this.goDetail_lock) {
+                return;
+            }
+            this.goDetail_lock = true;
             if (item.orderFlag === 0) {
-                this.$router.push(
-                    "/pages/goodsPackage/wares/wares-detail?goodsCode=" +
-                        item.goodsCode +
-                        "&goodsType=singleGood"
+                //非定制商品
+                let params = {
+                    ownCompanyId: global.Storage.get("COMPANYID").company_id,
+                    goodsCode: item.goodsCode,
+                    buscontsCode: global.baseConstant.busContsCode
+                };
+                Goods.isShelves(params).then(
+                    res => {
+                        // 未导入微信平台和全平台跳转至商品未上架页面
+                        if (!res) {
+                            this.$router.push(
+                                "/pages/goodsPackage/goods/off-shelves"
+                            );
+                            this.goDetail_lock = false;
+                        } else {
+                            this.$router.push(
+                                "/pages/goodsPackage/wares/wares-detail?goodsCode=" +
+                                    item.goodsCode +
+                                    "&goodsType=singleGood"
+                            );
+                            this.goDetail_lock = false;
+                        }
+                    },
+                    () => {
+                        this.goDetail_lock = false;
+                    }
                 );
+            } else {
+                this.goDetail_lock = false;
             }
         }
     },
@@ -266,25 +287,23 @@ page {
 <style scoped lang="scss">
 @import "@/assets/scss/common/goods.scss";
 .my-collection {
-    height: 100%;
     box-sizing: border-box;
-    overflow: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: computed(100);
     min-height: 100%;
     background: $color-light-gray;
-    .collection_title {
+    .fixed-content {
         width: 100%;
-        height: computed(40);
         position: fixed;
-        top: 0;
         left: 0;
         z-index: 99;
+    }
+    .collection_title {
+        height: computed(40);
+        top: 0;
         font-size: $font-h1;
         font-weight: bold;
         padding: computed(27) computed(25) computed(20) computed(30);
-        display: flex;
-        justify-content: space-between;
         color: $text-primary;
         background: $color-light-gray;
         .toggle {
@@ -297,23 +316,15 @@ page {
             border: computed(2) solid $domaincolor;
             text-align: center;
             margin-right: computed(61);
-            // box-shadow: 0 computed(1) 0 computed(0) rgba(204, 204, 204, 1);
             border-radius: $btn-radius25;
-            font-weight: 400;
         }
         p {
             margin-top: computed(-8);
         }
     }
     .removeTip {
-        width: 100%;
-        position: fixed;
         bottom: 0;
-        left: 0;
-        z-index: 99;
         background-color: $color-white;
-        display: flex;
-        justify-content: space-between;
         align-items: center;
         .good-remove {
             width: computed(200);
@@ -327,6 +338,9 @@ page {
         .checkbox {
             padding-left: computed(30);
         }
+    }
+    .empty-box {
+        padding-top: computed(100);
     }
 }
 </style>

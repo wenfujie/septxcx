@@ -2,34 +2,6 @@
 import Storage from "./utils/storage";
 
 export default {
-    globalConfig: {
-        usingComponents: {
-            "van-col": "/vant-weapp/dist/col/index",
-            "van-row": "/vant-weapp/dist/row/index",
-            "van-tag": "/vant-weapp/dist/tag/index",
-            "van-tabbar": "/vant-weapp/dist/tabbar/index",
-            "van-tabbar-item": "/vant-weapp/dist/tabbar-item/index",
-            "van-toast": "/vant-weapp/dist/toast/index",
-            "van-field": "/vant-weapp/dist/field/index",
-            "van-action-sheet": "/vant-weapp/dist/action-sheet/index",
-            "van-popup": "/vant-weapp/dist/popup/index",
-            "van-dialog": "/vant-weapp/dist/dialog/index",
-            "van-cell": "/vant-weapp/dist/cell/index",
-            "van-cell-group": "/vant-weapp/dist/cell-group/index",
-            "van-stepper": "/vant-weapp/dist/stepper/index",
-            "van-icon": "/vant-weapp/dist/icon/index",
-            "van-picker": "/vant-weapp/dist/picker/index",
-            "van-datetime-picker": "/vant-weapp/dist/datetime-picker/index",
-            "van-radio-group": "/vant-weapp/dist/radio-group/index",
-            "van-radio": "/vant-weapp/dist/radio/index",
-            "van-checkbox-group": "/vant-weapp/dist/checkbox-group/index",
-            "van-checkbox": "/vant-weapp/dist/checkbox/index",
-            "van-area": "/vant-weapp/dist/area/index",
-            "van-rate": "/vant-weapp/dist/rate/index",
-            "van-loading": "vant-weapp/dist/loading/index",
-            "van-steps": "/vant-weapp/dist/steps/index"
-        }
-    },
     methods:{
         // 设置页面分享功能
         overShare() {
@@ -66,26 +38,32 @@ export default {
                             if(!!shareParams.goPath) delete shareParams.goPath
                         }
 
-                        //  转发、分享商品详情页，打开商品详情页
-                        // if(res.path.indexOf('/goods-detail') !== -1 || res.path.indexOf('/wares-detail') !== -1){
-                        //     defaultPage = res.path
-                        //     if(!!shareParams.goPath) delete shareParams.goPath
-                        // }
-                        
                         shareUrl = global.getShareUrl(defaultPage,shareParams)
 
                         console.log(res.path,'res.path')
-                        //不是商品详情页的就设置，商品详情页的已在其页面设置了分享
-                        if(res.path.indexOf('wares/wares-detail') == -1){
+                        // 页内自定义分享的页面路由
+                        let shareCustomList = ['wares/wares-detail','task-detail','bargain/bargain-detail', 'assemble/assemble-record'];
+                        let isShareCustom = false;// 是否页内自定义分享
+                        for(let i=0;i<shareCustomList.length;i++) {
+                            if(res.path.indexOf(shareCustomList[i]) !== -1) {
+                                isShareCustom = true;
+                                break;
+                            }
+                        }
+
+                        if(!isShareCustom){
                              //  设置公用分享函数
                             view.onShareAppMessage = function () {
                                 return {
-                                    path: shareUrl
+                                    path: shareUrl,
+                                    success: function () {
+                                        global.gio('track', 'onShareAppMessage', {
+                                            path: shareUrl
+                                        });
+                                    }
                                 };
                             }
                         }
-                       
-                        
                     }
 
                     wx.showShareMenu({
@@ -95,8 +73,6 @@ export default {
                 }
             })
         }
-    },
-    onShow() {
     },
     onHide(){
         if(!!global.Storage.get('RELAY')) {
@@ -110,22 +86,3 @@ export default {
 
 };
 </script>
-
-<style lang="scss">
-// .container {
-//     height: 100%;
-//     display: flex;
-//     flex-direction: column;
-//     align-items: center;
-//     justify-content: space-between;
-//     padding: 200rpx 0;
-//     box-sizing: border-box;
-// }
-/* this rule will be remove */
-* {
-    transition: width 2s;
-    -moz-transition: width 2s;
-    -webkit-transition: width 2s;
-    -o-transition: width 2s;
-}
-</style>

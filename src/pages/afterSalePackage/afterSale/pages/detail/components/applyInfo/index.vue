@@ -23,6 +23,7 @@
             .right {
                 flex: 1;
                 color: #333333;
+                word-break: break-all;
             }
         }
     }
@@ -94,7 +95,7 @@
             <img
                 v-for="(item, index) in data.pictList"
                 :key="index"
-                :src="filter.imgFilter(item.pictUrl,companyId)"
+                :src="filter.imgFilter(item.pictUrl,companyId, '150*150')"
                 lazy-load="true"
             />
         </div>

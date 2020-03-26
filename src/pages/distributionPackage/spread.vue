@@ -21,13 +21,15 @@
             <!-- 模块富文本 end -->
 
             <!-- 接口指定按钮 begin -->
-            <div
+            <button
                 v-if="!!btnText"
                 class="diy-btn"
+                :open-type="!isLogin ? 'getUserInfo' : ''"
+                @getuserinfo="getLoginInfo"
                 @click="goApply"
                 ref="diyBtn"
-                :style="{ background : (!!btnImg ? 'url('+ filter.imgFilter(btnImg,company_id) +') no-repeat 100% center' : '#333') }"
-            >{{btnText}}</div>
+                :style="{ background : (!!btnImg ? 'url('+ filter.imgFilter(btnImg,company_id, '492*192') +') no-repeat 100% center' : '#333') }"
+            >{{btnText}}</button>
             <!-- 接口指定按钮 end -->
 
             <!-- 底部按钮 begin showBg是为了一开始不显示该按钮-->
@@ -42,9 +44,12 @@
                 v-if="showAgreement"
                 confirmButtonText="同意协议"
                 confirm-button-color="#333"
+                transition="none"
                 @confirm="apply"
             >
-                <img class="agreement-title" :src="serverUrl+'images/distribution/popup-title.png'" mode="widthFix">
+                <div class="title-bg">
+                    <img class="agreement-title" :src="serverUrl+'images/distribution/popup-title.png'" mode="widthFix" >
+                </div>
                 <div class="agreement-txt">
                     <div class="" v-html="agreement"></div>
                 </div>
@@ -124,6 +129,7 @@ export default {
             serverUrl: '',
             company_id:'',//公司id
             showBg: false,// 是否显示背景图
+            isLogin: false // 用户信息是否授权登陆
         }
     },
     methods: {
@@ -132,6 +138,17 @@ export default {
         onLoadImg(e){
             global.toastLoading(false);// 关闭
             this.showBg = true;
+        },
+        getLoginInfo() {
+            // 验证登陆
+            if (!global.Storage.get('USER_INFO')) {
+                global.loginAuthor().then((res) => {
+                    if(!!res) {
+                        this.isLogin = true
+                        this.goApply()
+                    }
+                })
+            }
         },
         inputFocus() {
             const ua = window.navigator.userAgent.toLocaleLowerCase();
@@ -152,7 +169,7 @@ export default {
             let data = {
                 cmsTemplateCode: global.Storage.get('TEMPLATE_INFO').cmsTemplateCode,
                 cmsWebCode: global.pageCode.distribution.children.spread.name,
-                busContsCode: global.baseConstant.busContsCode
+                busContsCode: !!global.baseConstant.busContsCode ? global.baseConstant.busContsCode : global.Storage.get('properties').busContsCode
             }
             Cms.getUsrCmsInfoV2(data).then((res) => {
                 if (res.cmsModulepageHdList.length > 0 && !!res.cmsModulepageHdList[0] && !!res.cmsModulepageHdList[0].cmsBackpageDtDtoList && !!res.cmsModulepageHdList[0].cmsBackpageDtDtoList.length > 0) {
@@ -174,15 +191,18 @@ export default {
                             }
                         }
                     })
+                }else{
+                    this.onLoadImg()
                 }
             })
         },
 
         //  跳转申请
         async goApply() {
+            if(!this.isLogin) return
             let data = {
                 vipInfoHdId: global.Storage.get('USER_INFO').vipInfoId,
-                busconsCode: global.baseConstant.busContsCode,
+                busconsCode: !!global.baseConstant.busContsCode ? global.baseConstant.busContsCode : global.Storage.get('properties').busContsCode,
             }
             Distribution.isDistribution(data).then((res) => {
                 //                    let url = null
@@ -219,7 +239,7 @@ export default {
                 upVipId: this.$route.query.vipId,
                 unVipId: global.Storage.get('USER_INFO').vipInfoId,
                 ascriptionId: !!this.$route.query.ascriptionId ? this.$route.query.ascriptionId : null,
-                busconsCode: global.baseConstant.busContsCode
+                busconsCode: !!global.baseConstant.busContsCode ? global.baseConstant.busContsCode : global.Storage.get('properties').busContsCode
             }
             Distribution.bindLevel(data).then((res) => {
             })
@@ -250,7 +270,7 @@ export default {
         getArticle() {
             let data = {
                 catCode: 'fxsbm',
-                buscontsCode: global.baseConstant.busContsCode
+                buscontsCode: !!global.baseConstant.busContsCode ? global.baseConstant.busContsCode : global.Storage.get('properties').busContsCode
             }
             Distribution.getAgreement(data).then((res) => {
                 if (!!res) {
@@ -260,7 +280,13 @@ export default {
                         return '<img src="' + imgData + '" style="width: 100%; display: block; margin: 0;">'
                     })
                     let newPre = newStr.replace(/\<pre\>/gi, function () {
-                        return '<pre style="word-wrap: break-word;white-space:pre-wrap;">'
+                        return '<div style="word-wrap: break-word;white-space:pre-wrap;">'
+                    })
+                    newPre = newPre.replace(/\<\/pre\>/gi, function () {
+                        return '</div>'
+                    })
+                    newPre = newPre.replace(/pt/gi, function () {
+                        return 'rpx'
                     })
                     let newP = newPre.replace(/\<p\>/gi, function () {
                         return '<p style="word-wrap: break-word;white-space:pre-wrap;">'
@@ -276,7 +302,7 @@ export default {
             this.btnLock = true
             let data = {
                 vipInfoHdId: global.Storage.get('USER_INFO').vipInfoId,
-                busconsCode: global.baseConstant.busContsCode,
+                busconsCode: !!global.baseConstant.busContsCode ? global.baseConstant.busContsCode : global.Storage.get('properties').busContsCode,
             }
             if (!!this.ascriptionId) data.ascriptionId = this.ascriptionId  // 归属地
             Distribution.applyVip(data).then((res) => {
@@ -335,7 +361,7 @@ export default {
 
         watchResize() {
             window.addEventListener('resize', () => {
-                console.log('屏幕高度发生改变')
+//                console.log('屏幕高度发生改变')
                 scrollTo(0, 0)
             }, false)
         },
@@ -403,7 +429,7 @@ export default {
             let that = this
             that.captchaLocked = true
             that.captchaText = '验证码已发送'
-            let interval = window.setInterval(function () {
+            let interval = setInterval(function () {
                 that.captchaText = '重新获取' + that.time + 's'
                 if ((that.time--) <= 0) {
                     that.time = 60
@@ -441,8 +467,8 @@ export default {
                 mobilePhone: this.phoneNum,
                 registCode: this.captcha,
                 verifyType: "D_VERIFYLOG",
-                sourceCode: global.baseConstant.busContsCode,
-                cudDptId: global.Storage.get('USER_INFO').shopId,
+                sourceCode: !!global.baseConstant.busContsCode ? global.baseConstant.busContsCode : global.Storage.get('properties').busContsCode,
+                cudDptId: global.Storage.get('properties').shopId,
                 verifyClassCode: "VERIFY_BIND_MOBILE",
             }
             //  验证手机号和验证码
@@ -450,7 +476,7 @@ export default {
                 // 绑定手机号
                 let bindData = {
                     mobile: this.phoneNum,
-                    buscontsId: global.baseConstant.busContsCode
+                    buscontsId: !!global.baseConstant.busContsCode ? global.baseConstant.busContsCode : global.Storage.get('properties').busContsCode
                 }
                 UserService.bindMobile(bindData).then(() => {
                     Toast('绑定手机号成功~')
@@ -486,6 +512,14 @@ export default {
     },
     onUnload(){
         Object.assign(this.$data, this.$options.data());
+    },
+    onShow(){
+        //  判断用户登陆状态设置购物车、账户的按钮类型
+        if (!!global.Storage.get('USER_INFO')) {
+            this.isLogin = true
+        } else {
+            this.isLogin = false
+        }
     },
     mounted() {
         // setTimeout(() => {
@@ -559,16 +593,29 @@ export default {
     .agreement-popup {
         width: computed(560);
         height: computed(520);
-        .agreement-title {
+        .title-bg{
             width: 100%;
+            height: computed(120);
             position: absolute;
             top: 0;
             left: 0;
+            overflow: hidden;
+            border: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0;
+            line-height: 0;
+            .agreement-title {
+                display: block;
+                width: 100%;
+                border: none;
+                line-height: 0;
+            }
         }
         .close-btn {
             position: absolute;
-            width: computed(30);
-            height: computed(30);
+            width: computed(90);
+            height: computed(90);
             right: computed(10);
             top: computed(10);
             text-align: center;
@@ -582,8 +629,7 @@ export default {
             box-sizing: border-box;
             // width: computed(480);
             height: computed(350);
-            margin: computed(80) computed(30) 0;
-            padding-top: computed(80);
+            margin: computed(160) computed(30) 0;
             overflow: auto;
             font-size: $font-small;
             line-height: computed(36);
@@ -593,7 +639,6 @@ export default {
     .reward-popup {
         width: computed(664);
         height: computed(637);
-        // background: url($serverUrl + "images/distribution/reward.png") no-repeat center;
         -webkit-background-size: cover;
         background-size: cover;
         .close-btn {

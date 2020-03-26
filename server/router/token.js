@@ -5,9 +5,9 @@
  */
 
 //  token功能模块
-const token = require('../controller/token/token')
+const tokenFun = require('../controller/token')
 
 module.exports = {
-    "POST/clientToken": token.clientToken, // 通过客户端获取token
-    "POST/pwdToken": token.pwdToken, // 通过密码模式获取token
+    "POST/getClientToken": tokenFun.getClientToken, // 通过客户端获取token
+    "POST/getPwdToken": tokenFun.getPwdToken, // 通过密码模式获取token
 }

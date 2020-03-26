@@ -7,7 +7,7 @@ const common = require('./common')
 
 class vouchersFunc {
   //  获取领取优惠券列表
-  static async getVouchersListValue(ctx, params) {
+  static async getVouchersList(ctx, params) {
     return ctx
       .$get(
         ctx.nettyUrl +
@@ -22,7 +22,7 @@ class vouchersFunc {
   }
 
   //  获取我的优惠券列表
-  static async getUserVouchersListValue(ctx, params) {
+  static async getUserVouchersList(ctx, params) {
     return ctx
       .$get(
         ctx.nettyUrl +
@@ -37,12 +37,8 @@ class vouchersFunc {
   }
 
   //  领取优惠券
-  static async saveCouponsValue(ctx, params) {
-    let url =
-      "/coupons-aggregates?usrId=" +
-      params.usrId +
-      "&companyId=" +
-      params.companyId;
+  static async saveCoupons(ctx, params) {
+    let url = '/coupons-aggregates?usrId=' + params.usrId + '&companyId=' + params.companyId + '&vipInfoHdId=' + params.vipInfoHdId
     return ctx
       .$post(ctx.baseUrl + ctx.serverPortUrl.memberService + url, params)
       .then(res => {
@@ -90,20 +86,20 @@ class vouchersFunc {
 
   //  获取订单结算页面促销赠品信息
   static async getOrderPromotionValue(ctx, params) {
-    return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.promotion + "/online-hds/cart-temp-id/order-promotions", params).then(res => {
+    return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.promotion + "/online-hds/cart-temp-id/order-promotions/new", params).then(res => {
       return res;
     });
   }
 
   //  获取订单结算页面促销赠品信息(重构)
-  static async getNewOrderPromotionValue(ctx, params) {
+  static async getNewOrderPromotion(ctx, params) {
     return ctx.$get(ctx.baseUrl + ctx.serverPortUrl.promotion + "/online-hds/cart-temp-id/order-promotions/new", params).then(res => {
       return res;
     });
   }
 
   //  获取商品促销活动
-  static async getGoodsPromotionValue(ctx, params) {
+  static async getGoodsPromotion(ctx, params) {
     return ctx
       .$get(
         ctx.baseUrl +
@@ -117,7 +113,7 @@ class vouchersFunc {
   }
 
   //  获取促销标识
-  static async getGoodspmFlagValue(ctx, params) {
+  static async goodsPmFlag(ctx, params) {
     return ctx
       .$get(
         ctx.baseUrl +
@@ -131,7 +127,7 @@ class vouchersFunc {
   }
 
   //  获取促销赠品sku
-  static async getPromotionGoodskuValue(ctx, params) {
+  static async getPromotionGoodsSku(ctx, params) {
     return ctx
       .$get(
         ctx.baseUrl + ctx.serverPortUrl.promotion + "/promotion-goods-skus",
@@ -157,7 +153,7 @@ class vouchersFunc {
   }
 
   //  获取结算可用优惠券列表 (季老师，新版)   旧版为/valuecard-hds/ord-usable-coupons
-  static async getCouponsListValue(ctx, params) {
+  static async getOrderCouponsList(ctx, params) {
     return ctx
       .$get(
         ctx.nettyUrl +
@@ -172,7 +168,7 @@ class vouchersFunc {
   }
 
   //  根据卡编号 获取卡id
-  static async getCouponsIdValue(ctx, params) {
+  static async getCouponsId(ctx, params) {
     return ctx
       .$get(
         ctx.baseUrl +
@@ -186,7 +182,7 @@ class vouchersFunc {
   }
 
   //  选券后获取可用券id列表
-  static async getCanUseCouponsListValue(ctx, params) {
+  static async getCanUseCouponsList(ctx, params) {
     return ctx
       .$get(
         ctx.baseUrl +
@@ -214,20 +210,17 @@ class vouchersFunc {
   }
 
   //  结算页面优惠金额(包含积分) 建福
-  static async getOrderDiscountPointValue(ctx, params) {
+  static async getOrderDiscountPoint(ctx, params) {
     return ctx
       .$postUrl(
         ctx.nettyUrl +
         ctx.serverPortUrl.shoppingCart +
         common.newUrlKey +
         "/rtl-online-result-hds/preferential-amount-point" +
-        `?companyId=${params.companyId}&usrId=${params.usrId}&rtlOrdInterHdId=${params.rtlOrdInterHdId}&pointFlag=${params.pointFlag}&ownCompanyId=${params.ownCompanyId}&cardIds=${params.cardIds}`,
+        `?companyId=${params.companyId}&usrId=${params.usrId}&vipInfoHdId=${params.vipInfoHdId}&rtlOrdInterHdId=${params.rtlOrdInterHdId}&pointFlag=${params.pointFlag}&ownCompanyId=${params.ownCompanyId}&cardIds=${params.cardIds}` +
+        `&shopId=${params.shopId}&busContsCode=${params.busContsCode}`,
         params
       )
-      //   .$postUrl("http://1.1.6.162:28806/rtl-online-result-hds/preferential-amount-point" +
-      //       `?companyId=${params.companyId}&usrId=${params.usrId}&rtlOrdInterHdId=${params.rtlOrdInterHdId}&pointFlag=${params.pointFlag}&ownCompanyId=${params.ownCompanyId}&cardIds=${params.cardIds}`,
-      //       params
-      //   )
       .then(res => {
         return res;
       });

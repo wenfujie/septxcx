@@ -19,7 +19,7 @@ import http from "../../utils/http";
  */
 
 export const getFreight = config => {
-    return http.get("order/freight", config);
+    return http.get("order/getFreight", config);
 };
 
 /**
@@ -34,7 +34,7 @@ export const getFreight = config => {
  */
 
 export const getDiscount = config => {
-    return http.get("order/orderDiscount", config);
+    return http.get("order/getOrderDiscount", config);
 };
 
 /**
@@ -86,7 +86,7 @@ export const saveCartTemp = config => {
  */
 
 export const getSettlementInfo = config => {
-    return http.get("order/orderSettlementInfo", config);
+    return http.get("order/getOrderSettlementInfo", config);
 };
 
 /**
@@ -100,7 +100,7 @@ export const getSettlementInfo = config => {
  */
 
 export const getShipType = config => {
-    return http.get("order/shipType", config);
+    return http.get("order/getShipType", config);
 };
 
 /**
@@ -167,23 +167,6 @@ export const saveOrder = config => {
     return http.post("order/saveOrder", config);
 };
 
-/**
- * 获取结算页商品信息
- * @param config
- * var param = {
-    ownCompanyId
-    ordHdId 订单号
-    saleMeasureHdCode 预约工单code
-    usrId
-    companyId
-    }
- * @returns {*}
- */
-//预约量体-工单 聚合
-export const saleCtmmeasureAggregate = config => {
-    return http.put("order/saleCtmmeasureAggregate", config);
-};
-
 //获取物流信息
 export const thirdParty = config => {
     return http.post("thirdParty/getLogis", config);
@@ -194,11 +177,11 @@ export const getDetailInfo = config => {
 };
 // 获取列表
 export const getList = config => {
-    return http.get("order/getList", config);
+    return http.get("order/getOrderList", config);
 };
 // 取消订单
 export const cancel = config => {
-    return http.put("order/cancel", config);
+    return http.put("order/cancelOrder", config);
 };
 
 //再次购买
@@ -212,32 +195,16 @@ export const beforeSignUp = config => {
 };
 // 签收订单(确认收货)
 export const signUp = config => {
-    return http.put("order/confirmRcieved", config);
+    return http.put("order/confirmReceived", config);
 };
 
 // 获取微信分享签名
 export const getWxSignature = config => {
     return http.post("order/getWxSignature", config);
 };
-// 获取待评价订单详情，用于分享用途
-export const getDetail = config => {
-    return http.get("order/getDetail", config);
-};
-// 订单分享信息查询
-export const getShareItem = config => {
-    return http.get("order/getShareItem", config);
-};
-// 订单分享信息更新
-export const saveShareItem = config => {
-    return http.put("order/saveShareItem", config);
-};
 // 提交订单评价
 export const ordComment = config => {
-    return http.post("order/ordComment", config);
-};
-// 订单分享信息保存
-export const saveShareInfo = config => {
-    return http.post("order/saveShareInfo", config);
+    return http.post("order/saveOrderComment", config);
 };
 
 /**
@@ -271,12 +238,12 @@ export const handlePoints = config => {
 //
 
 export const orderPreferCal = config => {
-    return http.get("order/orderPreferCal", config);
+    return http.get("order/getOrderPreferCal", config);
 };
 
 // 执行会员升级
 export const packLevelUp = config => {
-    return http.post("order/packLvUp", config);
+    return http.post("order/packLevelUp", config);
 };
 
 /**

@@ -33,14 +33,10 @@ const tokenManager = {
 
   //  游客模式
   async getToken() {
-    let data = {
-      client_id: "wissClient",
-      client_secret: "wissClientSecret"
-    }
     return new Promise((reslove,reject) => {
       wx.request({
-        url: global.baseConstant.serverUrl + 'token/clientToken',
-        data: data,
+        url: global.baseConstant.serverUrl + 'token/getClientToken',
+        data: {},
         method: 'POST',
         success: (res) => {
           Storage.set('TOKENINFO',res.data,6660)  // 设置token存储时间为1小时52分钟

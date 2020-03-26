@@ -14,7 +14,9 @@ let url = config.tokenUrl || 'http://qishon-zuul-gateway.test.qs.com/uaa/oauth-c
 class getToken {
 
   //  通过客户端获取token
-  static async getclientToken(ctx, params) {
+  static async getClientToken(ctx, params) {
+    params.client_id = global.shopClientId
+    params.client_secret = global.shopClientSecret
     return axios.post(url, params).then((res) => {
       return res.data
     });

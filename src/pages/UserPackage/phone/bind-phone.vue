@@ -50,21 +50,24 @@ export default {
             time: 60, // 倒计时时间
             checkStatus: false, // 手机号是否允许绑定状态
             btnLock: false, //  绑定手机号按钮锁
-            type: 0, //绑定手机号为0 ，更换手机号为1
+            type: 0, //更换手机号为1
             phoneStatus: "",
-            title: "" //动态修改头部导航名字
+            title: "", //动态修改头部导航名字
+            successUrl: null, // 成功后的跳转
+            source: null // 来源
         };
     },
     onShow() {
         // 绑定手机成功后要跳转路由
         this.successUrl = this.$route.query.successUrl;
-        this.type = this.$route.query.type;
+        this.source = this.$route.query.source;
+        this.type = this.$route.query.type; //更换手机号为1
         if (this.type == 1) {
             this.phoneStatus = "确定";
-            this.title = "更换手机号";
+            this.title = "更换手机号"; //头部标题
         } else {
             this.phoneStatus = "立即绑定";
-            this.title = "绑定手机号";
+            this.title = "绑定手机号"; //头部标题
         }
         wx.setNavigationBarTitle({
             title: this.title //动态修改小程序头部标题
@@ -151,13 +154,13 @@ export default {
             let that = this;
             that.captchaLocked = true;
             that.captchaText = "验证码已发送";
-            let interval = setInterval(function() {
+            that.countDownData = setInterval(function() {
                 that.captchaText = "重新获取" + that.time + "s";
                 if (that.time-- <= 0) {
                     that.time = 60;
                     that.captchaLocked = false;
                     that.captchaText = "点击获取验证码";
-                    clearInterval(interval);
+                    clearInterval(that.countDownData);
                 }
             }, 1000);
         },
@@ -166,8 +169,10 @@ export default {
             if (this.btnLock === true) return;
             this.btnLock = true;
             if (this.type == 1) {
+                // 更换手机号
                 var verifyClassCodeStatus = "VERIFY_CHANGE_MOBILE";
             } else {
+                // 绑定手机号
                 var verifyClassCodeStatus = "VERIFY_BIND_MOBILE";
             }
             if (!global.isPhone(this.phoneNum)) {
@@ -200,25 +205,53 @@ export default {
             UserService.checkCaptcha(data)
                 .then(
                     () => {
-                        // 绑定手机号
+                        // 绑定手机号/更换手机号
                         let bindData = {
                             mobile: this.phoneNum,
                             buscontsId: global.baseConstant.busContsCode
                         };
                         UserService.bindMobile(bindData).then(
                             () => {
-                                Toast("绑定手机号成功~");
-                                this.btnLock = false;
-                                // this.getUser();
-                                let userInfo = global.Storage.get("USER_INFO");
-                                userInfo.mobilePhone = this.phoneNum;
-                                global.Storage.set("USER_INFO", userInfo);
-                                // 存在成功后需跳转地址
-                                if (this.successUrl) {
-                                    this.$router.replace(this.successUrl);
+                                // 更换手机号
+                                if (this.type == 1) {
+                                    Toast("更换绑定成功~");
+                                    this.btnLock = false;
+                                    // this.getUser();
+                                    let userInfo = global.Storage.get(
+                                        "USER_INFO"
+                                    );
+                                    userInfo.mobilePhone = this.phoneNum;
+                                    global.Storage.set("USER_INFO", userInfo);
+                                    // 存在成功后需跳转地址
+                                    if (this.successUrl) {
+                                        this.$router.replace(this.successUrl);
+                                    } else {
+                                        this.$router.go(-1);
+                                    }
+
                                 } else {
-                                    this.$router.go(-1);
+                                    // 绑定手机号,调用联合登录
+                                    global.updateUserInfo().then(res => {
+                                        Toast("绑定手机号成功~");
+                                        this.btnLock = false;
+                                        // global.sendCardCoupons() // 绑定手机号成功发券
+                                        if (res) {
+                                            // 来源搭配需要跳转回上一页
+                                            if (this.source && this.source === 'collocate') {
+                                                this.$router.go(-1);
+                                            } else {
+                                                this.$router.replace(
+                                                    this.successUrl ||
+                                                    "/pages/home/home"
+                                                );
+                                            }
+                                        } else {
+                                            this.$router.go(-1);
+                                        }
+                                    });
                                 }
+
+                                // })
                             },
                             () => {
                                 Toast("绑定手机出错~");

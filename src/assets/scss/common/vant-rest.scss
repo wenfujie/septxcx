@@ -8,9 +8,10 @@
  .footer-bar {
     .van-tabbar{
         height: auto !important;
+        padding-bottom: 0;
     }
     .van-tabbar-item{
-        padding-top:computed(7);
+        padding-top:computed(12);
     }
     .van-tabbar-item__icon {
        margin-bottom:computed(5);
@@ -87,7 +88,6 @@
 }
 .van-checkbox .van-icon-success{
     line-height:computed(38) !important;
-
 }
 
 .van-checkbox .van-checkbox__icon--checked .van-icon {
@@ -121,15 +121,10 @@
     width: 100%;
     height: computed(744);
     background-color: transparent !important;
-    // background:rgba(255,255,255,1);
-    // background-image: url('../assets/images/volume/redBag.png');
     border-radius: computed(10);
     overflow-y: initial !important;
 }
 
-// .container .van-tabs__line{
-//     width: computed(375)!important;
-// }
 
 //单选框颜色覆盖
 .van-radio .van-icon-checked {
@@ -154,17 +149,9 @@
     color: $blackcolor !important;
 }
 
-.van-picker-column__item--selected {
-    //color: $maincolor!important;
-}
-
 [class*=van-hairline]::after {
     display: none
 }
-
-// .design .van-list{
-//     height: computed(1700);
-// }
 
 //覆盖loading样式
 .van-loading--white {
@@ -193,55 +180,6 @@
     }
 }
 
-// .van-stepper {
-//     height: 100%;
-
-//     .van-stepper__minus {
-//         width: computed(88);
-//         height: 100%;
-//         border-top: 1px solid $text-secondary;
-//         border-right: none;
-//         border-bottom: 1px solid $text-secondary;
-//         border-left: 1px solid $text-secondary;
-//         border-top-left-radius: computed(5);
-//         border-bottom-left-radius: computed(5);
-
-//         &.van-stepper__minus--disabled {
-//             background-color: $color-white;
-//             border-top: 1px solid $text-placeholder;
-//             border-right: none;
-//             border-bottom: 1px solid $text-placeholder;
-//             border-left: 1px solid $text-placeholder;
-//         }
-//     }
-
-//     .van-stepper__input {
-//         width: computed(80);
-//         height: 100%;
-//         box-sizing: border-box;
-//         border: 1px solid $text-secondary;
-//     }
-
-//     .van-stepper__plus {
-//         width: computed(88);
-//         height: 100%;
-//         border-top: 1px solid $text-secondary;
-//         border-right: 1px solid $text-secondary;
-//         border-bottom: 1px solid $text-secondary;
-//         border-left: none;
-//         border-top-right-radius: computed(5);
-//         border-bottom-right-radius: computed(5);
-
-//         &.van-stepper__plus--disabled {
-//             background-color: $color-white;
-//             border-top: 1px solid $text-placeholder;
-//             border-right: 1px solid $text-placeholder;
-//             border-bottom: 1px solid $text-placeholder;
-//             border-left: none;
-//         }
-//     }
-// }
-
  // 复写有赞样式
 .van-cell-reset {
     border-bottom: dashed 1px #cccccc;
@@ -264,6 +202,11 @@
 .radio-box {
     margin-left: computed(40);
 
+    .van-radio__icon--checked{
+        background-color: $domaincolor !important;
+        border-color: $domaincolor !important;
+    }
+
     .radio {
         height: 100%;
         display: flex;
@@ -274,6 +217,9 @@
         .van-radio__input {
             font-size: $font-common;
             height: $font-common;
+            .van-radio__icon--checked{
+                color: $domaincolor !important;
+            }
         }
 
         .van-radio__label {
@@ -307,15 +253,12 @@
         padding-right: computed(20);
         word-wrap: break-word;
         padding-left: 0;
-
-        &:not(:last-child)::after {
-            // border-bottom: none;
+        .van-field__input {
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-
-        &:last-child {
-            // border-bottom: none;
-        }
-
         .van-field__control {
             &::-webkit-input-placeholder {
                 color: #cccccc;
@@ -329,7 +272,6 @@
                 color: #cccccc;
             }
         }
-
     }
 }
 
@@ -339,16 +281,6 @@
     border-color: $domaincolor;
     // 转mpvue后 无需设置background-color
     // background-color: $domaincolor;
-}
-
-// 复选框
-.goods-item .van-checkbox__icon .van-icon {
-    // border: computed(2) solid $color-white;
-}
-
-// 复选框未选中样式
-.van-checkbox__icon .van-icon {
-    //   border: computed(2) solid $text-secondary;
 }
 
 .van-checkbox__label {
@@ -484,4 +416,12 @@
 .van-checkbox__icon--disabled{
     background-color: $color-light-gray !important;
     border-color: $text-gray !important;
+}
+
+// 会员整合页 覆盖表单下边线
+.form-item{
+    .van-cell:after{
+        content: " ";
+        border-bottom: none!important;
+    }
 }

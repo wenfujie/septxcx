@@ -9,8 +9,8 @@
         <div class="qr-code-box">
             <!-- 会员头像 -->
             <div class="avatar"
-                 :style="{ background : (!!usrInfo.photoThumb ? 'url('+ usrInfo.photoThumb +') no-repeat center' : 'url('+ filter.imgFilter(usrInfo.photoThumb) +') no-repeat center')}">
-                <!--<img v-lazy="usrInfo.photoThumb" alt="" :key="usrInfo.photoThumb">-->
+                 :style="{ background : 'url('+ filter.imgFilter(usrInfo.photoThumb, company_id, '150*150') +') no-repeat center'}">
+                <!--<img :src="filter.imgFilter(usrInfo.photoThumb, company_id, '150*150')" alt="">-->
             </div>
             <!--<div class="avatar">-->
             <!--<img v-lazy="usrInfo.photoThumb" alt="" :key="usrInfo.photoThumb">-->
@@ -63,14 +63,18 @@
             handleLongPress(e){
                 wx.previewImage({
                     urls: [this.qrcode],
-                    success: ()=>{
-                        console.log("成功")
-                    }
+                    success: ()=>{}
                 })
             },
             //  获取个人信息
             getUserInfo() {
                 let data = {};
+
+                //  会员整合新增选中分销商查询
+                if(!!this.$store.state.distribution.accountInfo.id) {
+                    data.vipInfoHdId = this.$store.state.distribution.accountInfo.vipInfoHdId
+                }
+
                 UserService.getUserInfo(data).then((res) => {
                     this.usrInfo = res;
                     this.getQrcode()
@@ -82,11 +86,17 @@
                 let data = {
                     vipId: this.vipId
                 }
+
+                //  会员整合新增选中分销商查询
+                if(!!this.$store.state.distribution.accountInfo.id) {
+                    data.vipId = this.$store.state.distribution.accountInfo.vipInfoHdId
+                }
+
                 Distribution.getWechatQrcode(data).then((res) => {
-                    console.log("两个接口加载完成...")
+//                    console.log("两个接口加载完成...")
                     this.qrcode = res
                     global.getImgBase64ToLocalUrl(this.qrcode).then(res=>{
-                    console.log("图片转成本地地址")
+//                    console.log("图片转成本地地址")
                         this.createNewImg(res)
                     })
 
@@ -171,7 +181,7 @@
                     destHeight: this.canvasHeight,
                     canvasId: 'canvas',
                     success:(res)=> {
-                    console.log("绘画完成...")
+//                    console.log("绘画完成...")
                         that.qrcode = res.tempFilePath
                         global.toastLoading(false);// 关闭
 

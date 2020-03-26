@@ -81,24 +81,24 @@
             border-right: none;
         }
         .shaixuan {
-            width: computed(15);
-            height: computed(18);
-            padding: computed(10) 0 0 computed(10);
+            display: inline-block;
+            font-size: computed(26);
         }
     }
 }
 .header-item-sort {
-    width: computed(12);
-    height: computed(20);
-    padding: computed(10) 0 0 computed(10);
+    width: computed(20);
+    height: computed(25);
+    padding: computed(7) 0 0 computed(10);
 }
+
 .good-list {
     display: flex;
     flex-wrap: wrap;
     padding: computed(120) computed(16) computed(0) computed(16);
     .checkbox {
         position: absolute;
-        margin:computed(20) 0 0 computed(-130);
+        margin:computed(20);
         z-index: 9;
     }
     .img-shadow {
@@ -107,6 +107,7 @@
         height: computed(345);
         background: rgba(0, 0, 0, 1);
         opacity: 0.3;
+        border-radius: computed(20) computed(20) 0 0;
     }
 }
 .goods-list {
@@ -121,13 +122,16 @@
     background: rgba(255, 255, 255, 1);
     margin: 0 computed(9) computed(20) computed(6);
     .cuxiao{
-        width:computed(120);
-        height:computed(32);
+        width:computed(60);
+        height:computed(60);
         position: absolute;
-        border-radius:computed(16);
-        margin:computed(16) 0 0 computed(-95);
+        border-radius:computed(10);
+        margin:computed(15) 0 0 computed(120);
+        z-index:5;
+        // background:red;
     }
     .good-item-img {
+        position: relative;
         width: computed(345);
         height: computed(345);
         img {
@@ -177,7 +181,7 @@
         height: 92%;
         width: computed(660);
         overflow-x: hidden;
-        overflow-y: auto;
+        // overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         background-color: $color-white;
 
@@ -223,6 +227,9 @@
                 background-color: $color-background;
                 margin: computed(18) computed(20) 0 0;
                 border-radius: $btn-radius25;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
             .checked {
                 background: $domaincolor;

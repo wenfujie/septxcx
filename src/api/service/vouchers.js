@@ -18,7 +18,7 @@ import http from '../../utils/http'
     }
  * @returns {*}
  */
-export const getVouchersList = (config) => { return http.get('vouchers/vouchersList',config); }
+export const getVouchersList = (config) => { return http.get('vouchers/getVouchersList',config); }
 
 /**
  * 获取我的优惠券列表
@@ -33,7 +33,7 @@ export const getVouchersList = (config) => { return http.get('vouchers/vouchersL
     }
  * @returns {*}
  */
-export const userVouchersList = (config) => { return http.get('vouchers/userVouchersList',config); }
+export const userVouchersList = (config) => { return http.get('vouchers/getUserVouchersList',config); }
 
 /**
  * 领取优惠券
@@ -51,44 +51,6 @@ export const userVouchersList = (config) => { return http.get('vouchers/userVouc
 export const saveCoupons = (config) => { return http.post('vouchers/saveCoupons',config); }
 
 /**
- * 购买优惠券
- * @param config
- * var param = {
-   "usrId":"用户ID",
-   "companyId":"公司ID",
-   "shopCode":"店铺编码",
-   "couponsId":"优惠劵ID"
-   "cardHdId":"储值卡ID"[增加储值卡分支]
-    }
- * @returns {*}
- */
-export const buyCoupons = (config) => { return http.post('vouchers/buyCoupons',config); }
-
-
-/**
- * 清空优惠券
- * @param config
- * var param = {
-   "usrId":"用户ID",
-   "companyId":"公司ID",
-   couponCategory: 'D_VALCARDUSEED(已使用)'/ 'D_VALCARDOVERD(已过期)'
-    }
- * @returns {*}
- */
-export const deleteCoupons = (config) => { return http.put('vouchers/deleteCoupons',config); }
-
-/**
- * 获取结算可用优惠信息 (超鸿)
- * @param config
- * var param = {
-   "usrId":"用户ID",
-   "companyId":"公司ID",
-    }
- * @returns {*}
- */
-export const getSettlementDiscount = (config) => { return http.get('vouchers/settlementDiscount',config); }
-
-/**
  * 获取结算可用优惠信息 (季老师)
  * @param config
  * var param = {
@@ -100,7 +62,7 @@ export const getSettlementDiscount = (config) => { return http.get('vouchers/set
     }
  * @returns {*}
  */
-export const getOrderCouponsList = (config) => { return http.get('vouchers/couponsList',config); }
+export const getOrderCouponsList = (config) => { return http.get('vouchers/getOrderCouponsList',config); }
 
 /**
  * 根据卡编号 获取卡id
@@ -114,7 +76,7 @@ export const getOrderCouponsList = (config) => { return http.get('vouchers/coupo
     }
  * @returns {*}
  */
-export const getCouponsId = (config) => { return http.get('vouchers/couponsId',config); }
+export const getCouponsId = (config) => { return http.get('vouchers/getCouponsId',config); }
 
 /**
  * 选券后获取可用券id列表 (季老师)
@@ -129,21 +91,7 @@ export const getCouponsId = (config) => { return http.get('vouchers/couponsId',c
     }
  * @returns {*}
  */
-export const getCanUseCouponsList = (config) => { return http.get('vouchers/canUseCouponsList',config); }
-
-/**
- * 获取订单结算页的促销信息
- * @param config
- * var param = {
-   "usrId":"用户ID",
-   "companyId":"公司ID",
-   "shopCode":"店铺编码",
-   "rtlCartTempHdId":"购物车中间表key",
-   "busContsCode":"业务触点"
-    }
- * @returns {*}
- */
-export const getOrderPromotion = (config) => { return http.get('vouchers/orderPromotion',config); }
+export const getCanUseCouponsList = (config) => { return http.get('vouchers/getCanUseCouponsList',config); }
 
 /**
  * 获取赠品
@@ -165,60 +113,7 @@ export const getNewOrderPromotion = (config) => { return http.get('vouchers/getN
     }
  * @returns {*}
  */
-export const getGoodsPromotion = (config) => { return http.get('vouchers/goodsPromotion',config); }
-
-/**
- * 获取商品促销标识图标
- * @param config
- * var param = {
-    companyId: "公司ID",
-    shopCode: "店铺编码",
-    partCode: "商品编码",
-    ownCompanyId: 公司id
-    }
- * @returns {*}
- */
-export const getGoodspmFlag = (config) => { return http.get('vouchers/goodspmFlag',config); }
-
-/**
- * 获取促销赠品sku
- * @param config
- * var param = {
-    usrId: "用户ID",
-    companyId: "公司ID",
-    busContsCode: "业务触点",
-    goodsCode: "赠品编码",
-    groupId: "赠品组主键"
-    }
- * @returns {*}
- */
-export const getPromotionGoodsSku = (config) => { return http.get('vouchers/promotionGoodsSku',config); }
-
-/**
- * 获取促销赠品库存
- * @param config
- * var param = {
-    giftId: 赠品行key
-    goodsCode: 赠品编码
-    skuCode :
-    companyId: 公司ID
-    }
- * @returns {*}
- */
-export const promotionGoodsInventory = (config) => { return http.get('vouchers/promotionGoodsInventory',config); }
-
-/**
- * 获取商品促销活动
- * @param config
- * var param = {
-    usrId: "用户ID",
-    companyId: "公司ID",
-    rtlOrdInterHdId: 中间表id,
-    cardIds: '卡券id',
-    }
- * @returns {*}
- */
-export const getOrderDiscount = (config) => { return http.post('vouchers/orderDiscount',config); }
+export const getGoodsPromotion = (config) => { return http.get('vouchers/getGoodsPromotion',config); }
 
 /**
  * 获取商品促销活动(包含积分)
@@ -232,7 +127,7 @@ export const getOrderDiscount = (config) => { return http.post('vouchers/orderDi
     }
  * @returns {*}
  */
-export const getOrderDiscountPoint = (config) => { return http.post('vouchers/orderDiscountPoint',config); }
+export const getOrderDiscountPoint = (config) => { return http.post('vouchers/getOrderDiscountPoint',config); }
 
 /**
  * 加入微信卡券获取参数
@@ -246,19 +141,16 @@ export const getOrderDiscountPoint = (config) => { return http.post('vouchers/or
     }
  * @returns {*}
  */
-export const getWxconfig = (config) => { return http.post('vouchers/wxConfig',config); }
+export const getWxconfig = (config) => { return http.post('vouchers/getWxConfig',config); }
 
 /**
- * 获取商品可使用一次性储值卡
+ * 发卡发券
  * @param config
  * var param = {
       "ownCompanyId":
       "companyId":
-      "ptiPartCode": 单品goodcode
-      "combPartCode": 组合goodcode
-      "dptId": 店铺id
-      "usrId": （非必填）
+      "usrId": 用户id
     }
  * @returns {*}
  */
-export const getGoodUsableVlaueCard = (config) => { return http.get('vouchers/usableVlaueCard',config); }
+export const sendCardCoupons = (config) => { return http.put('vouchers/sendCardCoupons',config); }

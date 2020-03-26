@@ -16,7 +16,12 @@ import * as Order from './service/order'  // 订单模块
 import * as Payment from './service/payment'  // 支付模块
 import * as Salon from './service/salon'  // 线下沙龙模块
 import * as Fund from './service/fund'  // 资金模块
+import * as Point from './service/point'  // 积分模块
 import * as Distribution from './service/distribution'  // 分销模块
+import * as Invoice from './service/invoice'  // 发票模块
+import * as ThirdParty from './service/thirdParty'  // 发票模块
+import * as Fission from './service/fission'  // 裂变模块
+
 
 
 export {
@@ -32,5 +37,9 @@ export {
     Payment,
     Salon,
     Fund,
-    Distribution
+    Point,
+    Distribution,
+    Invoice,
+    ThirdParty,
+    Fission
 };

@@ -7,18 +7,12 @@
 import http from '../../utils/http'
 
 /**
- * 获取常数值
- * @returns {*}
- */
-export const getBase = () => { return http.get('base/constants'); }
-
-/**
  * 获取门店列表
  * @param config
  * var params = { code: 省市区编码 ,pageNo: 1 , pageSize: 10 }
  * @returns {*}
  */
-export const getShopList = (config) => { return http.get('base/shopList',config); }
+export const getShopList = (config) => { return http.get('base/getShopList',config); }
 
 
 /**
@@ -26,21 +20,7 @@ export const getShopList = (config) => { return http.get('base/shopList',config)
  * @param config
  * @returns {*}
  */
-export const getDestnation = () => { return http.get('base/destnation'); }
-
-/**
- * 获取购物平台设置
- * @returns {*}
- */
-export const getPlamset = () => { return http.get('base/plamset'); }
-
-/**
- * 获取二级域名解析
- * @param config
- * var params = { companyUrl: 域名 }
- * @returns {*}
- */
-export const getCompanyQuery = (config) => { return http.get('base/companyQuery',config); }
+export const getDestnation = () => { return http.get('base/getDestnation'); }
 
 /*
 * 图片上传
@@ -56,4 +36,20 @@ export const imgUpload = (config) => { return http.post('file-system/imgUpload',
  * var params = { }
  * @returns {*}
  */
-export const getCompanyById = (config) => { return http.get('base/getCompanyById',config); }
+export const getCompanyById = (config) => { return http.get('base/getCompanyById', config); }
+
+/**
+ * 通过APPID获取基础参数
+ * @param config
+ * var params = {
+ *      appId: 小程序唯一标识
+  * }
+ * @returns {*}
+ */
+export const getBaseParams = (config) => { return http.get('base/getBaseParams',config); }
+
+/**
+ * 获取省市区数据
+ * @returns {*}
+ */
+export const getCityData = (config) => { return http.get('base/getCityData'); }

@@ -34,9 +34,8 @@
 </template>
 <script>
 import Toast from "vant-weapp/dist/toast/toast";
-import MyVouchers from "@/components/MyVouchers";
 import couponList from "./components/couponList";
-import { Vouchers, Order } from "@/api/service";
+import { Vouchers } from "@/api/service";
 import Empty from "@/components/EmptyContent.vue";
 export default {
     config: {
@@ -45,7 +44,6 @@ export default {
         backgroundTextStyle: "dark"
     },
     components: {
-        MyVouchers,
         couponList,
         empty: Empty
     },
@@ -81,7 +79,7 @@ export default {
     },
     onShow() {
         // 默认显示未使用优惠券
-        this.handleCarList();
+        this.onRefresh();
         setTimeout(() => {
             wx.pageScrollTo({
                 scrollTop: 0,
@@ -158,10 +156,14 @@ export default {
                 global.toastLoading(false);
                 return;
             }
-
+            let cardList = this.cardList;
+            if (this.pageNum == 1) {
+                cardList = [];
+            }
             res.list.forEach(item => {
-                this.cardList.push(item);
+                cardList.push(item);
             });
+            this.cardList = cardList;
             if (!this.cardList.length) {
                 this.showEmpty = true;
             }

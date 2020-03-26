@@ -1,3 +1,4 @@
+
 /*
 * createTime：2018/11/1
 * author：lan.chen
@@ -24,7 +25,7 @@
                     :scroll-into-view="navId"
                     scroll-with-animation="true"
                     scroll-y
-                    :style="{height:scrollHeight-20+'px'}"
+                    :style="{height:scrollHeight+'px'}"
                     :scroll-top="scrollTops"
                 >
                     <ul class="tab-list">
@@ -48,29 +49,29 @@
                 <swiper
                     autoplay="true"
                     interval="3000"
-                    :class="imageList.length===0?'swipe-boxs':'swipe-box'"
+                    class="swipe-box"
+                    :style="{height:imageList.length==0?'0'+'rpx':''}"
                 >
                     <block v-for="(image, index) in imageList" :key="index">
                         <swiper-item>
                             <img
                                 class="banner"
                                 lazy-load="true"
-                                :src="filter.imgFilter(image.coverFileUrl,company_id)"
+                                :src="filter.imgFilter(image.coverFileUrl,company_id, '570*750')"
                                 :key="image.coverFileUrl"
                                 @click="goUrl(image.url)"
-                                @onerror="global.errImg(event)"
                             />
                         </swiper-item>
                     </block>
                 </swiper>
-                <div :class="imageList.length===0?'rightConts':'rightCont'">
+                <div class="rightCont" :style="{paddingTop:imageList.length==0?'0'+'rpx':''}">
                     <scroll-view
                         scroll-y="true"
                         @scroll="onScroll"
                         :scroll-into-view="contentId"
                         scroll-with-animation="true"
                         class="foods-wrapper"
-                        :style="{height:scrollHeight+150+'px'}"
+                        :style="{height:scrollHeight+'px'}"
                     >
                         <div
                             class="material-parent"
@@ -78,24 +79,24 @@
                             :id="'con_'+i"
                             :key="i"
                         >
-                            <div class="material2">
-                                <div class="material2-title" @click="goListPage(classItem,url)">
+                            <div class="material-body">
+                                <div class="material-title" @click="goListPage(classItem,url)">
                                     <p>{{classItem.cmsBusconclaHdName}}</p>
-                                    <p class="material2-title-more">
+                                    <p class="material-title-more">
                                         查看更多
                                         <span class="iconfont iconxuanzexiao"></span>
                                     </p>
                                 </div>
-                                <ul class="material2-list">
+                                <ul class="material-list">
                                     <li
-                                        class="material2-list-item"
+                                        class="material-list-item"
                                         :key="item.cmsBusconclaHdCode"
                                         @click="goListPage(item)"
-                                        v-for="(item,index) in classItem.childs"
+                                        v-for="item in classItem.childs"
                                     >
                                         <img
                                             class="item_img_border"
-                                            :src="filter.imgFilter(item.picUrl,company_id)"
+                                            :src="filter.imgFilter(item.picUrl,company_id, '150*150')"
                                             :key="item.picUrl"
                                             lazy-load="true"
                                         />
@@ -109,7 +110,6 @@
                 </div>
             </div>
         </div>
-        <van-toast id="van-toast" />
     </div>
 
     <!--底部导航-->
@@ -131,7 +131,6 @@ export default {
             classList: [], //分类列表
             needAddHeight: 0, //设置底部需增加高度
             imageList: [], //头部轮播图
-            fflb: global.pageCode.index.children.fflb, // 爆款全场
             company_id: "",
             contentId: "", // 每个food-list的id，scroll-into-view滚动到对应的id
             navId: "", // 导航模块对应的id，用来联动内容区域
@@ -143,10 +142,11 @@ export default {
             lastHeight: 0, //最后一个内部块的高度
             scrollHeight: 0, //滚动高度
             scrollTops: 0, //左侧距离顶部距离\
-            value: ""
+            keyWord: "" //关键词
         };
     },
     created() {
+        this.scrollTops = 0;
         this.company_id = global.Storage.get("COMPANYID").company_id;
         this.getNavList();
         this.getImage();
@@ -162,7 +162,7 @@ export default {
         //  跳转搜索页
         goSearch() {
             this.$router.push(
-                "/pages/goodsPackage/goods/good-search?value=" + this.value
+                "/pages/goodsPackage/goods/good-search?keyWord=" + this.keyWord
             );
         },
         //  下拉刷新
@@ -226,7 +226,7 @@ export default {
                 .boundingClientRect(rect => {
                     this.lastHeight = rect.height;
                     this.needAddHeight =
-                        this.contentHeight - this.lastHeight - 70;
+                        this.contentHeight - this.lastHeight - 20;
                 });
             // 获取每个导航栏高度
             query
@@ -244,7 +244,9 @@ export default {
         goListPage(item, url) {
             this.$router.push(
                 "/pages/goodsPackage/goods/good-list?classId=" +
-                    item.cmsBusconclaHdCode
+                    item.cmsBusconclaHdCode +
+                    "&brandId=" +
+                    item.brandId
             );
         },
         // 获取导航栏元素
@@ -276,8 +278,6 @@ export default {
                         item.cmsBackpageDtDtoList.length > 0
                     ) {
                         item.cmsBackpageDtDtoList.forEach((itm, itmIndex) => {
-                            // banner
-                            // balongshouye是由跟后台配置约定，需事先知道
                             if (
                                 itm.cmsBackpageDtCode ===
                                     global.pageCode.index.children.fflb &&
@@ -310,7 +310,7 @@ export default {
     },
     watch: {
         classList() {
-            // 获取模块高度，即food-list
+            // 获取模块高度
             setTimeout(() => {
                 this.getFoodHeight();
             }, 1000);
@@ -379,12 +379,11 @@ swiper {
     }
 }
 .main {
-    position: absolute;
     width: 100%;
     display: flex;
     overflow-y: hidden !important;
     box-sizing: border-box;
-    margin-top: computed(110);
+    padding-top: computed(110);
     .swipe-box {
         position: fixed;
         left: computed(182);
@@ -396,9 +395,6 @@ swiper {
             width: computed(570);
             height: 100%;
         }
-    }
-    .swipe-boxs {
-        height: 0;
     }
 }
 .main-left {
@@ -445,7 +441,7 @@ swiper {
 }
 .main-right {
     flex: 1;
-    width: 80%;
+    width: 100%;
     box-sizing: border-box;
     ::-webkit-scrollbar {
         width: 0;
@@ -453,15 +449,9 @@ swiper {
         color: transparent;
     }
     .rightCont {
-        position: absolute;
+        width: 100%;
         -webkit-overflow-scrolling: touch;
         padding-top: computed(580);
-        box-sizing: border-box;
-    }
-    .rightConts {
-        position: absolute;
-        -webkit-overflow-scrolling: touch;
-        padding-top: computed(0);
         box-sizing: border-box;
     }
 }
@@ -469,58 +459,51 @@ swiper {
     text-align: center;
     padding: 0 computed(30);
 }
-.material-title {
-    display: flex;
-    justify-content: space-between;
-    font-size: computed(28);
-    font-weight: bold;
-    padding: computed(60) 0;
-}
-.material2 {
-    text-align: center;
-    margin: computed(13) computed(30) computed(0) computed(30);
-}
 .material-parent {
+    .material-body {
+        text-align: center;
+        margin: computed(13) computed(30) computed(0) computed(30);
+    }
     &:first-child {
-        .material2 {
+        .material-body {
             border-top: none;
         }
     }
-}
-.material2-title {
-    width: 100%;
-    text-align: center;
-    font-size: computed(30);
-    line-height: computed(48);
-    color: $text-primary;
-    font-weight: bold;
-    .material2-title-more {
-        font-size: computed(24);
-        font-weight: 500;
-        .van-icon-arrow::before {
-            font-size: $font-small;
+    .material-title {
+        width: 100%;
+        text-align: center;
+        font-size: computed(30);
+        line-height: computed(48);
+        color: $text-primary;
+        font-weight: bold;
+        .material-title-more {
+            font-size: computed(24);
+            font-weight: 500;
+            .van-icon-arrow::before {
+                font-size: $font-small;
+            }
         }
     }
-}
-.material2-list {
-    display: flex;
-    flex-wrap: wrap;
-    margin: computed(20) 0 computed(23) 0;
-    border-bottom: computed(1) solid #cccccc;
-    .material2-list-item {
-        width: 33.3%;
-        padding-bottom: computed(16);
-        .item_img_border {
-            width: computed(150);
-            height: computed(150);
-            background: rgba(255, 255, 255, 1);
-        }
+    .material-list {
+        display: flex;
+        flex-wrap: wrap;
+        margin: computed(20) 0 computed(23) 0;
+        border-bottom: computed(1) solid #cccccc;
+        .material-list-item {
+            width: 33.3%;
+            padding-bottom: computed(16);
+            .item_img_border {
+                width: computed(150);
+                height: computed(150);
+                background: rgba(255, 255, 255, 1);
+            }
 
-        .item-describe {
-            margin: computed(17) 0 computed(10) 0;
-            font-size: computed(24);
-            text-align: center;
-            color: $text-primary;
+            .item-describe {
+                margin: computed(17) 0 computed(10) 0;
+                font-size: computed(24);
+                text-align: center;
+                color: $text-primary;
+            }
         }
     }
 }
